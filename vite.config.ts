@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
       port: Number.parseInt(env.VITE_PORT) || 5173,
       proxy: {
         "/storage": {
-          target: env.VITE_API_URL || "http://localhost:9000",
+          target: env.VITE_API_URL || "http://localhost:8000",
           changeOrigin: true,
         },
       },
