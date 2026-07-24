@@ -3,9 +3,12 @@ import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import heroImg from './assets/hero.png'
 import './App.css'
+import { useNotification } from './hooks/useNotification'
 
 function App() {
   const [count, setCount] = useState(0)
+
+  const { notifications } = useNotification('1');
 
   return (
     <>
@@ -26,7 +29,7 @@ function App() {
           className="counter"
           onClick={() => setCount((count) => count + 1)}
         >
-          Count is {count}
+          <span className='text-white'>Count is {count}</span>
         </button>
       </section>
 
@@ -55,61 +58,35 @@ function App() {
           </ul>
         </div>
         <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+          <div className="w-full max-w-md rounded-xl border border-slate-700/60 bg-slate-900/50 p-5 shadow-lg backdrop-blur-md text-left">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="m-0 text-base font-semibold text-slate-100">
+                Notifikasi Real-time
+              </h3>
+              <span className="rounded-full bg-indigo-500/10 px-2.5 py-0.5 text-xs font-medium text-indigo-400 border border-indigo-500/20">
+                {notifications.length} Baru
+              </span>
+            </div>
+
+            {notifications.length === 0 ? (
+              <div className="py-6 text-center text-slate-400">
+                <span className="text-2xl block mb-1 opacity-70">🔔</span>
+                <p className="text-sm m-0">Belum ada notifikasi baru.</p>
+              </div>
+            ) : (
+              <ul className="m-0 p-0 list-none space-y-2 max-h-60 overflow-y-auto pr-1">
+                {notifications.map((msg, index) => (
+                  <li
+                    key={index}
+                    className="flex items-start gap-3 rounded-lg border border-slate-800 bg-slate-800/40 p-3 text-sm text-slate-200 transition hover:bg-slate-800/80"
+                  >
+                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]" />
+                    <p className="m-0 leading-relaxed">{msg}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
       </section>
 

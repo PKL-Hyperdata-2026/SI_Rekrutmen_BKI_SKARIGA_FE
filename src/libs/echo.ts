@@ -14,10 +14,11 @@ export const echo = new Echo({
   key: import.meta.env.VITE_REVERB_APP_KEY,
   wsHost: import.meta.env.VITE_REVERB_HOST,
   wsPort: import.meta.env.VITE_REVERB_PORT,
+  wssPort: import.meta.env.VITE_REVERB_PORT,
   forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
   enabledTransports: ['ws', 'wss'],
 
-  authEndpoint: `${import.meta.env.VITE_API_URL}/api/broadcasting/auth`,
+  authEndpoint: `${import.meta.env.VITE_API_URL}/broadcasting/auth`,
   auth: {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token')}`,
