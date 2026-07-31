@@ -1,33 +1,30 @@
 import { LoginForm } from "../components/login-form";
-import { FileText } from "lucide-react";
 
 export function LoginPage() {
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
-      {/* Kiri: Form */}
-      <div className="flex flex-col gap-4 p-6 md:p-10">
-        <div className="flex justify-center gap-2 md:justify-start">
-          <div className="flex items-center gap-2 font-bold text-lg text-foreground">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-md">
-              <FileText className="h-5 w-5" />
-            </div>
-            BKI Rekrutmen
-          </div>
-        </div>
-        <div className="flex flex-1 items-center justify-center">
-          <div className="w-full max-w-sm">
-            <LoginForm />
-          </div>
-        </div>
-      </div>
-      
-      {/* Kanan: Gambar Unsplash */}
-      <div className="relative hidden bg-muted lg:block">
+    <div className="theme-siswa flex flex-col lg:flex-row min-h-screen bg-background text-foreground">
+      <div className="relative w-full h-[28vh] lg:h-auto lg:flex-1 lg:order-2 overflow-hidden">
+        
+        <svg 
+          className="absolute left-0 top-0 h-full w-[350px] xl:w-[450px] z-10 hidden lg:block" 
+          viewBox="0 0 500 1000" 
+          preserveAspectRatio="none"
+        >
+          <path 
+            d="M0,-10 L450,-10 C450,200 100,300 150,500 C200,700 500,800 150,1010 L0,1010 Z" 
+            className="fill-background" 
+          />
+        </svg>
+
         <img
-          src="https://images.unsplash.com/photo-1572544731033-c41d0ed8316c?q=80&w=735&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          alt="BKI Vessel"
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.4] dark:grayscale-0"
+          src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="Classroom"
+          className="absolute inset-0 h-full w-full object-cover"
         />
+      </div>
+
+      <div className="w-full lg:w-[50%] flex-shrink-0 relative z-20 flex flex-col px-6 pt-5 pb-6 lg:p-24 justify-center lg:order-1 bg-background -mt-4 lg:mt-0 rounded-t-3xl lg:rounded-none">
+        <LoginForm />
       </div>
     </div>
   );

@@ -97,6 +97,36 @@
   --sidebar-ring: oklch(0.708 0 0)
 }
 
+/* Color Palette Siswa / Alumni */
+.theme-siswa {
+  --background: #FDFDFD;
+  --foreground: #111827;
+  --primary: #287DCE;
+  --primary-foreground: #FDFDFD;
+  --accent: #042442;
+  --accent-foreground: #FDFDFD;
+}
+
+/* Color Palette Admin BKK */
+.theme-admin {
+  --background: #FDFDFD;
+  --foreground: #111827;
+  --primary: #7C3AED;
+  --primary-foreground: #FDFDFD;
+  --accent: #552FB8;
+  --accent-foreground: #FDFDFD;
+}
+
+/* Color Palette HRD */
+.theme-hrd {
+  --background: #FDFDFD;
+  --foreground: #111827;
+  --primary: #D069D7;
+  --primary-foreground: #FDFDFD;
+  --accent: #8D1D96;
+  --accent-foreground: #FDFDFD;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --text: #9ca3af;
