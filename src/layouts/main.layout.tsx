@@ -1,20 +1,54 @@
 import { Outlet, Navigate, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/hooks/useApp";
-import { logout } from "@/slices/authSlice";
+import { logout, setCredentials } from "@/slices/authSlice";
+import { useEffect, useState } from "react";
+import { api } from "@/api/axios";
+import { Loader2 } from "lucide-react";
 
 export function MainLayout() {
   const token = localStorage.getItem("access_token");
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
+  const [fetchingUser, setFetchingUser] = useState(!user && !!token);
+
+  useEffect(() => {
+    if (token && !user) {
+      api.get('/me')
+      .then((res) => {
+        dispatch(setCredentials(res.data.user));
+      })
+      .catch(() => {
+        dispatch(logout());
+      })
+      .finally(() => {
+        setFetchingUser(false);
+      });
+    }
+  }, [token, user, dispatch]);
 
   if (!token) {
     return <Navigate to="/login" replace />;
   }
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/login");
+  if (fetchingUser) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-900 text-white">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const handleLogout = async () => {
+    try {
+      await api.post('/logout');
+    } catch (error) {
+      console.error(`Kesalahan saat logout: ${error}`);
+    }
+    finally {
+      dispatch(logout());
+      navigate('/login');
+    }
   };
 
   return (
