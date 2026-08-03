@@ -2,9 +2,9 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { authRoute } from "./features/auth/route";
 import { AuthLayout } from "./layouts/auth.layout";
 import { MainLayout } from "./layouts/main.layout";
-import { ProtectedRoute } from "./components/auth/protected-route";
-import { useAppSelector } from "./hooks/useApp";
-import { DashboardRedirector } from "./components/auth/dashboard-redirector";
+import { ProtectedRoute } from "./features/auth/components/protected-route";
+import { DashboardRedirector } from "./features/auth/components/dashboard-redirector";
+import { studentRoute } from "./features/student/route";
 
 export const router = createBrowserRouter([
   {
@@ -19,17 +19,9 @@ export const router = createBrowserRouter([
         element: <DashboardRedirector />
       },
       {
+        path: "/student",
         element: <ProtectedRoute allowedRoles={['siswa', 'alumni']} />,
-        children: [
-          {
-            path: "/student/dashboard",
-            // element: <StudentDashboard />,
-          },
-          // {
-          //   path: "/student/feature",
-          //   element: <StudentFeature />,
-          // },
-        ],
+        children: studentRoute,
       },
       {
         element: <ProtectedRoute allowedRoles={['admin']} />,

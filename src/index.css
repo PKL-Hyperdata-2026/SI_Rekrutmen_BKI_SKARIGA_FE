@@ -241,4 +241,41 @@ body {
   body {
     @apply bg-background text-foreground;}
   html {
-    @apply font-sans;}}
+    @apply font-sans;
+  }
+}
+/* Cutout Container */
+.sidebar-cutout-active {
+  position: relative;
+  background-color: var(--background);
+  border-top-left-radius: 9999px;
+  border-bottom-left-radius: 9999px;
+  margin-right: -1px;
+  z-index: 20;
+}
+
+/* Lekukan Atas & Bawah */
+.sidebar-cutout-active::before,
+.sidebar-cutout-active::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  background-color: transparent;
+  pointer-events: none;
+}
+
+/* Lekukan Ekor Atas */
+.sidebar-cutout-active::before {
+  top: -16px;
+  border-bottom-right-radius: 16px;
+  box-shadow: 4px 4px 0 4px var(--background);
+}
+
+/* Lekukan Ekor Bawah */
+.sidebar-cutout-active::after {
+  bottom: -16px;
+  border-top-right-radius: 16px;
+  box-shadow: 4px -4px 0 4px var(--background);
+}
