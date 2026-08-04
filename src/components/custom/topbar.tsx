@@ -19,19 +19,19 @@ export function Topbar() {
             />
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2.5">
-          <button className="relative h-9 w-9 flex items-center justify-center rounded-full border border-blue-200 bg-white text-primary hover:bg-blue-50 transition-colors shadow-sm">
-            <Mail className="h-[18px] w-[18px]" strokeWidth={2} />
+          <button className="relative h-9 w-9 flex items-center justify-center rounded-full border border-blue-200 bg-white text-primary hover:bg-blue-50 transition-colors shadow-sm cursor-pointer">
+            <Mail className="h-4.5 w-4.5" strokeWidth={2} />
           </button>
-          
-          <button className="relative h-9 w-9 flex items-center justify-center rounded-full border border-blue-200 bg-white text-primary hover:bg-blue-50 transition-colors shadow-sm">
-            <Bell className="h-[18px] w-[18px]" strokeWidth={2} />
+
+          <button className="relative h-9 w-9 flex items-center justify-center rounded-full border border-blue-200 bg-white text-primary hover:bg-blue-50 transition-colors shadow-sm cursor-pointer">
+            <Bell className="h-4.5 w-4.5" strokeWidth={2} />
             <span className="absolute top-1.5 right-1.5 flex h-2 w-2 rounded-full bg-blue-500 ring-2 ring-white"></span>
           </button>
-          
+
           <div className="w-[1.5px] h-6 bg-slate-200/70 mx-1.5" />
-          
+
           <div className="flex items-center gap-2.5 pl-1">
             <Avatar className="h-9 w-9 !rounded-xl border border-white shadow-sm ring-1 ring-slate-100">
               <AvatarImage src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${user?.full_name}`} alt="Avatar" className="!rounded-xl" />
