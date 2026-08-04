@@ -83,16 +83,16 @@ export function LoginForm({
         </div>
         <div className="flex flex-col">
           <span className="font-bold text-accent text-[14px] leading-tight">BKI SKARIGA</span>
-          <span className="text-primary text-[11px] font-medium leading-tight">Portal Siswa & Alumni</span>
+          <span className="text-primary text-[11px] font-medium leading-tight">Sistem Informasi Rekrutmen</span>
         </div>
       </div>
 
       <div className="mb-4 lg:mb-5">
         <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px] mb-1">
-          PORTAL SISWA & ALUMNI
+          SISTEM INFORMASI REKRUTMEN
         </p>
         <h1 className="text-xl lg:text-2xl font-extrabold text-foreground tracking-tight leading-tight">
-          Lanjut sebagai <span className="whitespace-nowrap">Siswa <span className="text-primary">.</span></span>
+          Masuk ke <span className="whitespace-nowrap">Sistem <span className="text-primary">.</span></span>
         </h1>
       </div>
 
