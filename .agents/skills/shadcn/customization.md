@@ -132,6 +132,49 @@ module.exports = {
 
 ---
 
+## Sidebar Role-Based Theming
+
+The sidebar is themed per user role. Each role class (`.theme-siswa`, `.theme-admin`, `.theme-hrd`) defines its own set of sidebar color variables in `src/index.css`. These variables are isolated from `--primary` / `--accent`, so changing the sidebar never affects other components.
+
+| Variable                         | Purpose                                                        |
+| -------------------------------- | -------------------------------------------------------------- |
+| `--sidebar-gradient-from`        | Top color of the sidebar body gradient (light end)             |
+| `--sidebar-gradient-to`          | Bottom color of the sidebar body gradient (dark end)           |
+| `--sidebar-strip`                | Dark vertical strip on the left (`w-14`) that holds the icons  |
+
+Example (siswa):
+
+```css
+.theme-siswa {
+  --sidebar-gradient-from: #2F8CDB;
+  --sidebar-gradient-to: #062A4D;
+  --sidebar-strip: #123C70;
+}
+```
+
+Register them in `@theme inline` (like the other colors) so they become Tailwind utilities:
+
+```css
+@theme inline {
+  --color-sidebar-gradient-from: var(--sidebar-gradient-from);
+  --color-sidebar-gradient-to: var(--sidebar-gradient-to);
+  --color-sidebar-strip: var(--sidebar-strip);
+}
+```
+
+Usage in `app-sidebar.tsx` — use the generated utilities directly:
+
+```tsx
+<div className="bg-gradient-to-b from-sidebar-gradient-from to-sidebar-gradient-to" />
+<div className="bg-sidebar-strip" />
+```
+
+Notes:
+- `--accent` is still used by other components (e.g. login form logo, dropdown-menu hover). It is no longer used for the sidebar gradient — that role moved to the `--sidebar-gradient-*` variables.
+- The theme class is applied to `document.body` via `useEffect` in `main.layout.tsx` so that portal-rendered content (mobile sidebar Sheet) inherits the CSS variables.
+
+---
+
 ## Border Radius
 
 `--radius` controls border radius globally. Components derive values from it (`rounded-lg` = `var(--radius)`, `rounded-md` = `calc(var(--radius) - 2px)`).

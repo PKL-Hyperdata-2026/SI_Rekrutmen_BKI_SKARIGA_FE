@@ -55,14 +55,14 @@ export function AppSidebar() {
       variant="sidebar"
       className="border-none border-r-0 shadow-none bg-transparent p-2 pr-0 overflow-x-hidden"
     >
-      {/* Blue Gradient Background Container */}
+      {/* Role-based Gradient Background Container */}
       <div className={cn(
-        "absolute top-2 bottom-2 left-2 right-0 z-0 rounded-2xl overflow-hidden pointer-events-none transition-opacity duration-200 ease-linear bg-gradient-to-b from-primary to-accent border border-white/20 border-r-0",
+        "absolute top-2 bottom-2 left-2 right-0 z-0 rounded-2xl overflow-hidden pointer-events-none transition-opacity duration-200 ease-linear bg-gradient-to-b from-sidebar-gradient-from to-sidebar-gradient-to border border-white/20 border-r-0",
         isCollapsed ? "opacity-0" : "opacity-100"
       )} />
 
-      {/* Dark Strip Background (w-14 di left-2) */}
-      <div className="absolute top-2 bottom-2 left-2 w-14 z-0 bg-foreground rounded-2xl border border-white/10 transition-all duration-200 ease-linear" />
+      {/* Role-based Dark Strip Background (w-14 di left-2) */}
+      <div className="absolute top-2 bottom-2 left-2 w-14 z-0 bg-sidebar-strip rounded-2xl border border-white/10 transition-all duration-200 ease-linear" />
 
       <div className="relative z-10 flex flex-col h-full text-white py-2">
         {/* Custom Header */}

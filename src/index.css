@@ -105,6 +105,9 @@
   --primary-foreground: #FDFDFD;
   --accent: #042442;
   --accent-foreground: #FDFDFD;
+  --sidebar-gradient-from: #2F8CDB;
+  --sidebar-gradient-to: #062A4D;
+  --sidebar-strip: #123C70;
 }
 
 /* Color Palette Admin BKK */
@@ -115,6 +118,9 @@
   --primary-foreground: #FDFDFD;
   --accent: #552FB8;
   --accent-foreground: #FDFDFD;
+  --sidebar-gradient-from: #8B5CF6;
+  --sidebar-gradient-to: #2A1063;
+  --sidebar-strip: #351477;
 }
 
 /* Color Palette HRD */
@@ -125,6 +131,9 @@
   --primary-foreground: #FDFDFD;
   --accent: #8D1D96;
   --accent-foreground: #FDFDFD;
+  --sidebar-gradient-from: #D46AD8;
+  --sidebar-gradient-to: #3D0040;
+  --sidebar-strip: #5A0C62;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -169,6 +178,9 @@ body {
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+  --color-sidebar-gradient-from: var(--sidebar-gradient-from);
+  --color-sidebar-gradient-to: var(--sidebar-gradient-to);
+  --color-sidebar-strip: var(--sidebar-strip);
   --color-chart-5: var(--chart-5);
   --color-chart-4: var(--chart-4);
   --color-chart-3: var(--chart-3);

@@ -32,6 +32,15 @@ export function MainLayout() {
     }
   }, [token, user, dispatch]);
 
+  const themeClass = user?.role === "siswa" || user?.role === "alumni" ? "theme-siswa" : user?.role === "admin" ? "theme-admin" : "theme-hrd";
+
+  // Pasang class tema di <body> agar konten portal (Sheet sidebar mobile) ikut mewarisi CSS variables.
+  useEffect(() => {
+    if (!themeClass) return;
+    document.body.classList.add(themeClass);
+    return () => document.body.classList.remove(themeClass);
+  }, [themeClass]);
+
   if (!token) {
     return <Navigate to="/login" replace />;
   }
@@ -56,27 +65,19 @@ export function MainLayout() {
     }
   };
 
-  const themeClass = user?.role === "siswa" || user?.role === "alumni" 
-    ? "theme-siswa" 
-    : user?.role === "admin" 
-      ? "theme-admin" 
-      : "theme-hrd";
-
   return (
-    <div className={themeClass}>
-      <TooltipProvider>
-        <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset className="w-full flex flex-col min-h-screen bg-slate-50">
-            <Topbar />
-            <main className="flex-1 overflow-x-hidden overflow-y-auto p-6 relative">
-              <div className="h-full">
-                <Outlet />
-              </div>
-            </main>
-          </SidebarInset>
-        </SidebarProvider>
-      </TooltipProvider>
-    </div>
+    <TooltipProvider>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset className="w-full flex flex-col min-h-screen bg-slate-50">
+          <Topbar />
+          <main className="flex-1 overflow-x-hidden overflow-y-auto p-6 relative">
+            <div className="h-full">
+              <Outlet />
+            </div>
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
+    </TooltipProvider>
   );
 }
