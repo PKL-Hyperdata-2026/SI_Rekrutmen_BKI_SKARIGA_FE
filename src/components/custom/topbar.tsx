@@ -1,15 +1,20 @@
-import { Search, Mail, Bell } from "lucide-react";
+import { Search, Mail, Bell, PanelLeft } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
+import { useSidebar } from "@/components/ui/sidebar";
 import { useAppSelector } from "@/hooks/useApp";
 
 export function Topbar() {
   const { user } = useAppSelector((state) => state.auth);
+  const { toggleSidebar } = useSidebar();
 
   return (
     <div className="pt-2 px-4 lg:px-6 w-full">
       <header className="flex h-[72px] shrink-0 items-center justify-between gap-4 rounded-2xl bg-white pl-4 pr-6 w-full shadow-sm border border-white ring-1 ring-slate-100/50">
-        <div className="flex items-center flex-1">
+        <div className="flex items-center flex-1 gap-3">
+          <button onClick={toggleSidebar} aria-label="Buka Menu" className="md:hidden relative h-9 w-9 flex items-center justify-center rounded-full border border-blue-200 bg-white text-primary hover:bg-blue-50 transition-colors shadow-sm cursor-pointer">
+            <PanelLeft className="h-4.5 w-4.5" strokeWidth={2} />
+          </button>
           <div className="relative w-full max-w-[550px] hidden md:block">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary" />
             <Input
