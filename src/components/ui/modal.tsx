@@ -46,9 +46,6 @@ export interface ModalProps {
 
   // Custom CSS Classes
   className?: string;
-  bodyClassName?: string;
-  headerClassName?: string;
-  footerClassName?: string;
 }
 
 // 1. Size Preset Mapping
@@ -324,9 +321,6 @@ export function Modal({
   hideCancelButton = false,
   hideConfirmButton = false,
   className,
-  bodyClassName,
-  headerClassName,
-  footerClassName,
 }: ModalProps) {
   const handleCancel = () => {
     if (onCancel) {
@@ -342,7 +336,7 @@ export function Modal({
         className={cn(
           "p-0 flex flex-col max-h-[90vh] rounded-2xl",
           sizeClasses[size],
-          className,
+          className
         )}
       >
         {/* Header Section (Using ModalHeader Compound Component) */}
@@ -356,7 +350,6 @@ export function Modal({
             onClose={handleCancel}
             title={title}
             description={description}
-            className={headerClassName}
           />
         ) : (
           /* A11y Fallback jika benar-benar tanpa header */
@@ -367,7 +360,7 @@ export function Modal({
         )}
 
         {/* Scrollable Body Content (Using ModalBody Compound Component) */}
-        <ModalBody className={bodyClassName}>{children}</ModalBody>
+        <ModalBody>{children}</ModalBody>
 
         {/* Footer Section (Using ModalFooter Compound Component) */}
         {footer !== null && (
@@ -381,7 +374,6 @@ export function Modal({
             confirmIcon={confirmIcon}
             hideCancelButton={hideCancelButton}
             hideConfirmButton={hideConfirmButton}
-            className={footerClassName}
           >
             {footer}
           </ModalFooter>
