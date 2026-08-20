@@ -57,32 +57,12 @@ const sizeClasses: Record<ModalSize, string> = {
   full: "max-w-[96vw] max-h-[96vh]",
 };
 
-// 2. Role Gradient Mapping (Sync with src/index.css tokens)
-const roleHeaderGradients: Record<ModalVariant, string> = {
-  admin: "bg-gradient-to-r from-[#2A1063] via-[#552FB8] to-[#8B5CF6]",
-  student: "bg-gradient-to-r from-[#062A4D] via-[#123C70] to-[#2F8CDB]",
-  alumni: "bg-gradient-to-r from-[#062A4D] via-[#123C70] to-[#2F8CDB]",
-  hrd: "bg-gradient-to-r from-[#3D0040] via-[#5A0C62] to-[#D46AD8]",
-  auto: "bg-gradient-to-r from-[var(--sidebar-gradient-to)] via-[var(--sidebar-strip)] to-[var(--sidebar-gradient-from)]",
-};
-
-const roleConfirmButtonClasses: Record<ModalVariant, string> = {
-  admin:
-    "bg-gradient-to-r from-[#351477] to-[#7C3AED] hover:opacity-90 text-white shadow-sm",
-  student:
-    "bg-gradient-to-r from-[#123C70] to-[#287DCE] hover:opacity-90 text-white shadow-sm",
-  alumni:
-    "bg-gradient-to-r from-[#123C70] to-[#287DCE] hover:opacity-90 text-white shadow-sm",
-  hrd: "bg-gradient-to-r from-[#5A0C62] to-[#8D1D96] hover:opacity-90 text-white shadow-sm",
-  auto: "bg-primary text-primary-foreground hover:opacity-90 shadow-sm",
-};
-
-const roleAccentTextClasses: Record<ModalVariant, string> = {
-  admin: "text-[#552FB8]",
-  student: "text-[#123C70]",
-  alumni: "text-[#123C70]",
-  hrd: "text-[#8D1D96]",
-  auto: "text-primary",
+const roleThemeClasses: Record<ModalVariant, string> = {
+  admin: "theme-admin",
+  student: "theme-siswa",
+  alumni: "theme-siswa",
+  hrd: "theme-hrd",
+  auto: "",
 };
 
 // ==========================================
@@ -119,8 +99,9 @@ export function ModalHeader({
     <div
       className={cn(
         "relative px-6 py-5 flex items-start justify-between gap-4 select-none shrink-0",
+        roleThemeClasses[variant],
         isGradientHeader
-          ? cn("text-white shadow-sm", roleHeaderGradients[variant])
+          ? "bg-gradient-to-r from-sidebar-gradient-to via-sidebar-strip to-sidebar-gradient-from text-white shadow-sm"
           : "bg-white border-b border-gray-100 text-gray-900",
         className,
       )}
@@ -134,9 +115,7 @@ export function ModalHeader({
             <div
               className={cn(
                 "mt-0.5 shrink-0 flex items-center justify-center",
-                isGradientHeader
-                  ? "text-white"
-                  : roleAccentTextClasses[variant],
+                isGradientHeader ? "text-white" : "text-accent",
               )}
             >
               {headerIcon}
@@ -147,9 +126,7 @@ export function ModalHeader({
               <DialogTitle
                 className={cn(
                   "font-bold text-lg md:text-xl tracking-tight truncate",
-                  isGradientHeader
-                    ? "text-white"
-                    : roleAccentTextClasses[variant],
+                  isGradientHeader ? "text-white" : "text-accent",
                 )}
               >
                 {title}
@@ -178,7 +155,7 @@ export function ModalHeader({
         </div>
       )}
 
-      {/* Right Action & Non-force Close Button */}
+      {/* Right Action & Close Button */}
       <div className="flex items-center gap-2 shrink-0 self-center">
         {headerAction}
         {!hideCloseButton && (
@@ -247,6 +224,7 @@ export function ModalFooter({
     <div
       className={cn(
         "px-6 py-4 border-t border-gray-100 bg-gray-50/50 flex flex-col-reverse sm:flex-row sm:justify-end sm:items-center gap-2.5 shrink-0 rounded-b-2xl",
+        roleThemeClasses[variant],
         className,
       )}
       {...props}
@@ -271,10 +249,7 @@ export function ModalFooter({
               type="button"
               onClick={onConfirm}
               disabled={isLoading}
-              className={cn(
-                "rounded-lg font-semibold px-5 transition-all flex items-center gap-2 cursor-pointer",
-                roleConfirmButtonClasses[variant],
-              )}
+              className="rounded-lg font-semibold px-5 transition-all flex items-center gap-2 cursor-pointer bg-gradient-to-r from-sidebar-strip to-primary hover:opacity-90 text-white shadow-sm"
             >
               {isLoading ? (
                 <>
@@ -335,8 +310,9 @@ export function Modal({
       <DialogContent
         className={cn(
           "p-0 flex flex-col max-h-[90vh] rounded-2xl",
+          roleThemeClasses[variant],
           sizeClasses[size],
-          className
+          className,
         )}
       >
         {/* Header Section (Using ModalHeader Compound Component) */}
