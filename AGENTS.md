@@ -33,6 +33,7 @@ npm run preview                            # Preview production build locally
 6. Component UI styling MUST use Tailwind CSS utility classes and Shadcn UI primitives located in `src/components/ui/`.
 7. NEVER edit or commit `.env` files.
 8. NEVER edit files inside `node_modules/` or `dist/`.
+9. NEVER use `git add .` or `git add -A`. Explicitly stage ONLY files strictly relevant to the task (`git add <path/to/file>`). Exclude collateral edits, lockfiles (`package-lock.json`), and unrelated files from commits.
 
 ## Non-Default Conventions (Things You'd Get Wrong)
 
@@ -46,6 +47,7 @@ npm run preview                            # Preview production build locally
 - Working branch: `development`.
 - NEVER commit unless explicitly requested by the user.
 - Commit format: Conventional Commits (`feat:`, `fix:`, `refactor:`, `test:`, `docs:`, `chore:`).
+- Staging discipline: Stage files explicitly by path. Exclude lockfiles, environment artifacts, and unrelated changes.
 - Always verify that `npm run build` succeeds with zero TypeScript or lint errors before marking work complete.
 
 ## Definition of Done
