@@ -30,7 +30,7 @@ npm run preview                            # Preview production build locally
    - Hooks, utilities, API clients, and slices: `camelCase.ts` (e.g., `useAuth.ts`, `axios.ts`, `authSlice.ts`).
 4. NEVER make raw `fetch()` calls or create new Axios instances. Always use the central configured client at `src/api/axios.ts`.
 5. Global authentication and session state MUST be stored in Redux (`src/store/index.ts` and `src/slices/authSlice.ts`).
-6. Component UI styling MUST use Tailwind CSS utility classes and Shadcn UI primitives located in `src/components/ui/`.
+6. Component UI styling MUST use Tailwind CSS utility classes, Shadcn UI primitives located in `src/components/ui/`, and custom layout components in `src/components/custom/` (e.g., `PageHeader`).
 7. NEVER edit or commit `.env` files.
 8. NEVER edit files inside `node_modules/` or `dist/`.
 
