@@ -69,7 +69,7 @@ const roleThemeClasses: Record<ModalVariant, string> = {
 // Compound Building Blocks
 // ==========================================
 
-export interface ModalHeaderProps extends React.ComponentProps<"div"> {
+export interface ModalHeaderProps extends Omit<React.ComponentProps<"div">, "title"> {
   variant?: ModalVariant;
   headerStyle?: ModalHeaderStyle;
   headerIcon?: React.ReactNode;

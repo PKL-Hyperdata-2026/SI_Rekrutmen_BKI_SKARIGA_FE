@@ -1,4 +1,4 @@
-import { Outlet, Navigate, useNavigate, useLocation } from "react-router-dom";
+import { Outlet, Navigate, useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/hooks/useApp";
 import { logout, setCredentials } from "@/slices/authSlice";
 import { useEffect, useState } from "react";
@@ -12,7 +12,6 @@ import { Topbar } from "@/components/custom/topbar";
 export function MainLayout() {
   const token = localStorage.getItem("access_token");
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAppSelector((state) => state.auth);
   const [fetchingUser, setFetchingUser] = useState(!user && !!token);
@@ -41,6 +40,10 @@ export function MainLayout() {
     return () => document.body.classList.remove(themeClass);
   }, [themeClass]);
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   if (!token) {
     return <Navigate to="/login" replace />;
   }
@@ -52,18 +55,6 @@ export function MainLayout() {
       </div>
     );
   }
-
-  const handleLogout = async () => {
-    try {
-      await api.post('/logout');
-    } catch (error) {
-      console.error(`Kesalahan saat logout: ${error}`);
-    }
-    finally {
-      dispatch(logout());
-      navigate('/login');
-    }
-  };
 
   return (
     <TooltipProvider>

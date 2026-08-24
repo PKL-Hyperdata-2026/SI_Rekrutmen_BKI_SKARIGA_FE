@@ -5,6 +5,7 @@ import { MainLayout } from "./layouts/main.layout";
 import { ProtectedRoute } from "./features/auth/components/protected-route";
 import { DashboardRedirector } from "./features/auth/components/dashboard-redirector";
 import { studentRoute } from "./features/student/route";
+import { adminRoute } from "./features/admin/route";
 
 export const router = createBrowserRouter([
   {
@@ -24,17 +25,9 @@ export const router = createBrowserRouter([
         children: studentRoute,
       },
       {
+        path: "/admin",
         element: <ProtectedRoute allowedRoles={['admin']} />,
-        children: [
-          {
-            path: "/admin/dashboard",
-            // element: <AdminDashboard />,
-          },
-          // {
-          //   path: "/admin/feature",
-          //   element: <AdminFeature />,
-          // },
-        ],
+        children: adminRoute,
       },
       {
         element: <ProtectedRoute allowedRoles={['hrd']} />,
