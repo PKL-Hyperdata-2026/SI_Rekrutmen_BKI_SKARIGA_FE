@@ -1,6 +1,6 @@
 # Frontend Codebase Reference (React 19 + TypeScript + Vite)
 
-Deep, factual reference for AI agents and developers. **Last verified: 2026-08-20.**
+Deep, factual reference for AI agents and developers. **Last verified: 2026-08-22.**
 If you modify code that alters any architecture, feature modules, state slices, or routes documented here, update this file in the same change.
 Operational instructions & boundaries: [`AGENTS.md`](./AGENTS.md).
 
@@ -43,7 +43,8 @@ frontend/src/
 │   └── axios.ts                       # Configured Axios client with Bearer auth interceptors
 ├── assets/                            # Static assets, logos, illustration SVGs
 ├── components/
-│   └── ui/                            # Shadcn UI primitives (Button, Dialog, Table, Form, Input, etc.)
+│   ├── custom/                        # Reusable global layout elements (PageHeader, Topbar, AppSidebar)
+│   └── ui/                            # Shadcn UI primitives & modal boilerplate (Button, Dialog, Modal, etc.)
 ├── config/                            # Runtime configurations and constants
 ├── features/                          # role-based feature modules
 │   ├── auth/                          # Authentication feature module
@@ -106,3 +107,8 @@ Features follow an **role -> Feature Folder -> Flat Files** organization:
   - Unwraps response envelopes matching `{ success: true, message, data, errors }`.
   - Handles `401 Unauthorized` by triggering auth state reset and redirecting to `/login`.
   - Catches `422 Unprocessable Content` and surfaces validation error maps.
+
+## 7. Reusable Component Conventions
+
+- **Page Header (`src/components/custom/page-header.tsx`):** Universal top banner with role theming (`admin`, `student`, `alumni`, `hrd`, `auto`). Supports self-closing props (`badge`, `title`, `description`, `titleAs`) and interactive children (`PageHeader.Button`, `PageHeader.NotificationCard`, `PageHeader.StatCard`).
+- **Modal Boilerplate (`src/components/ui/modal.tsx`):** Dual-mode dialog wrapper over Radix UI primitives (`src/components/ui/dialog.tsx`). Use `<Modal ... />` for standard form workflows, or compound primitives (`Modal.Root`, `Modal.Content`, `Modal.Header`, `Modal.Body`, `Modal.Footer`) for custom multi-column layouts.
