@@ -48,9 +48,10 @@ frontend/src/
 ├── config/                            # Runtime configurations and constants
 ├── features/                          # role-based feature modules
 │   ├── auth/                          # Authentication feature module
-│   │   ├── components/                # Auth-specific UI elements (LoginForm, OTPInput)
-│   │   ├── pages/                     # Login & Register views
-│   │   └── route.tsx                  # Auth sub-routing definitions
+│   │   ├── components/                # Auth-specific UI elements (LoginForm, OTPInput, ForgotPasswordModal)
+│   │   ├── pages/                     # Login & Reset Password views
+│   │   ├── schemas/                   # Zod schemas (login, forgot-password, reset-password)
+│   │   └── route.tsx                  # Auth sub-routing definitions (/login, /reset-password)
 │   ├── student/                       # Student portal feature module
 │   │   ├── components/                # Student-specific widgets & panels
 │   │   ├── pages/                     # dashboard, absensi, lamaran, lowongan, portofolio, tracer
@@ -112,3 +113,8 @@ Features follow an **role -> Feature Folder -> Flat Files** organization:
 
 - **Page Header (`src/components/custom/page-header.tsx`):** Universal top banner with role theming (`admin`, `student`, `alumni`, `hrd`, `auto`). Supports self-closing props (`badge`, `title`, `description`, `titleAs`) and interactive children (`PageHeader.Button`, `PageHeader.NotificationCard`, `PageHeader.StatCard`).
 - **Modal Boilerplate (`src/components/ui/modal.tsx`):** Dual-mode dialog wrapper over Radix UI primitives (`src/components/ui/dialog.tsx`). Use `<Modal ... />` for standard form workflows, or compound primitives (`Modal.Root`, `Modal.Content`, `Modal.Header`, `Modal.Body`, `Modal.Footer`) for custom multi-column layouts.
+
+## 8. Password Reset Flow (auth feature)
+1. Login page → "Lupa Password" opens `ForgotPasswordModal` → `POST /forgot-password` with email; success panel instructs checking inbox.
+2. Backend emails SPA link `/reset-password?token=...&email=...`.
+3. `ResetPasswordPage` (`features/auth/pages/reset-password.tsx`) reads query params, validates password + confirmation (zod, min 8), submits `POST /reset-password`, then redirects to `/login` with `state.flashMessage` shown as success banner. Invalid/missing params render an invalid-link state.

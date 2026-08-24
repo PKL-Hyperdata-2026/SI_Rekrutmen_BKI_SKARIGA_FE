@@ -69,7 +69,7 @@ const roleThemeClasses: Record<ModalVariant, string> = {
 // Compound Building Blocks
 // ==========================================
 
-export interface ModalHeaderProps extends React.ComponentProps<"div"> {
+export interface ModalHeaderProps extends Omit<React.ComponentProps<"div">, "title"> {
   variant?: ModalVariant;
   headerStyle?: ModalHeaderStyle;
   headerIcon?: React.ReactNode;
@@ -139,7 +139,7 @@ export function ModalHeader({
             {description ? (
               <DialogDescription
                 className={cn(
-                  "text-xs md:text-[13px] leading-snug",
+                  "text-xs md:text-[13px] leading-snug w-80",
                   isGradientHeader ? "text-white/80" : "text-gray-500",
                 )}
               >
@@ -156,7 +156,7 @@ export function ModalHeader({
       )}
 
       {/* Right Action & Close Button */}
-      <div className="flex items-center gap-2 shrink-0 self-center">
+      <div className="absolute top-4 right-4 flex items-center gap-2 shrink-0 self-center">
         {headerAction}
         {!hideCloseButton && (
           <button
@@ -186,7 +186,7 @@ export function ModalBody({
 }: React.ComponentProps<"div">) {
   return (
     <div
-      className={cn("p-6 overflow-y-auto flex-1 text-foreground", className)}
+      className={cn("px-6 py-4 overflow-y-auto flex-1 text-foreground", className)}
       {...props}
     >
       {children}
