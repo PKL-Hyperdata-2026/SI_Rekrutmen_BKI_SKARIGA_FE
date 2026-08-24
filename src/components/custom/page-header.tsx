@@ -51,7 +51,6 @@ export function PageHeader({
       {...props}
     >
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
-        {/* Sisi Kiri: Badge, Judul, dan Subjudul */}
         <div className="flex-1 min-w-0">
           {badge && (
             <div
@@ -74,7 +73,6 @@ export function PageHeader({
           )}
         </div>
 
-        {/* Sisi Kanan: Slot Children Fleksibel */}
         {children && (
           <div className="shrink-0 flex items-center gap-3 flex-wrap">
             {children}
@@ -84,10 +82,6 @@ export function PageHeader({
     </div>
   );
 }
-
-// ==========================================
-// Sub-Helpers (Tombol Aksi, Kartu Stat, dsb.)
-// ==========================================
 
 export interface PageHeaderButtonProps extends React.ComponentProps<"button"> {
   variant?: "primary" | "glass" | "dark";
