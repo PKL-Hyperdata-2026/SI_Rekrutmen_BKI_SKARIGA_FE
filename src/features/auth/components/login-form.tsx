@@ -2,12 +2,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { isAxiosError } from "axios";
 import { Loader2, Mail, Eye, EyeOff, Building2, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppDispatch } from "@/hooks/useApp";
 import { setCredentials } from "@/slices/authSlice";
 import { api } from "@/api/axios";
 import { useNavigate } from "react-router";
+import { ForgotPasswordModal } from "./forgot-password-modal";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Format email tidak valid" }),
@@ -47,6 +49,7 @@ export function LoginForm({
   const navigate = useNavigate();
   const [errorMsg, setErrorMsg] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
 
   const {
     register,
@@ -68,10 +71,12 @@ export function LoginForm({
       localStorage.setItem("access_token", access_token);
       dispatch(setCredentials(user));
       navigate("/");
-    } catch (error: any) {
-      setErrorMsg(
-        error.response?.data?.message || "Terjadi kesalahan saat login."
-      );
+    } catch (error) {
+      if (isAxiosError(error)) {
+        setErrorMsg(error.response?.data?.message || "Terjadi kesalahan saat login.");
+      } else {
+        setErrorMsg("Terjadi kesalahan saat login.");
+      }
     }
   };
 
@@ -155,9 +160,13 @@ export function LoginForm({
 
         <div className="flex items-center justify-between pt-0.5">
           <RememberCheckbox />
-          <a href="#" className="text-[11px] text-red-600 font-bold hover:underline">
+          <button
+            type="button"
+            onClick={() => setForgotOpen(true)}
+            className="text-[11px] text-red-600 font-bold hover:underline cursor-pointer"
+          >
             Lupa Password
-          </a>
+          </button>
         </div>
 
         <button 
@@ -169,6 +178,8 @@ export function LoginForm({
           {isSubmitting ? "Memproses..." : "Masuk"}
         </button>
       </form>
+
+      <ForgotPasswordModal open={forgotOpen} onOpenChange={setForgotOpen} />
     </div>
   );
 }

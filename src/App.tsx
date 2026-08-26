@@ -81,7 +81,7 @@ function App() {
                     className="flex items-start gap-3 rounded-lg border border-slate-800 bg-slate-800/40 p-3 text-sm text-slate-200 transition hover:bg-slate-800/80"
                   >
                     <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-sky-400 shadow-[0_0_8px_rgba(56,189,248,0.8)]" />
-                    <p className="m-0 leading-relaxed">{msg.message || msg.title}</p>
+                    <p className="m-0 leading-relaxed">{msg.message}</p>
                   </li>
                 ))}
               </ul>
