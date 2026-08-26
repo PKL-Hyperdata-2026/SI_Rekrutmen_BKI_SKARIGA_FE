@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isAxiosError } from "axios";
-import { Loader2, Mail, MailCheck, KeyRound, SendHorizontal, Lock } from "lucide-react";
+import { Loader2, Mail, MailCheck, SendHorizontal, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Modal } from "@/components/ui/modal";
 import { api } from "@/api/axios";

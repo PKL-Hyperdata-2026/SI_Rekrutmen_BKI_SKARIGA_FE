@@ -14,14 +14,14 @@ import {
 export function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token") ?? "";
-  const email = searchParams.get("email") ?? "";
+  const email = searchParams.get("email") || searchParams.get("amp;email") || "";
   const isValidLink = token !== "" && email !== "";
 
   return (
     <div className="theme-siswa flex flex-col lg:flex-row min-h-screen bg-background text-foreground">
       <div className="relative w-full h-[28vh] lg:h-auto lg:flex-1 lg:order-2 overflow-hidden">
         <svg
-          className="absolute left-0 top-0 h-full w-[350px] xl:w-[450px] z-10 hidden lg:block"
+          className="absolute left-0 top-0 h-full w-87.5 xl:w-112.5 z-10 hidden lg:block"
           viewBox="0 0 500 1000"
           preserveAspectRatio="none"
         >
@@ -38,7 +38,7 @@ export function ResetPasswordPage() {
         />
       </div>
 
-      <div className="w-full lg:w-[50%] flex-shrink-0 relative z-20 flex flex-col px-6 pt-5 pb-6 lg:p-24 justify-center lg:order-1 bg-background -mt-4 lg:mt-0 rounded-t-3xl lg:rounded-none">
+      <div className="w-full lg:w-[50%] shrink-0 relative z-20 flex flex-col px-6 pt-5 pb-6 lg:p-24 justify-center lg:order-1 bg-background -mt-4 lg:mt-0 rounded-t-3xl lg:rounded-none">
         {isValidLink ? (
           <ResetPasswordForm token={token} email={email} />
         ) : (
