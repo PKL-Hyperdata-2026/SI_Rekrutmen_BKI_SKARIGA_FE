@@ -1,6 +1,10 @@
 import { LoginForm } from "../components/login-form";
+import { useLocation } from "react-router";
 
 export function LoginPage() {
+  const location = useLocation();
+  const flashMessage = (location.state as { flashMessage?: string } | null)?.flashMessage;
+
   return (
     <div className="theme-siswa flex flex-col lg:flex-row min-h-screen bg-background text-foreground">
       <div className="relative w-full h-[28vh] lg:h-auto lg:flex-1 lg:order-2 overflow-hidden">
@@ -24,6 +28,11 @@ export function LoginPage() {
       </div>
 
       <div className="w-full lg:w-[50%] flex-shrink-0 relative z-20 flex flex-col px-6 pt-5 pb-6 lg:p-24 justify-center lg:order-1 bg-background -mt-4 lg:mt-0 rounded-t-3xl lg:rounded-none">
+        {flashMessage && (
+          <div className="absolute top-6 left-6 right-6 lg:left-24 lg:right-auto lg:max-w-[320px] rounded-lg bg-emerald-500/10 p-2.5 text-[13px] font-medium text-emerald-700 border border-emerald-500/20">
+            {flashMessage}
+          </div>
+        )}
         <LoginForm />
       </div>
     </div>
