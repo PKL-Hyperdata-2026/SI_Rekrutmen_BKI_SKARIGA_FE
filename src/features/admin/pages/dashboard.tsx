@@ -140,7 +140,7 @@ export function AdminDashboard() {
       </PageHeader>
 
       {/* 2. Stat Cards Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 sm:gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <StatCard label="Siswa XII TA 2026" value="491" icon={GraduationCap} color="purple" />
         <StatCard label="Alumni Terdata" value="1.340" icon={UserPlus} color="sky" />
         <StatCard label="Lowongan Aktif" value="52" icon={Briefcase} color="teal" />
@@ -176,12 +176,12 @@ export function AdminDashboard() {
                 Melamar Lowongan
               </div>
               <div className="flex items-center gap-2 font-medium text-slate-800">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#7C5DFA] inline-block shadow-2xs" />
+                <span className="h-2.5 w-2.5 rounded-full bg-primary inline-block shadow-2xs" />
                 Diterima Kerja
               </div>
             </div>
 
-            <div className="h-[240px] w-full pt-1">
+            <div className="h-60 w-full pt-1">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
                   data={chartData}
@@ -193,8 +193,8 @@ export function AdminDashboard() {
                       <stop offset="95%" stopColor="#FA8272" stopOpacity={0.02} />
                     </linearGradient>
                     <linearGradient id="gradDiterima" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#7C5DFA" stopOpacity={0.35} />
-                      <stop offset="95%" stopColor="#7C5DFA" stopOpacity={0.02} />
+                      <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.35} />
+                      <stop offset="95%" stopColor="#7C3AED" stopOpacity={0.02} />
                     </linearGradient>
                     <linearGradient id="gradKehadiran" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#38BDF8" stopOpacity={0.3} />
@@ -204,12 +204,12 @@ export function AdminDashboard() {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                   <XAxis
                     dataKey="month"
-                    className="text-[11px] font-medium fill-slate-500"
+                    className="text-xs font-medium fill-slate-500"
                     tickLine={false}
                     axisLine={false}
                   />
                   <YAxis
-                    className="text-[11px] fill-slate-400"
+                    className="text-xs fill-slate-400"
                     tickLine={false}
                     axisLine={false}
                     domain={[0, 100]}
@@ -261,11 +261,11 @@ export function AdminDashboard() {
                     type="natural"
                     dataKey="diterima"
                     name="Diterima Kerja"
-                    stroke="#7C5DFA"
+                    stroke="#7C3AED"
                     strokeWidth={1.8}
                     fill="url(#gradDiterima)"
                     fillOpacity={1}
-                    dot={{ r: 3.5, fill: "#fff", stroke: "#7C5DFA", strokeWidth: 1.5 }}
+                    dot={{ r: 3.5, fill: "#fff", stroke: "#7C3AED", strokeWidth: 1.5 }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -297,11 +297,11 @@ export function AdminDashboard() {
                     <TableRow key={idx} className="border-none hover:bg-slate-50/60 transition-colors">
                       <TableCell className="py-4 px-5">
                         <div className="font-bold text-xs sm:text-sm text-slate-900">{item.name}</div>
-                        <div className="text-[11px] text-slate-400 font-medium mt-0.5">{item.majorYear}</div>
+                        <div className="text-xs text-slate-400 font-medium mt-0.5">{item.majorYear}</div>
                       </TableCell>
                       <TableCell className="py-4 px-5">
                         <div className="font-bold text-xs sm:text-sm text-slate-900">{item.company}</div>
-                        <div className="text-[11px] text-slate-400 font-medium mt-0.5">{item.position}</div>
+                        <div className="text-xs text-slate-400 font-medium mt-0.5">{item.position}</div>
                       </TableCell>
                       <TableCell className="py-4 px-5 text-xs sm:text-sm font-semibold text-slate-800">{item.date}</TableCell>
                       <TableCell className="py-4 px-5 text-center">
@@ -310,7 +310,7 @@ export function AdminDashboard() {
                         </Badge>
                       </TableCell>
                       <TableCell className="py-4 px-5 text-center">
-                        <Button size="sm" className="bg-[#4c1d95] hover:bg-[#3b1578] text-white rounded-full h-7.5 px-4 text-xs font-semibold shadow-2xs transition-all active:scale-[0.98] cursor-pointer">
+                        <Button size="sm" className="bg-[var(--accent)] hover:bg-[var(--sidebar-strip)] text-white rounded-full h-8 px-4 text-xs font-semibold shadow-xs transition-all active:scale-[0.98] cursor-pointer">
                           Detail
                         </Button>
                       </TableCell>
@@ -327,7 +327,7 @@ export function AdminDashboard() {
           <SectionCard
             title="Absensi Realtime"
             action={
-              <Badge variant="outline" className="border-purple-200 text-purple-700 bg-purple-50/60 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+              <Badge variant="outline" className="border-primary/30 text-primary bg-primary/10 text-xs font-bold px-2.5 py-0.5 rounded-full">
                 LIVE
               </Badge>
             }
@@ -348,7 +348,7 @@ export function AdminDashboard() {
             </div>
 
             <div className="pt-4 mt-auto">
-              <Button className="w-full bg-[#1b0d5c] hover:bg-[#2b1689] text-white font-bold text-xs sm:text-sm py-3 h-11.5 rounded-2xl flex items-center justify-center gap-2 shadow-xs transition-all active:scale-[0.98] cursor-pointer">
+              <Button className="w-full bg-[var(--sidebar-gradient-to)] hover:bg-[var(--sidebar-strip)] text-white font-bold text-xs sm:text-sm py-3 h-11 rounded-2xl flex items-center justify-center gap-2 shadow-xs transition-all active:scale-[0.98] cursor-pointer">
                 <BadgeCheck className="h-4 w-4" />
                 Validasi
               </Button>

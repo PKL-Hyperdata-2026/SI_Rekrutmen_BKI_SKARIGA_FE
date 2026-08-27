@@ -14,12 +14,13 @@ import {
   ClipboardList,
   CalendarClock,
   CheckCircle,
+  type LucideIcon,
 } from "lucide-react";
 
 export interface MenuItem {
   name: string;
   link: string;
-  icon?: any;
+  icon?: LucideIcon;
 }
 
 export const STUDENT_MENUS: MenuItem[] = [
