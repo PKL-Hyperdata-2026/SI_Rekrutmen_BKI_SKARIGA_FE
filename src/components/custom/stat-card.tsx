@@ -1,4 +1,4 @@
-﻿import * as React from "react";
+import * as React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -36,23 +36,23 @@ export function StatCard({
   return (
     <Card
       className={cn(
-        "rounded-2xl border border-slate-100 bg-white p-2.5 sm:p-3 shadow-xs hover:shadow-md transition-all",
+        "rounded-2xl border border-slate-100 bg-white p-3 shadow-xs hover:shadow-md transition-all",
         className
       )}
       {...props}
     >
-      <CardContent className="p-0 flex items-center gap-2.5">
+      <CardContent className="p-0 flex items-center gap-3">
         <div
           className={cn(
-            "h-9 w-9 rounded-xl text-white flex items-center justify-center shrink-0 shadow-2xs",
+            "h-9 w-9 rounded-xl text-white flex items-center justify-center shrink-0 shadow-xs",
             currentTheme.box
           )}
         >
-          <Icon className="h-4.5 w-4.5" />
+          <Icon className="h-4 w-4" />
         </div>
         <div className="min-w-0">
           <p className="text-base sm:text-lg font-bold text-slate-900 leading-tight">{value}</p>
-          <p className={cn("text-[10.5px] font-semibold truncate mt-0.5", currentTheme.text)}>
+          <p className={cn("text-xs font-semibold truncate mt-0.5", currentTheme.text)}>
             {label}
           </p>
         </div>

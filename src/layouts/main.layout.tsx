@@ -6,8 +6,7 @@ import { api } from "@/api/axios";
 import { Loader2 } from "lucide-react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AppSidebar } from "@/components/custom/app-sidebar";
-import { Topbar } from "@/components/custom/topbar";
+import { AppSidebar, Topbar } from "@/components/custom";
 
 export function MainLayout() {
   const token = localStorage.getItem("access_token");

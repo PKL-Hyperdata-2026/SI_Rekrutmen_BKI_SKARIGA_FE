@@ -38,7 +38,7 @@ export function SectionCard({
         >
           <div>
             {typeof title === "string" ? (
-              <h3 className="text-base sm:text-lg font-bold text-[#1e1b4b]">{title}</h3>
+              <h3 className="text-base sm:text-lg font-bold text-slate-900">{title}</h3>
             ) : (
               title
             )}

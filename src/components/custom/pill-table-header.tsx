@@ -13,10 +13,10 @@ export interface PillTableHeaderProps extends React.HTMLAttributes<HTMLDivElemen
   role?: "admin" | "siswa" | "hrd";
 }
 
-const roleStyles: Record<"admin" | "siswa" | "hrd", { border: string; bg: string; text: string }> = {
-  admin: { border: "border-purple-200/80", bg: "bg-[#f8f5ff]", text: "text-[#1e1b4b]" },
-  siswa: { border: "border-sky-200/80", bg: "bg-[#f0f9ff]", text: "text-[#0c4a6e]" },
-  hrd: { border: "border-pink-200/80", bg: "bg-[#fdf2f8]", text: "text-[#701a75]" },
+const roleThemeClasses: Record<"admin" | "siswa" | "hrd", string> = {
+  admin: "theme-admin",
+  siswa: "theme-siswa",
+  hrd: "theme-hrd",
 };
 
 export function PillTableHeader({
@@ -25,15 +25,11 @@ export function PillTableHeader({
   className,
   ...props
 }: PillTableHeaderProps) {
-  const current = roleStyles[role] || roleStyles.admin;
-
   return (
     <div
       className={cn(
-        "grid items-center w-full rounded-full border py-2.5 px-5 text-xs sm:text-[13px] font-bold",
-        current.border,
-        current.bg,
-        current.text,
+        "grid items-center w-full rounded-full border border-primary/20 bg-primary/5 text-slate-900 py-2.5 px-5 text-xs sm:text-sm font-semibold",
+        roleThemeClasses[role],
         className
       )}
       style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}

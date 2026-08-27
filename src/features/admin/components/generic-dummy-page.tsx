@@ -16,18 +16,18 @@ export function GenericAdminDummyPage({ title, description }: { title: string; d
         <CardContent>
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
-              <Skeleton className="h-10 w-[280px] rounded-lg" />
+              <Skeleton className="h-10 w-72 rounded-lg" />
               <div className="flex gap-2">
-                <Skeleton className="h-10 w-[110px] rounded-lg" />
-                <Skeleton className="h-10 w-[130px] rounded-lg" />
+                <Skeleton className="h-10 w-28 rounded-lg" />
+                <Skeleton className="h-10 w-32 rounded-lg" />
               </div>
             </div>
-            <Skeleton className="h-[320px] w-full rounded-xl" />
+            <Skeleton className="h-80 w-full rounded-xl" />
             <div className="flex justify-between items-center mt-4">
-              <Skeleton className="h-8 w-[140px] rounded" />
+              <Skeleton className="h-8 w-36 rounded" />
               <div className="flex gap-2">
-                <Skeleton className="h-8 w-[80px] rounded" />
-                <Skeleton className="h-8 w-[80px] rounded" />
+                <Skeleton className="h-8 w-20 rounded" />
+                <Skeleton className="h-8 w-20 rounded" />
               </div>
             </div>
           </div>

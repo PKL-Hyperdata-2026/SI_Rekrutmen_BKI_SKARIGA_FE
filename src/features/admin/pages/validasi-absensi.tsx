@@ -1,4 +1,4 @@
-﻿import { PageHeader } from "@/components/custom";
+import { PageHeader } from "@/components/custom";
 import {
   Select,
   SelectContent,
@@ -23,10 +23,10 @@ export const ValidasiAbsensiPage = () => {
           Refresh Data
         </PageHeader.Button>
         <Select defaultValue="astra">
-          <SelectTrigger className="!w-[240px] !bg-white/15 hover:!bg-white/25 !text-white !border !border-white/25 !rounded-xl px-3.5 h-10 text-xs sm:text-sm font-medium backdrop-blur-xs shadow-2xs transition-all duration-200 cursor-pointer gap-2 [&_svg]:!text-white [&_svg]:!opacity-100">
+          <SelectTrigger className="!w-60 !bg-white/15 hover:!bg-white/25 !text-white !border !border-white/25 !rounded-xl px-3.5 h-10 text-xs sm:text-sm font-medium backdrop-blur-xs shadow-xs transition-all duration-200 cursor-pointer gap-2 [&_svg]:!text-white [&_svg]:!opacity-100">
             <SelectValue placeholder="Filter Berdasarkan Lowongan" />
           </SelectTrigger>
-          <SelectContent align="end" className="w-[280px]">
+          <SelectContent align="end" className="w-72">
             <SelectItem value="all" className="text-xs">
               Semua Lowongan
             </SelectItem>
