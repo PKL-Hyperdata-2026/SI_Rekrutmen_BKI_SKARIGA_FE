@@ -46,8 +46,10 @@ export function AppSidebar() {
   let menus: MenuItem[] = [];
   if (user?.role === "siswa" || user?.role === "alumni") {
     menus = STUDENT_MENUS;
-  } else if (user?.role === "admin") {
+  } else if (user?.role === "superadmin") {
     menus = ADMIN_MENUS;
+  } else if (user?.role === "admin") {
+    menus = ADMIN_MENUS.filter((item) => !item.superadminOnly);
   } else if (user?.role === "hrd") {
     menus = HRD_MENUS;
   }
@@ -106,7 +108,7 @@ export function AppSidebar() {
                   BKI SKARIGA
                 </span>
                 <span className="text-[10px] text-white/90 capitalize mt-0.5">
-                  Portal {user?.role === 'siswa' || user?.role === 'alumni' ? 'Siswa & Alumni' : user?.role || 'Sistem'}
+                  Portal {user?.role === 'siswa' || user?.role === 'alumni' ? 'Siswa & Alumni' : user?.role === 'superadmin' ? 'Super Admin' : user?.role || 'Sistem'}
                 </span>
               </div>
             </div>

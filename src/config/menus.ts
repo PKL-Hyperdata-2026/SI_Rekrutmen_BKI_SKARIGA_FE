@@ -14,6 +14,7 @@ import {
   ClipboardList,
   CalendarClock,
   CheckCircle,
+  UserCog,
   type LucideIcon,
 } from "lucide-react";
 
@@ -21,6 +22,7 @@ export interface MenuItem {
   name: string;
   link: string;
   icon?: LucideIcon;
+  superadminOnly?: boolean;
 }
 
 export const STUDENT_MENUS: MenuItem[] = [
@@ -34,6 +36,7 @@ export const STUDENT_MENUS: MenuItem[] = [
 
 export const ADMIN_MENUS: MenuItem[] = [
   { name: "Dashboard", link: "/admin/dashboard", icon: LayoutDashboard },
+  { name: "Manajemen Pengguna", link: "/admin/users", icon: UserCog, superadminOnly: true },
   { name: "Data Siswa", link: "/admin/siswa", icon: Users },
   { name: "Data Alumni", link: "/admin/alumni", icon: GraduationCap },
   { name: "Perusahaan DUDI", link: "/admin/dudi", icon: Building2 },

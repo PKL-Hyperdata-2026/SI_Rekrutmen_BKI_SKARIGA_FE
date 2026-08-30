@@ -9,6 +9,7 @@ export function DashboardRedirector() {
   }
 
   switch (user.role) {
+    case "superadmin":
     case "admin":
       return <Navigate to="/admin/dashboard" replace />;
     case "hrd":
