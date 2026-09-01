@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppSidebar, Topbar } from "@/components/custom";
+import { Toaster } from "@/components/ui/sonner";
 
 export function MainLayout() {
   const token = localStorage.getItem("access_token");
@@ -30,7 +31,7 @@ export function MainLayout() {
     }
   }, [token, user, dispatch]);
 
-  const themeClass = user?.role === "siswa" || user?.role === "alumni" ? "theme-siswa" : user?.role === "admin" ? "theme-admin" : "theme-hrd";
+  const themeClass = user?.role === "siswa" || user?.role === "alumni" ? "theme-siswa" : (user?.role === "admin" || user?.role === "superadmin") ? "theme-admin" : "theme-hrd";
 
   // Pasang class tema di <body> agar konten portal (Sheet sidebar mobile) ikut mewarisi CSS variables.
   useEffect(() => {
@@ -57,6 +58,7 @@ export function MainLayout() {
 
   return (
     <TooltipProvider>
+      <Toaster position="top-center" />
       <SidebarProvider>
         <AppSidebar />
         <SidebarInset className="w-full flex flex-col min-h-screen bg-slate-50">

@@ -4,5 +4,6 @@ export * from "./section-card";
 export * from "./pill-table-header";
 export * from "./interactive-item-card";
 export * from "./filter-select";
+export * from "./data-table";
 export * from "./app-sidebar";
 export * from "./topbar";

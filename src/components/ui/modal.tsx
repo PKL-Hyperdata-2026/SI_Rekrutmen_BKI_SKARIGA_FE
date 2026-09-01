@@ -239,7 +239,7 @@ export function ModalFooter({
               variant="outline"
               onClick={onCancel}
               disabled={isLoading}
-              className="rounded-lg border-gray-200 hover:bg-gray-100 text-gray-700 font-medium px-5 cursor-pointer"
+              className="h-10 rounded-xl border-gray-200 hover:bg-gray-100 text-gray-700 font-medium px-5 cursor-pointer"
             >
               {cancelText}
             </Button>
@@ -249,7 +249,7 @@ export function ModalFooter({
               type="button"
               onClick={onConfirm}
               disabled={isLoading}
-              className="rounded-lg font-semibold px-5 transition-all flex items-center gap-2 cursor-pointer bg-gradient-to-r from-sidebar-strip to-primary hover:opacity-90 text-white shadow-sm"
+              className="h-10 rounded-xl font-semibold px-5 transition-all flex items-center gap-2 cursor-pointer bg-gradient-to-r from-sidebar-strip to-primary hover:opacity-90 text-white shadow-sm"
             >
               {isLoading ? (
                 <>

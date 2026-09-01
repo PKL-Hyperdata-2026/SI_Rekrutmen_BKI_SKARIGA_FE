@@ -8,11 +8,16 @@ import { ValidasiAbsensiPage } from "./pages/validasi-absensi";
 import { PenempatanKerjaPage } from "./pages/penempatan";
 import { TracerStudyPage } from "./pages/tracer";
 import { LaporanCetakPage } from "./pages/laporan";
+import { UsersManagementPage } from "./pages/users";
 
 export const adminRoute = [
   {
     path: "dashboard",
     element: <AdminDashboard />,
+  },
+  {
+    path: "users",
+    element: <UsersManagementPage />,
   },
   {
     path: "siswa",
