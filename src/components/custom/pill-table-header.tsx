@@ -25,6 +25,9 @@ export function PillTableHeader({
   className,
   ...props
 }: PillTableHeaderProps) {
+  const hasSpan = columns.some((col) => col.span !== undefined);
+  const totalSpan = columns.reduce((acc, col) => acc + (col.span || 1), 0);
+
   return (
     <div
       className={cn(
@@ -32,7 +35,11 @@ export function PillTableHeader({
         roleThemeClasses[role],
         className
       )}
-      style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}
+      style={{
+        gridTemplateColumns: hasSpan
+          ? `repeat(${totalSpan}, minmax(0, 1fr))`
+          : `repeat(${columns.length}, minmax(0, 1fr))`,
+      }}
       {...props}
     >
       {columns.map((col, idx) => (
@@ -44,6 +51,7 @@ export function PillTableHeader({
             col.align === "left" && "text-left",
             col.className
           )}
+          style={col.span ? { gridColumn: `span ${col.span} / span ${col.span}` } : undefined}
         >
           {col.label}
         </span>

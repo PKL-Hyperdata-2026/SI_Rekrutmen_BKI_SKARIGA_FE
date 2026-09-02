@@ -1,7 +1,8 @@
 import * as React from "react";
-import { Loader2, Trash2, AlertCircle, FileText, Pencil } from "lucide-react";
+import { Trash2, AlertCircle, FileText, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Popover,
   PopoverTrigger,
@@ -13,12 +14,20 @@ import {
   type RoleType,
 } from "./data-table-pagination";
 
+function getNestedValue(obj: any, path?: string): any {
+  if (!path || !obj) return null;
+  if (!path.includes(".")) return obj[path] ?? null;
+  return path.split(".").reduce((acc, part) => acc?.[part], obj) ?? null;
+}
+
 export interface DataTableColumn<T> {
   header: string;
-  accessorKey?: keyof T | string;
+  accessorKey?: keyof T | (string & {});
   align?: "left" | "center" | "right";
   className?: string;
   headerClassName?: string;
+  sortable?: boolean;
+  sortKey?: string;
   cell?: (row: T, index: number) => React.ReactNode;
 }
 
@@ -48,7 +57,8 @@ export function DataTableDeleteButton({
   const [open, setOpen] = React.useState(false);
   const [isDeleting, setIsDeleting] = React.useState(false);
 
-  const handleConfirm = async () => {
+  const handleConfirm = async (e?: React.MouseEvent) => {
+    e?.stopPropagation();
     if (!onConfirm) {
       setOpen(false);
       return;
@@ -57,6 +67,8 @@ export function DataTableDeleteButton({
     try {
       await onConfirm();
       setOpen(false);
+    } catch (err) {
+      console.error("Delete confirmation failed:", err);
     } finally {
       setIsDeleting(false);
     }
@@ -71,7 +83,7 @@ export function DataTableDeleteButton({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
         <Button
           type="button"
           variant="outline"
@@ -89,6 +101,7 @@ export function DataTableDeleteButton({
       <PopoverContent
         align={align}
         side={side}
+        onClick={(e) => e.stopPropagation()}
         className="w-72 p-3.5 shadow-xl border border-slate-200/90 rounded-xl bg-white text-slate-800 z-50"
       >
         <div className="flex flex-col gap-2.5">
@@ -111,7 +124,10 @@ export function DataTableDeleteButton({
               variant="outline"
               size="sm"
               disabled={isDeleting}
-              onClick={() => setOpen(false)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpen(false);
+              }}
               className="h-7 px-2.5 text-xs font-medium rounded-lg border-slate-200 hover:bg-slate-50 text-slate-700 cursor-pointer"
             >
               Batal
@@ -121,16 +137,9 @@ export function DataTableDeleteButton({
               size="sm"
               disabled={isDeleting}
               onClick={handleConfirm}
-              className="h-7 px-3 text-xs font-semibold rounded-lg bg-rose-600 hover:bg-rose-700 text-white shadow-xs flex items-center gap-1.5 cursor-pointer"
+              className="h-7 px-2.5 text-xs font-medium rounded-lg bg-rose-600 hover:bg-rose-700 text-white cursor-pointer"
             >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="size-3 animate-spin" />
-                  <span>Menghapus...</span>
-                </>
-              ) : (
-                "Hapus"
-              )}
+              {isDeleting ? "Menghapus..." : "Hapus"}
             </Button>
           </div>
         </div>
@@ -172,14 +181,20 @@ export function DataTableActions<T>({
     typeof deleteItemName === "function" ? deleteItemName(row) : deleteItemName;
 
   return (
-    <div className={cn("flex items-center justify-center gap-2", className)}>
+    <div
+      className={cn("flex items-center justify-center gap-2", className)}
+      onClick={(e) => e.stopPropagation()}
+    >
       {extraActions}
       {showView && (
         <Button
           type="button"
           variant="outline"
           size="icon"
-          onClick={() => onView?.(row)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onView?.(row);
+          }}
           className="h-8.5 w-8.5 rounded-md border-blue-200 text-blue-500 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 cursor-pointer shadow-none transition-colors"
           title="Lihat Detail"
         >
@@ -191,7 +206,10 @@ export function DataTableActions<T>({
           type="button"
           variant="outline"
           size="icon"
-          onClick={() => onEdit?.(row)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit?.(row);
+          }}
           className="h-8.5 w-8.5 rounded-md border-purple-200 text-purple-600 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-300 cursor-pointer shadow-none transition-colors"
           title="Edit"
         >
@@ -235,10 +253,24 @@ export interface DataTableProps<T> {
   numberStartIndex?: number;
   className?: string;
   rowClassName?: string;
-  pagination?: DataTablePaginationProps;
+  variant?: "default" | "pill";
   role?: RoleType;
+  pagination?: DataTablePaginationProps;
   actions?: DataTableActionConfig<T>;
+  selectable?: boolean;
+  selectedIds?: (string | number)[];
+  onSelectAll?: (checked: boolean) => void;
+  onSelectRow?: (id: string | number, checked: boolean) => void;
+  onRowClick?: (row: T, index: number) => void;
+  getRowId?: (row: T, index: number) => string | number;
 }
+
+const roleThemeHeader: Record<RoleType, string> = {
+  admin: "border-purple-200/80 bg-purple-50/60 text-purple-900",
+  siswa: "border-sky-200/80 bg-sky-50/60 text-sky-900",
+  hrd: "border-fuchsia-200/80 bg-fuchsia-50/60 text-fuchsia-900",
+  default: "border-purple-200/80 bg-purple-50/60 text-purple-900",
+};
 
 export function DataTable<T extends Record<string, any>>({
   columns,
@@ -251,10 +283,19 @@ export function DataTable<T extends Record<string, any>>({
   numberStartIndex = 1,
   className,
   rowClassName,
+  variant = "default",
+  role = "admin",
   pagination,
-  role,
   actions,
+  selectable = false,
+  selectedIds = [],
+  onSelectAll,
+  onSelectRow,
+  onRowClick,
+  getRowId = (_, idx) => idx,
 }: DataTableProps<T>) {
+  const isPill = variant === "pill";
+
   const effectiveColumns = React.useMemo<DataTableColumn<T>[]>(() => {
     if (!actions) return columns;
 
@@ -280,27 +321,75 @@ export function DataTable<T extends Record<string, any>>({
       },
     ];
   }, [columns, actions]);
+
+  const allSelected =
+    data.length > 0 &&
+    data.every((row, idx) => selectedIds.includes(getRowId(row, idx)));
+  const someSelected =
+    data.some((row, idx) => selectedIds.includes(getRowId(row, idx))) &&
+    !allSelected;
+
+  const totalCols = Math.max(
+    1,
+    effectiveColumns.length + (showNumbering ? 1 : 0) + (selectable ? 1 : 0),
+  );
+
   return (
     <div
       className={cn(
-        "w-full bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden",
+        "w-full bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden",
         className,
       )}
     >
       <div className="w-full overflow-x-auto custom-scrollbar">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#F6F7FB] border-b border-slate-200/90">
-              {showNumbering && (
-                <th className="py-4 px-6 font-bold text-xs text-slate-500 uppercase tracking-wider w-16 text-center select-none">
-                  No
+            <tr
+              className={cn(
+                "border-b border-slate-200/80 select-none",
+                isPill
+                  ? cn(
+                      "text-xs font-bold uppercase tracking-wider",
+                      roleThemeHeader[role] ?? roleThemeHeader.default,
+                    )
+                  : "bg-[#F6F7FB] text-slate-500 font-bold text-xs uppercase tracking-wider",
+              )}
+            >
+              {/* Selectable Checkbox Header */}
+              {selectable && (
+                <th scope="col" className="py-3.5 px-4 w-12 text-center">
+                  <input
+                    type="checkbox"
+                    aria-label="Pilih semua baris"
+                    aria-checked={someSelected ? "mixed" : allSelected}
+                    checked={allSelected}
+                    disabled={loading || data.length === 0}
+                    ref={(el) => {
+                      if (el) el.indeterminate = someSelected;
+                    }}
+                    onChange={(e) => onSelectAll?.(e.target.checked)}
+                    className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary/20 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  />
                 </th>
               )}
+
+              {/* Numbering Header */}
+              {showNumbering && (
+                <th
+                  scope="col"
+                  className="py-3.5 px-5 font-bold text-xs w-16 text-center select-none"
+                >
+                  NO
+                </th>
+              )}
+
+              {/* Dynamic Columns Header */}
               {effectiveColumns.map((col, idx) => (
                 <th
                   key={idx}
+                  scope="col"
                   className={cn(
-                    "py-4 px-6 font-bold text-xs text-slate-500 uppercase tracking-wider select-none",
+                    "py-3.5 px-5 font-bold text-xs uppercase tracking-wider select-none",
                     col.align === "center" && "text-center",
                     col.align === "right" && "text-right",
                     col.align === "left" && "text-left",
@@ -314,24 +403,56 @@ export function DataTable<T extends Record<string, any>>({
           </thead>
           <tbody className="divide-y divide-slate-100">
             {loading ? (
-              <tr>
-                <td
-                  colSpan={effectiveColumns.length + (showNumbering ? 1 : 0)}
-                  className="py-16 text-center text-slate-500"
-                >
-                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-3 text-primary" />
-                  <p className="text-sm font-semibold text-slate-700">
-                    Memuat data...
-                  </p>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Mohon tunggu beberapa saat
-                  </p>
-                </td>
-              </tr>
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={i} className="animate-pulse">
+                  {selectable && (
+                    <td className="py-4 px-4 text-center">
+                      <Skeleton className="h-4 w-4 rounded mx-auto" />
+                    </td>
+                  )}
+                  {showNumbering && (
+                    <td className="py-4 px-5 text-center">
+                      <Skeleton className="h-4 w-6 rounded mx-auto" />
+                    </td>
+                  )}
+                  {effectiveColumns.map((col, cIdx) => (
+                    <td
+                      key={cIdx}
+                      className={cn(
+                        "py-4 px-5",
+                        col.align === "center" && "text-center",
+                        col.align === "right" && "text-right",
+                        col.align === "left" && "text-left",
+                        col.className,
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "space-y-1.5",
+                          col.align === "center" && "mx-auto",
+                        )}
+                      >
+                        <Skeleton
+                          className={cn(
+                            "h-4 w-3/4",
+                            col.align === "center" && "mx-auto",
+                          )}
+                        />
+                        <Skeleton
+                          className={cn(
+                            "h-3 w-1/2",
+                            col.align === "center" && "mx-auto",
+                          )}
+                        />
+                      </div>
+                    </td>
+                  ))}
+                </tr>
+              ))
             ) : data.length === 0 ? (
               <tr>
                 <td
-                  colSpan={effectiveColumns.length + (showNumbering ? 1 : 0)}
+                  colSpan={totalCols}
                   className="py-16 text-center text-slate-500"
                 >
                   {emptyIcon && (
@@ -346,39 +467,69 @@ export function DataTable<T extends Record<string, any>>({
                 </td>
               </tr>
             ) : (
-              data.map((row, rowIdx) => (
-                <tr
-                  key={rowIdx}
-                  className={cn(
-                    "hover:bg-slate-50/70 transition-colors group",
-                    rowClassName,
-                  )}
-                >
-                  {showNumbering && (
-                    <td className="py-4.5 px-6 text-center font-bold text-sm text-slate-800">
-                      {numberStartIndex + rowIdx}
-                    </td>
-                  )}
-                  {effectiveColumns.map((col, colIdx) => (
-                    <td
-                      key={colIdx}
-                      className={cn(
-                        "py-4.5 px-6 text-sm text-slate-700 align-middle",
-                        col.align === "center" && "text-center",
-                        col.align === "right" && "text-right",
-                        col.align === "left" && "text-left",
-                        col.className,
-                      )}
-                    >
-                      {col.cell
-                        ? col.cell(row, rowIdx)
-                        : col.accessorKey
-                          ? row[col.accessorKey as string]
-                          : null}
-                    </td>
-                  ))}
-                </tr>
-              ))
+              data.map((row, rowIdx) => {
+                const rowId = getRowId(row, rowIdx) ?? rowIdx;
+                const isSelected = selectedIds.includes(rowId);
+
+                return (
+                  <tr
+                    key={rowId}
+                    onClick={() => onRowClick?.(row, rowIdx)}
+                    className={cn(
+                      "hover:bg-slate-50/70 transition-colors group",
+                      isSelected && "bg-purple-50/30",
+                      onRowClick && "cursor-pointer",
+                      rowClassName,
+                    )}
+                  >
+                    {/* Selectable Checkbox */}
+                    {selectable && (
+                      <td
+                        className="py-3.5 px-4 text-center align-middle"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          type="checkbox"
+                          aria-label={`Pilih baris ${numberStartIndex + rowIdx}`}
+                          checked={isSelected}
+                          onChange={(e) =>
+                            onSelectRow?.(rowId, e.target.checked)
+                          }
+                          onClick={(e) => e.stopPropagation()}
+                          className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary/20 cursor-pointer"
+                        />
+                      </td>
+                    )}
+
+                    {/* Numbering Cell */}
+                    {showNumbering && (
+                      <td className="py-3.5 px-5 text-center font-bold text-xs sm:text-sm text-slate-700 align-middle">
+                        {numberStartIndex + rowIdx}
+                      </td>
+                    )}
+
+                    {/* Data Cells */}
+                    {effectiveColumns.map((col, colIdx) => (
+                      <td
+                        key={colIdx}
+                        className={cn(
+                          "py-3.5 px-5 text-sm text-slate-700 align-middle",
+                          col.align === "center" && "text-center",
+                          col.align === "right" && "text-right",
+                          col.align === "left" && "text-left",
+                          col.className,
+                        )}
+                      >
+                        {col.cell
+                          ? col.cell(row, rowIdx)
+                          : col.accessorKey
+                            ? getNestedValue(row, col.accessorKey as string)
+                            : null}
+                      </td>
+                    ))}
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>

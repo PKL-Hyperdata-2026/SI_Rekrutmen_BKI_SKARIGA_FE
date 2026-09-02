@@ -494,6 +494,7 @@ export const UsersManagementPage = () => {
         emptyMessage="Tidak ada pengguna yang ditemukan"
         emptyDescription="Coba sesuaikan kata kunci pencarian atau filter peran"
         emptyIcon={<Users className="h-8 w-8 text-slate-400" />}
+        getRowId={(user) => user.id}
       />
 
       {/* Modal Form Tambah / Edit User */}

@@ -367,3 +367,9 @@ Modal.Body = ModalBody;
 Modal.Footer = ModalFooter;
 Modal.Title = DialogTitle;
 Modal.Description = DialogDescription;
+
+export {
+  DialogContent as ModalContent,
+  DialogTitle as ModalTitle,
+  DialogDescription as ModalDescription,
+};
