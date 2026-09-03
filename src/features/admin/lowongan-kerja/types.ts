@@ -1,7 +1,7 @@
 import { type FilterSelectOption } from "@/components/custom/filter-select";
 
 export interface Company {
-  id: number;
+  id: number | string;
   name: string;
   email?: string;
   phone?: string;
@@ -11,14 +11,14 @@ export interface Company {
 }
 
 export interface StandardTypeItem {
-  id: number;
+  id: number | string;
   code: string;
   name: string;
   metadata?: Record<string, unknown>;
 }
 
 export interface MajorItem {
-  id: number;
+  id: number | string;
   code: string;
   name: string;
 }
@@ -28,14 +28,14 @@ export interface MajorFilterOption extends FilterSelectOption {
 }
 
 export interface JobVacancy {
-  id: number;
-  companyId: number;
+  id: number | string;
+  companyId: number | string;
   company?: Company;
-  jobTypeId?: number;
+  jobTypeId?: number | string;
   jobType?: StandardTypeItem;
-  statusId?: number;
+  statusId?: number | string;
   status?: StandardTypeItem;
-  targetApplicantId?: number;
+  targetApplicantId?: number | string;
   targetApplicant?: StandardTypeItem;
   title: string;
   slug: string;
@@ -46,7 +46,7 @@ export interface JobVacancy {
   deadline?: string;
   workLocation?: string;
   majors?: MajorItem[];
-  majorIds?: number[];
+  majorIds?: (number | string)[];
   minSalary?: number;
   maxSalary?: number;
   isFeatured?: boolean;

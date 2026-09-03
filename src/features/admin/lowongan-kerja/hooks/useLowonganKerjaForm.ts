@@ -284,7 +284,7 @@ export function useLowonganKerjaForm({
         const parsedQuota = parseInt(quota, 10);
 
         const payload: Record<string, unknown> = {
-          company_id: Number(companyId),
+          company_id: companyId,
           position: position.trim(),
           title: position.trim(),
           quota: parsedQuota > 0 ? parsedQuota : 1,
@@ -292,9 +292,9 @@ export function useLowonganKerjaForm({
           work_location: workLocation.trim(),
           qualification: qualification.trim(),
           send_notification: sendNotification,
-          major_ids: majorId && majorId !== "all" ? [Number(majorId)] : [],
+          major_ids: majorId && majorId !== "all" ? [majorId] : [],
           target_applicant_id:
-            targetId && targetId !== "all" ? Number(targetId) : null,
+            targetId && targetId !== "all" ? targetId : null,
         };
 
         if (isEditMode && activeVacancy?.id) {

@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { type JobVacancy } from "../types";
 import { api } from "@/api/axios";
 
@@ -58,7 +58,7 @@ export function useLowonganKerjaDetailForm({
   );
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchDetail = useCallback(async (id: number) => {
+  const fetchDetail = useCallback(async (id: number | string) => {
     setIsLoading(true);
     try {
       const response = await api.get<{ data: JobVacancy }>(
