@@ -286,7 +286,7 @@ export function DataTable<T extends Record<string, any>>({
         className,
       )}
     >
-      <div className="w-full overflow-x-auto">
+      <div className="w-full overflow-x-auto custom-scrollbar">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-[#F6F7FB] border-b border-slate-200/90">

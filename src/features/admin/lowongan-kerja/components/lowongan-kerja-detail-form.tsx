@@ -1,4 +1,4 @@
-﻿import { Modal } from "@/components/ui/modal";
+import { Modal } from "@/components/ui/modal";
 import {
   Card,
   CardContent,
@@ -48,7 +48,7 @@ function QualificationList({ lines }: { lines: string[] }) {
   }
 
   return (
-    <Card className="rounded-lg border border-slate-200 bg-[#F6F7FB] px-4 py-3 ring-0 shadow-none gap-0">
+    <Card className="rounded-lg border border-slate-200 bg-[#F6F7FB] px-4 py-3 ring-0 shadow-none gap-0 max-h-52 overflow-y-auto custom-scrollbar pr-2">
       <CardContent className="flex flex-col gap-1.5 p-0">
         {lines.map((line, idx) => (
           <CardDescription key={idx} className="text-sm text-slate-700">

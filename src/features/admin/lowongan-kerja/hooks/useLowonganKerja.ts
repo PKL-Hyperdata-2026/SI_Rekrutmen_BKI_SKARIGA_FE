@@ -1,4 +1,4 @@
-﻿import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useLowonganKerjaFilter } from "./useLowonganKerjaFilter";
 import { type JobVacancy } from "../types";
 import { api } from "@/api/axios";
@@ -24,38 +24,61 @@ export function useLowonganKerja() {
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [detailVacancy, setDetailVacancy] = useState<JobVacancy | null>(null);
 
+  const formTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const detailTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const filter = useLowonganKerjaFilter();
 
   const handleOpenCreate = useCallback(() => {
+    if (formTimerRef.current) {
+      clearTimeout(formTimerRef.current);
+      formTimerRef.current = null;
+    }
     setSelectedVacancy(null);
     setIsFormOpen(true);
   }, []);
 
   const handleView = useCallback((item: JobVacancy) => {
+    if (detailTimerRef.current) {
+      clearTimeout(detailTimerRef.current);
+      detailTimerRef.current = null;
+    }
     setDetailVacancy(item);
     setIsDetailOpen(true);
   }, []);
 
   const handleEdit = useCallback((item: JobVacancy) => {
+    if (formTimerRef.current) {
+      clearTimeout(formTimerRef.current);
+      formTimerRef.current = null;
+    }
     setSelectedVacancy(item);
     setIsFormOpen(true);
   }, []);
 
   const handleFormOpenChange = useCallback((open: boolean) => {
+    if (formTimerRef.current) {
+      clearTimeout(formTimerRef.current);
+      formTimerRef.current = null;
+    }
     setIsFormOpen(open);
     if (!open) {
-      setTimeout(() => {
+      formTimerRef.current = setTimeout(() => {
         setSelectedVacancy(null);
-      }, 350);
+      }, 260);
     }
   }, []);
 
   const handleDetailOpenChange = useCallback((open: boolean) => {
+    if (detailTimerRef.current) {
+      clearTimeout(detailTimerRef.current);
+      detailTimerRef.current = null;
+    }
     setIsDetailOpen(open);
     if (!open) {
-      setTimeout(() => {
+      detailTimerRef.current = setTimeout(() => {
         setDetailVacancy(null);
-      }, 350);
+      }, 260);
     }
   }, []);
 

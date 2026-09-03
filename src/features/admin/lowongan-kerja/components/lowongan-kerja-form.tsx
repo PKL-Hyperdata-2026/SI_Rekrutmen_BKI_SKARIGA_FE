@@ -364,7 +364,7 @@ export function LowonganKerjaForm({
               onChange={(e) => setQualification(e.target.value)}
               placeholder="cth. Surat Lamaran Kerja, CV, .."
               className={cn(
-                "min-h-20 max-h-28 w-full rounded-lg border bg-[#F8F9FD] p-3 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:bg-white focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all resize-y",
+                "min-h-20 max-h-28 w-full rounded-lg border bg-[#F8F9FD] p-3 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:bg-white focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all resize-y custom-scrollbar",
                 errors.qualification
                   ? "border-red-500 bg-red-50/20"
                   : "border-slate-200",
