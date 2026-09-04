@@ -24,6 +24,7 @@ export interface PageHeaderProps extends Omit<React.ComponentProps<"div">, "titl
   title: React.ReactNode;
   titleAs?: "h1" | "h2" | "h3" | "div";
   description?: React.ReactNode;
+  size?: "default" | "compact";
   children?: React.ReactNode;
 }
 
@@ -34,28 +35,41 @@ export function PageHeader({
   title,
   titleAs = "h1",
   description,
+  size = "default",
   children,
   className,
   ...props
 }: PageHeaderProps) {
   const HeadingTag = titleAs;
+  const isCompact = size === "compact";
 
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-3xl p-6 sm:p-7 text-white shadow-md",
+        "relative overflow-hidden text-white",
+        isCompact
+          ? "rounded-2xl p-4 sm:p-5 shadow-sm"
+          : "rounded-3xl p-6 sm:p-7 shadow-md",
         "bg-gradient-to-r from-sidebar-gradient-to via-sidebar-strip to-sidebar-gradient-from",
         roleThemeClasses[variant],
         className
       )}
       {...props}
     >
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+      <div
+        className={cn(
+          "flex flex-col lg:flex-row lg:items-center justify-between relative z-10",
+          isCompact ? "gap-3.5 sm:gap-4" : "gap-6"
+        )}
+      >
         <div className="flex-1 min-w-0">
           {badge && (
             <div
               className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-white/90 mb-3 select-none w-fit",
+                "inline-flex items-center rounded-full font-semibold text-white/90 select-none w-fit",
+                isCompact
+                  ? "gap-1.5 px-2.5 py-0.5 text-[11px] mb-2"
+                  : "gap-1.5 px-3 py-1 text-xs mb-3",
                 glassPill
               )}
             >
@@ -63,11 +77,25 @@ export function PageHeader({
               <span>{badge}</span>
             </div>
           )}
-          <HeadingTag className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight">
+          <HeadingTag
+            className={cn(
+              "font-bold tracking-tight text-white",
+              isCompact
+                ? "text-lg sm:text-xl leading-snug"
+                : "text-2xl sm:text-3xl leading-tight"
+            )}
+          >
             {title}
           </HeadingTag>
           {description && (
-            <p className="text-xs sm:text-sm text-white/85 mt-1.5 max-w-2xl leading-relaxed">
+            <p
+              className={cn(
+                "text-white/85 max-w-2xl",
+                isCompact
+                  ? "text-xs mt-1 leading-normal"
+                  : "text-xs sm:text-sm mt-1.5 leading-relaxed"
+              )}
+            >
               {description}
             </p>
           )}

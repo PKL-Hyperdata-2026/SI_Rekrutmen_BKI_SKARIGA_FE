@@ -1,5 +1,6 @@
 import { X, ExternalLink, Download } from "lucide-react";
-import type { PortfolioItem } from "../schemas/portfolio.schema";
+import { Button } from "@/components/ui/button";
+import type { PortfolioItem } from "../../schemas/portfolio.schema";
 
 interface DocumentPreviewModalProps {
   portfolio: PortfolioItem | null;
@@ -32,32 +33,45 @@ export function DocumentPreviewModal({
           <div className="flex items-center gap-2 shrink-0">
             {portfolio.fileUrl && (
               <>
-                <a
-                  href={portfolio.fileUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="h-8 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium flex items-center gap-1.5 transition-all"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                  className="h-8 px-3 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-medium cursor-pointer"
                 >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  <span>Tab Baru</span>
-                </a>
-                <a
-                  href={portfolio.fileUrl}
-                  download
-                  className="h-8 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium flex items-center gap-1.5 transition-all"
+                  <a
+                    href={portfolio.fileUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                    <span>Tab Baru</span>
+                  </a>
+                </Button>
+                <Button
+                  size="sm"
+                  asChild
+                  className="h-8 px-3 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-medium cursor-pointer"
                 >
-                  <Download className="h-3.5 w-3.5" />
-                  <span>Unduh</span>
-                </a>
+                  <a
+                    href={portfolio.fileUrl}
+                    download
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    <span>Unduh</span>
+                  </a>
+                </Button>
               </>
             )}
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={onClose}
-              className="h-8 w-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all cursor-pointer"
+              className="h-8 w-8 rounded-lg bg-white/10 hover:bg-white/20 text-white cursor-pointer"
             >
               <X className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         </div>
 

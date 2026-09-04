@@ -9,46 +9,52 @@ export function Topbar() {
   const { toggleSidebar } = useSidebar();
 
   return (
-    <div className="pt-2 px-4 lg:px-6 w-full">
-      <header className="flex h-16 sm:h-18 shrink-0 items-center justify-between gap-4 rounded-2xl bg-white pl-4 pr-6 w-full shadow-xs border border-white ring-1 ring-slate-100/50">
-        <div className="flex items-center flex-1 gap-3">
+    <div className="sticky top-0 z-30 pt-3 pb-1 px-4 lg:px-6 w-full bg-transparent transition-all pointer-events-none">
+      <header className="flex h-13 sm:h-14 shrink-0 items-center justify-between gap-3 rounded-xl bg-white px-3 sm:px-4 w-full shadow-md border border-slate-100 pointer-events-auto">
+        <div className="flex items-center flex-1 gap-2.5">
           <button
             onClick={toggleSidebar}
             aria-label="Buka Menu"
-            className="md:hidden relative h-9 w-9 flex items-center justify-center rounded-full border border-blue-200 bg-white text-primary hover:bg-blue-50 transition-colors shadow-xs cursor-pointer"
+            className="md:hidden relative h-8 w-8 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-primary hover:bg-slate-50 transition-colors shadow-2xs cursor-pointer shrink-0"
           >
             <PanelLeft className="h-4 w-4" strokeWidth={2} />
           </button>
-          <div className="relative w-full max-w-xl hidden md:block">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary" />
+          <div className="relative w-full max-w-lg hidden md:block">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
             <Input
               type="search"
               placeholder="Cari posisi pekerjaan, nama perusahaan, atau kata kunci..."
-              className="w-full bg-white pl-10 pr-4 border-blue-200/80 focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:border-primary rounded-xl h-10 text-sm placeholder:text-slate-400 shadow-xs"
+              className="w-full bg-slate-50/60 hover:bg-slate-50 focus-visible:bg-white pl-9 pr-3.5 border-slate-200 focus-visible:ring-1 focus-visible:ring-primary/40 focus-visible:border-primary rounded-lg h-8.5 text-xs placeholder:text-slate-400 shadow-none transition-all"
             />
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
-          <button className="relative h-9 w-9 flex items-center justify-center rounded-full border border-blue-200 bg-white text-primary hover:bg-blue-50 transition-colors shadow-xs cursor-pointer">
-            <Mail className="h-4 w-4" strokeWidth={2} />
+        <div className="flex items-center gap-2">
+          <button
+            aria-label="Pesan"
+            className="relative h-8 w-8 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-primary hover:bg-slate-50 hover:border-slate-300 transition-colors shadow-2xs cursor-pointer shrink-0"
+          >
+            <Mail className="h-3.5 w-3.5" strokeWidth={2} />
           </button>
 
-          <button className="relative h-9 w-9 flex items-center justify-center rounded-full border border-blue-200 bg-white text-primary hover:bg-blue-50 transition-colors shadow-xs cursor-pointer">
-            <Bell className="h-4 w-4" strokeWidth={2} />
-            <span className="absolute top-1.5 right-1.5 flex h-2 w-2 rounded-full bg-blue-500 ring-2 ring-white"></span>
+          <button
+            aria-label="Notifikasi"
+            className="relative h-8 w-8 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-primary hover:bg-slate-50 hover:border-slate-300 transition-colors shadow-2xs cursor-pointer shrink-0"
+          >
+            <Bell className="h-3.5 w-3.5" strokeWidth={2} />
+            <span className="absolute top-1 right-1 flex h-2 w-2 rounded-full bg-primary ring-2 ring-white"></span>
           </button>
 
-          <div className="w-px h-6 bg-slate-200/70 mx-1.5" />
+          <div className="w-px h-5 bg-slate-200/80 mx-1" />
 
-          <div className="flex items-center gap-2.5 pl-1">
-            <Avatar className="h-9 w-9 rounded-xl border border-white shadow-xs ring-1 ring-slate-100">
-              <AvatarImage src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${user?.full_name}`} alt="Avatar" className="rounded-xl" />
-              <AvatarFallback className="rounded-xl">{user?.full_name?.charAt(0) || "U"}</AvatarFallback>
+          <div className="flex items-center gap-2 pl-0.5">
+            <Avatar className="h-8 w-8 rounded-lg border border-slate-100 shadow-2xs">
+              <AvatarImage src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${user?.full_name}`} alt="Avatar" className="rounded-lg" />
+              <AvatarFallback className="rounded-lg text-xs">{user?.full_name?.charAt(0) || "U"}</AvatarFallback>
             </Avatar>
             <div className="hidden md:flex flex-col justify-center">
-              <span className="text-xs sm:text-sm font-bold text-primary leading-tight mb-0.5">{user?.full_name || "User"}</span>
-              <span className="text-xs font-medium text-slate-500 leading-tight">
+              <span className="text-xs font-bold text-slate-800 leading-tight truncate max-w-[140px]">{user?.full_name || "User"}</span>
+              <span className="text-[11px] font-medium text-slate-400 leading-tight">
                 {user?.role === "siswa" ? "XII RPL A • Siswa Aktif" : user?.role || "Guest"}
               </span>
             </div>

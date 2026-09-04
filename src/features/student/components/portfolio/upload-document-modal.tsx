@@ -7,7 +7,16 @@ import {
   Loader2,
   AlertCircle,
 } from "lucide-react";
-import type { PortfolioCategory } from "../schemas/portfolio.schema";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import type { PortfolioCategory } from "../../schemas/portfolio.schema";
 
 interface UploadDocumentModalProps {
   isOpen: boolean;
@@ -116,29 +125,31 @@ export function UploadDocumentModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 px-6 py-5 text-white flex items-center justify-between">
+        <div className="bg-primary px-6 py-5 text-primary-foreground flex items-center justify-between">
           <div className="flex items-center gap-3.5">
-            <div className="h-11 w-11 rounded-2xl bg-white/15 border border-white/25 backdrop-blur-[2px] flex items-center justify-center text-white shadow-inner">
+            <div className="h-11 w-11 rounded-2xl bg-white/15 border border-white/25 backdrop-blur-[2px] flex items-center justify-center text-primary-foreground shadow-inner">
               <UploadCloud className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
+              <h3 className="text-base sm:text-lg font-bold text-primary-foreground tracking-tight">
                 Unggah Dokumen
               </h3>
-              <p className="text-xs text-blue-100 font-medium mt-0.5">
+              <p className="text-xs text-primary-foreground/80 font-medium mt-0.5">
                 Tambahkan berkas pendukung lamaran
               </p>
             </div>
           </div>
 
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={handleClose}
             disabled={isUploading}
-            className="h-9 w-9 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white flex items-center justify-center transition-all cursor-pointer disabled:opacity-50"
+            className="h-9 w-9 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-primary-foreground cursor-pointer"
           >
             <X className="h-5 w-5" />
-          </button>
+          </Button>
         </div>
 
         {/* Modal Body / Form */}
@@ -150,36 +161,34 @@ export function UploadDocumentModal({
             </div>
           )}
 
-          {/* Kategori Dokumen */}
+          {/* Kategori Dokumen via Shadcn Select */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 tracking-wider mb-1.5">
+            <Label className="block text-xs font-bold text-slate-700 tracking-wider mb-1.5">
               Kategori Dokumen <span className="text-rose-500">*</span>
-            </label>
-            <div className="relative">
-              <select
-                value={currentCategoryId}
-                onChange={(e) => setSelectedCategoryId(Number(e.target.value))}
-                disabled={isUploading}
-                className="w-full h-11 px-3.5 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 focus:border-blue-500 rounded-xl text-xs sm:text-sm font-medium text-slate-800 transition-all outline-none appearance-none cursor-pointer"
-              >
-                <option value={0}>Pilih Jenis Berkas</option>
+            </Label>
+            <Select
+              value={currentCategoryId ? String(currentCategoryId) : undefined}
+              onValueChange={(val) => setSelectedCategoryId(Number(val))}
+              disabled={isUploading}
+            >
+              <SelectTrigger className="w-full h-11 px-3.5 bg-slate-50 hover:bg-slate-100/70 focus:bg-white border border-slate-200 focus:border-primary rounded-xl text-xs sm:text-sm font-medium text-slate-800 transition-all shadow-none">
+                <SelectValue placeholder="Pilih Jenis Berkas" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-slate-200 shadow-xl">
                 {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
+                  <SelectItem key={cat.id} value={String(cat.id)} className="text-xs sm:text-sm cursor-pointer py-2">
                     {cat.name}
-                  </option>
+                  </SelectItem>
                 ))}
-              </select>
-              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 text-xs">
-                ▼
-              </div>
-            </div>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Dropzone Upload File */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 tracking-wider mb-1.5">
+            <Label className="block text-xs font-bold text-slate-700 tracking-wider mb-1.5">
               Unggah File <span className="text-rose-500">*</span>
-            </label>
+            </Label>
 
             <input
               ref={fileInputRef}
@@ -199,10 +208,10 @@ export function UploadDocumentModal({
               onClick={() => fileInputRef.current?.click()}
               className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-2.5 ${
                 isDragOver
-                  ? "border-blue-500 bg-blue-50/50"
+                  ? "border-primary bg-primary/5"
                   : selectedFile
                   ? "border-emerald-300 bg-emerald-50/30"
-                  : "border-slate-200 hover:border-blue-400 bg-slate-50/40 hover:bg-blue-50/20"
+                  : "border-slate-200 hover:border-primary/50 bg-slate-50/40 hover:bg-primary/5"
               }`}
             >
               {selectedFile ? (
@@ -221,7 +230,7 @@ export function UploadDocumentModal({
                 </>
               ) : (
                 <>
-                  <div className="h-12 w-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shadow-xs">
+                  <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shadow-xs">
                     <UploadCloud className="h-6 w-6" />
                   </div>
                   <div>
@@ -239,19 +248,20 @@ export function UploadDocumentModal({
 
           {/* Modal Footer Buttons */}
           <div className="pt-2 flex items-center justify-end gap-3">
-            <button
+            <Button
               type="button"
+              variant="outline"
               onClick={handleClose}
               disabled={isUploading}
-              className="h-11 px-6 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs sm:text-sm font-semibold text-slate-600 transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+              className="h-11 px-6 rounded-xl border-slate-200 hover:bg-slate-50 text-xs sm:text-sm font-semibold text-slate-600 cursor-pointer"
             >
               Batal
-            </button>
+            </Button>
 
-            <button
+            <Button
               type="submit"
               disabled={isUploading}
-              className="h-11 px-6 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 shadow-sm cursor-pointer active:scale-95 disabled:opacity-60"
+              className="h-11 px-6 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 shadow-sm cursor-pointer"
             >
               {isUploading ? (
                 <>
@@ -264,10 +274,11 @@ export function UploadDocumentModal({
                   <Send className="h-3.5 w-3.5" />
                 </>
               )}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
     </div>
   );
 }
+
