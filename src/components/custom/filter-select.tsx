@@ -19,6 +19,7 @@ export interface FilterSelectProps {
   role?: "admin" | "siswa" | "hrd";
   onValueChange?: (val: string) => void;
   className?: string;
+  isLoading?: boolean;
 }
 
 const roleThemeClasses: Record<"admin" | "siswa" | "hrd", string> = {
@@ -34,20 +35,24 @@ export function FilterSelect({
   role = "admin",
   onValueChange,
   className,
+  isLoading = false,
 }: FilterSelectProps) {
   return (
     <div className={cn("inline-block", roleThemeClasses[role])}>
       <Select defaultValue={defaultValue} onValueChange={onValueChange}>
         <SelectTrigger
+          isLoading={isLoading}
           className={cn(
-            "!w-fit !text-white !border-none !rounded-lg !px-2.5 !h-7 !text-xs font-semibold shadow-xs transition-all duration-200 cursor-pointer !gap-1.5 [&_svg]:!text-white [&_svg]:!opacity-100 [&_svg]:!size-3.5",
-            "!bg-[var(--sidebar-strip)] hover:!bg-[var(--sidebar-gradient-to)]",
-            className
+            "w-fit! text-white! border-none! rounded-lg! px-2.5! h-7! text-xs! font-semibold shadow-xs transition-all duration-200 cursor-pointer gap-1.5! [&_svg]:text-white! [&_svg]:opacity-100! [&_svg]:size-3.5!",
+            "bg-sidebar-strip! hover:bg-sidebar-gradient-to!",
+            className,
           )}
         >
-          <SelectValue placeholder={placeholder || (options[0]?.label ?? "Pilih")} />
+          <SelectValue
+            placeholder={placeholder || (options[0]?.label ?? "Pilih")}
+          />
         </SelectTrigger>
-        <SelectContent align="end">
+        <SelectContent align="end" isLoading={isLoading}>
           {options.map((opt) => (
             <SelectItem key={opt.value} value={opt.value} className="text-xs">
               {opt.label}

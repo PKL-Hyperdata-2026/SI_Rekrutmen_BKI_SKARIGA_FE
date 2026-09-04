@@ -101,7 +101,7 @@ export function ModalHeader({
         "relative px-6 py-5 flex items-start justify-between gap-4 select-none shrink-0",
         roleThemeClasses[variant],
         isGradientHeader
-          ? "bg-gradient-to-r from-sidebar-gradient-to via-sidebar-strip to-sidebar-gradient-from text-white shadow-sm"
+          ? "bg-linear-to-r from-sidebar-gradient-to via-sidebar-strip to-sidebar-gradient-from text-white shadow-sm"
           : "bg-white border-b border-gray-100 text-gray-900",
         className,
       )}
@@ -249,7 +249,7 @@ export function ModalFooter({
               type="button"
               onClick={onConfirm}
               disabled={isLoading}
-              className="h-10 rounded-xl font-semibold px-5 transition-all flex items-center gap-2 cursor-pointer bg-gradient-to-r from-sidebar-strip to-primary hover:opacity-90 text-white shadow-sm"
+              className="h-10 rounded-xl font-semibold px-5 transition-all flex items-center gap-2 cursor-pointer bg-linear-to-r from-sidebar-strip to-primary hover:opacity-90 text-white shadow-sm"
             >
               {isLoading ? (
                 <>
