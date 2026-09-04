@@ -1,6 +1,6 @@
 # Frontend Codebase Reference (React 19 + TypeScript + Vite)
 
-Deep, factual reference for AI agents and developers. **Last verified: 2026-08-22.**
+Deep, factual reference for AI agents and developers. **Last verified: 2026-09-02.**
 If you modify code that alters any architecture, feature modules, state slices, or routes documented here, update this file in the same change.
 Operational instructions & boundaries: [`AGENTS.md`](./AGENTS.md).
 
@@ -43,26 +43,41 @@ frontend/src/
 │   └── axios.ts                       # Configured Axios client with Bearer auth interceptors
 ├── assets/                            # Static assets, logos, illustration SVGs
 ├── components/
-│   ├── custom/                        # Reusable global layout elements (PageHeader, Topbar, AppSidebar)
+│   ├── custom/                        # Reusable global elements (PageHeader, Topbar, AppSidebar, DataTable, StatCard, DocumentListCard, DocumentPreviewModal)
 │   └── ui/                            # Shadcn UI primitives & modal boilerplate (Button, Dialog, Modal, etc.)
-├── config/                            # Runtime configurations and constants
-├── features/                          # role-based feature modules
-│   ├── auth/                          # Authentication feature module
-│   │   ├── components/                # Auth-specific UI elements (LoginForm, OTPInput, ForgotPasswordModal)
-│   │   ├── pages/                     # Login & Reset Password views
-│   │   ├── schemas/                   # Zod schemas (login, forgot-password, reset-password)
-│   │   └── route.tsx                  # Auth sub-routing definitions (/login, /reset-password)
+├── config/
+│   └── menus.ts                       # Sidebar menus per role (STUDENT_MENUS, ADMIN_MENUS, HRD_MENUS)
+├── features/                          # role-based feature modules (kebab-case per feature domain)
+│   ├── auth/
+│   │   └── login/                     # Login feature domain (target pattern)
+│   │       ├── login.api.ts
+│   │       ├── login.schema.ts
+│   │       ├── login-form.tsx
+│   │       └── login-page.tsx
 │   ├── student/                       # Student portal feature module
-│   │   ├── components/                # Student-specific widgets & panels
-│   │   ├── pages/                     # dashboard, absensi, lamaran, lowongan, portofolio, tracer
-│   │   └── route.tsx                  # Student sub-routes
-│   ├── admin/                         # [Planned] Administrator portal module
+│   │   ├── e-portfolio/               # Fitur real E-Portofolio (akan dipolish rekan FE)
+│   │   │   ├── portfolio.api.ts            # API request functions (axios)
+│   │   │   ├── portfolio.form.ts           # Form setup (react-hook-form + zod)
+│   │   │   ├── portfolio.schema.ts         # Zod validation schemas & types
+│   │   │   ├── portfolio-header.tsx
+│   │   │   ├── personal-academic-form.tsx
+│   │   │   ├── upload-document-modal.tsx
+│   │   │   └── portofolio-page.tsx
+│   │   ├── lamaran/                   # [Planned] lamaran-page.tsx + lamaran.api.ts
+│   │   ├── absensi/                   # [Planned]
+│   │   ├── tracer-study/              # [Planned]
+│   │   └── route.tsx                  # Student sub-routes (agregator per-feature)
+│   ├── admin/                         # Administrator portal module (dashboard, siswa, alumni, dudi, lowongan, seleksi, validasi-absensi, penempatan, tracer, laporan)
 │   ├── hrd/                           # [Planned] Corporate HRD portal module
 │   └── alumni/                        # [Planned] Alumni portal module
-├── hooks/                             # Global reusable React hooks (useAuth, useDebounce, etc.)
-├── layouts/                           # Master layout wrappers (AuthLayout, DashboardLayout, etc.)
+├── hooks/                             # Global reusable React hooks
+│   ├── useApp.ts                      # Typed Redux hooks (useAppDispatch / useAppSelector)
+│   ├── useNotification.ts             # Realtime notification helper (Echo + polling)
+│   └── use-mobile.ts                  # Mobile breakpoint detector
+├── layouts/                           # Master layout wrappers (auth.layout.tsx, main.layout.tsx)
 ├── lib/
-│   └── utils.ts                       # Utility functions including cn() class merger
+│   ├── utils.ts                       # Utility functions including cn() class merger
+│   └── echo.ts                        # Laravel Echo (Reverb) instantiation
 ├── slices/
 │   └── authSlice.ts                   # Redux slice for user session, role, and token
 ├── store/
@@ -75,15 +90,39 @@ frontend/src/
 
 ## 4. Feature Module Pattern
 
-Features follow an **role -> Feature Folder -> Flat Files** organization:
+Features follow an **Role -> Feature Domain (kebab-case) -> Flat Files** organization:
 
-1. **role Level (`src/features/{role}`):** Groups modules by user persona (`auth`, `student`, `admin`, `hrd`, `alumni`).
-2. **Feature Level (`src/features/{role}/{feature}`):** Dedicated folder per sub-capability.
-3. **Files inside Feature:**
-   - `{Feature}API.ts` — Axios request functions for the feature endpoints.
-   - `{Feature}Hook.ts` — React custom hooks encapsulating local state, queries, and mutations.
-   - `{Feature}View.tsx` — Main presentational/container React component.
-   - `{Feature}Types.ts` — TypeScript interfaces for request payloads, response entities, and props.
+1. **Role Level (`src/features/{role}`):** Groups modules by user persona (`auth`, `student`, `admin`, `hrd`, `alumni`).
+2. **Feature Level (`src/features/{role}/{kebab-feature}`):** Dedicated folder per business capability (e.g. `student/lowongan-kerja`, `student/e-portfolio`, `student/lamaran`, `admin/penempatan`).
+3. **Files inside Feature Domain:**
+   - `kebab-feature.api.ts` — Axios request functions for the feature endpoints (e.g. `portfolio.api.ts`). Uses central `api` from `src/api/axios.ts`, never raw `fetch()` or new Axios instance.
+   - `kebab-feature.schema.ts` — Zod validation schemas & inferred TypeScript types (e.g. `portfolio.schema.ts`).
+   - `kebab-feature.form.ts` — Form setup using react-hook-form + zod resolver (e.g. `portfolio.form.ts`). Encapsulates form configuration and submit logic.
+   - `kebab-feature-page.tsx` — Main page/container component (PascalCase for component, kebab-case for file). Example: `lowongan-kerja-page.tsx` exports `LowonganKerjaPage`.
+   - `components/` — Optional subfolder only if the feature needs specific presentational components not reusable globally. Otherwise use `src/components/custom/` or `src/components/ui/`. Generic/reusable cards/modals (e.g. `document-list-card.tsx`, `document-preview-modal.tsx`) belong in `src/components/custom/` per leader feedback.
+   - `useKebabFeature.ts` — Optional local hook (`camelCase.ts`) encapsulating queries/mutations if needed.
+
+Routing stays at role level: `src/features/{role}/route.tsx` imports each `*-page.tsx` from its feature domain and exports an array (e.g. `studentRoute`) consumed by `src/route.tsx`.
+
+Example for `student`:
+
+```text
+features/student/
+├── lowongan-kerja/
+│   ├── lowongan-kerja.api.ts
+│   ├── lowongan-kerja.schema.ts
+│   └── lowongan-kerja-page.tsx
+├── e-portfolio/
+│   ├── portfolio.api.ts                # API functions (axios)
+│   ├── portfolio.form.ts               # Form setup (react-hook-form + zod)
+│   ├── portfolio.schema.ts             # Zod schemas & types
+│   ├── portfolio-header.tsx
+│   ├── personal-academic-form.tsx
+│   ├── upload-document-modal.tsx
+│   └── portofolio-page.tsx
+│   # document-list-card.tsx & document-preview-modal.tsx → src/components/custom/
+└── route.tsx
+```
 
 ## 5. State Management & Redux Store
 
@@ -102,19 +141,22 @@ Features follow an **role -> Feature Folder -> Flat Files** organization:
 ## 6. API Client & Networking Layer
 
 - Single Axios instance exported from `src/api/axios.ts`.
-- Base URL configured from environment variable `VITE_API_BASE_URL` (fallback `http://localhost:8000/api`).
-- Request Interceptor: Injects `Authorization: Bearer <token>` retrieved from state/storage.
+- Base URL configured from environment variable `VITE_API_URL` (fallback `http://localhost:8000/api`).
+- Request Interceptor: Injects `Authorization: Bearer ${token}` retrieved from `localStorage.getItem("access_token")`.
 - Response Interceptor:
-  - Unwraps response envelopes matching `{ success: true, message, data, errors }`.
-  - Handles `401 Unauthorized` by triggering auth state reset and redirecting to `/login`.
-  - Catches `422 Unprocessable Content` and surfaces validation error maps.
+  - Passes successful responses through.
+  - Handles `401 Unauthorized` by clearing `access_token` and redirecting to `/login`.
+  - Backend envelope is `{ success: boolean, message: string, data: {}, errors? }` — access payload via `response.data.data`.
+  - Catches `422 Unprocessable Content` and surfaces validation error maps where needed.
 
 ## 7. Reusable Component Conventions
 
 - **Page Header (`src/components/custom/page-header.tsx`):** Universal top banner with role theming (`admin`, `student`, `alumni`, `hrd`, `auto`). Supports self-closing props (`badge`, `title`, `description`, `titleAs`) and interactive children (`PageHeader.Button`, `PageHeader.NotificationCard`, `PageHeader.StatCard`).
 - **Modal Boilerplate (`src/components/ui/modal.tsx`):** Dual-mode dialog wrapper over Radix UI primitives (`src/components/ui/dialog.tsx`). Use `<Modal ... />` for standard form workflows, or compound primitives (`Modal.Root`, `Modal.Content`, `Modal.Header`, `Modal.Body`, `Modal.Footer`) for custom multi-column layouts.
+- **DataTable (`src/components/custom/data-table.tsx`):** Generic `<T>` table with loading skeleton, empty state, sorting/filtering via TanStack.
 
 ## 8. Password Reset Flow (auth feature)
+
 1. Login page → "Lupa Password" opens `ForgotPasswordModal` → `POST /forgot-password` with email; success panel instructs checking inbox.
 2. Backend emails SPA link `/reset-password?token=...&email=...`.
 3. `ResetPasswordPage` (`features/auth/pages/reset-password.tsx`) reads query params, validates password + confirmation (zod, min 8), submits `POST /reset-password`, then redirects to `/login` with `state.flashMessage` shown as success banner. Invalid/missing params render an invalid-link state.
