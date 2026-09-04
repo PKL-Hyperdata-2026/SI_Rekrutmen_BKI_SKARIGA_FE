@@ -88,7 +88,7 @@ export function LowonganKerjaDetailForm({
       title="Detail Lowongan Pekerjaan"
       description="Informasi lengkap mengenai lowongan kerja."
       footer={null}
-      className="sm:max-w-120 rounded-lg"
+      className="w-[95vw] sm:max-w-120 max-h-[92vh] rounded-lg"
     >
       {isLoading ? (
         <Card className="flex flex-col items-center justify-center py-24 gap-3 border-none ring-0 shadow-none bg-transparent">
@@ -98,7 +98,7 @@ export function LowonganKerjaDetailForm({
           </CardDescription>
         </Card>
       ) : (
-        <FieldGroup className="gap-5">
+        <FieldGroup className="gap-4 sm:gap-5">
           <Card className="flex flex-row items-center gap-3 rounded-lg border border-slate-200 bg-[#F6F7FB] px-4 py-3 ring-0 shadow-none">
             <CardContent className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-purple-100 text-purple-600 p-0">
               <Building2 className="size-5" />
@@ -113,17 +113,17 @@ export function LowonganKerjaDetailForm({
             </CardContent>
           </Card>
 
-          <FieldGroup className="grid grid-cols-2 gap-3">
+          <FieldGroup className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <DetailItem label="Kuota" value={quota} />
             <DetailItem label="Batas Pendaftaran" value={deadline} />
           </FieldGroup>
 
-          <FieldGroup className="grid grid-cols-2 gap-3">
+          <FieldGroup className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <DetailItem label="Jurusan" value={major} />
             <DetailItem label="Target" value={target} />
           </FieldGroup>
 
-          <DetailItem label="Status MOU BKK" value={workLocation} />
+          <DetailItem label="Lokasi Kerja" value={workLocation} />
 
           <Field className="gap-1.5">
             <Label className="text-xs font-bold text-[#1e1b4b]">

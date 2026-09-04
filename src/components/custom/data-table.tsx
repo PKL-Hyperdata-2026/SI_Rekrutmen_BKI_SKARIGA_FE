@@ -236,7 +236,7 @@ export interface DataTableProps<T> {
   className?: string;
   rowClassName?: string;
   pagination?: DataTablePaginationProps;
-  /** Automatically attaches action column with DeleteButton Popover confirmation */
+  role?: RoleType;
   actions?: DataTableActionConfig<T>;
 }
 
@@ -252,6 +252,7 @@ export function DataTable<T extends Record<string, any>>({
   className,
   rowClassName,
   pagination,
+  role,
   actions,
 }: DataTableProps<T>) {
   const effectiveColumns = React.useMemo<DataTableColumn<T>[]>(() => {
@@ -383,7 +384,7 @@ export function DataTable<T extends Record<string, any>>({
         </table>
       </div>
 
-      {pagination && <DataTablePagination {...pagination} />}
+      {pagination && <DataTablePagination role={role} {...pagination} />}
     </div>
   );
 }

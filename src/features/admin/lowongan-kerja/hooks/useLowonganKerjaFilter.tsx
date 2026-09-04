@@ -154,12 +154,17 @@ export function useLowonganKerjaFilter() {
   }, []);
 
   const totalCompaniesCount = useMemo(() => {
-    const ids = new Set(
-      vacancies
-        .map((v) => v.companyId ?? v.company?.id)
-        .filter((id): id is string | number => id !== undefined && id !== null && id !== ""),
-    );
-    return ids.size;
+    const uniqueCompanyKeys = new Set<string | number>();
+    for (const v of vacancies) {
+      const key =
+        v.companyId ??
+        v.company?.id ??
+        (v.company?.name ? v.company.name.trim().toLowerCase() : undefined);
+      if (key !== undefined && key !== null && key !== "") {
+        uniqueCompanyKeys.add(key);
+      }
+    }
+    return uniqueCompanyKeys.size;
   }, [vacancies]);
 
   return {
