@@ -373,7 +373,7 @@ export function useLowonganKerjaForm({
         const parsedQuota = parseInt(quota, 10);
 
         const payload: Record<string, unknown> = {
-          company_id: Number(companyId),
+          company_id: companyId,
           position: position.trim(),
           title: position.trim(),
           quota: parsedQuota > 0 ? parsedQuota : 1,

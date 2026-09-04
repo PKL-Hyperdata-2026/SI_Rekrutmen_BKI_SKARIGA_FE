@@ -41,7 +41,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/components/ui/sonner";
 
 interface UserItem {
-  id: number;
+  id: number | string;
   fullName: string;
   email: string;
   phone: string | null;
@@ -49,15 +49,15 @@ interface UserItem {
   isActive: boolean;
   createdAt: string;
   company?: {
-    id: number;
+    id: number | string;
     name: string;
   } | null;
 }
 
 interface CompanyOption {
-  id: number;
+  id: number | string;
   name: string;
-  user_id: number | null;
+  user_id: number | string | null;
 }
 
 export const UsersManagementPage = () => {
@@ -174,7 +174,7 @@ export const UsersManagementPage = () => {
       }
 
       if (formData.role === "hrd") {
-        payload.company_id = formData.company_id ? Number(formData.company_id) : null;
+        payload.company_id = formData.company_id || null;
       }
 
       if (editingUser) {
