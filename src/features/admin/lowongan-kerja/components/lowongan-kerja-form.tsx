@@ -102,7 +102,7 @@ export function LowonganKerjaForm({
           : "Lengkapi informasi lowongan untuk pendataan."
       }
       footer={null}
-      className="sm:max-w-160 rounded-lg overflow-hidden"
+      className="w-[95vw] sm:max-w-160 max-h-[92vh] rounded-lg overflow-hidden"
     >
       {isLoadingData ? (
         <div className="flex flex-col items-center justify-center py-24 gap-3">
@@ -364,7 +364,7 @@ export function LowonganKerjaForm({
               onChange={(e) => setQualification(e.target.value)}
               placeholder="cth. Surat Lamaran Kerja, CV, .."
               className={cn(
-                "min-h-20 max-h-28 w-full rounded-lg border bg-[#F8F9FD] p-3 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:bg-white focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all resize-y",
+                "min-h-20 max-h-28 w-full rounded-lg border bg-[#F8F9FD] p-3 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:bg-white focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all resize-y custom-scrollbar",
                 errors.qualification
                   ? "border-red-500 bg-red-50/20"
                   : "border-slate-200",
@@ -395,20 +395,20 @@ export function LowonganKerjaForm({
             </Label>
           </CardContent>
 
-          <CardContent className="sticky -bottom-4 bg-white/95 backdrop-blur-xs pt-2.5 pb-2 -mx-6 px-6 border-t border-slate-100 flex items-center justify-end gap-3 z-10 mt-1">
+          <CardContent className="sticky -bottom-4 bg-white/95 backdrop-blur-xs pt-2.5 pb-3 sm:pb-2 -mx-6 px-6 border-t border-slate-100 flex items-center justify-end gap-3 z-10 mt-1">
             <Button
               type="button"
               variant="outline"
               onClick={() => handleOpenChange(false)}
               disabled={isSubmitting}
-              className="h-9.5 px-6 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-sm shadow-xs cursor-pointer"
+              className="hidden sm:inline-flex h-9.5 w-auto px-6 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-sm shadow-xs cursor-pointer justify-center"
             >
               Batal
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="h-9.5 px-7 rounded-lg bg-linear-to-r from-[#2e1065] via-[#4c1d95] to-[#7c3aed] hover:opacity-95 text-white font-semibold text-sm shadow-md flex items-center gap-2 cursor-pointer"
+              className="h-9.5 w-full sm:w-auto px-7 rounded-lg bg-linear-to-r from-[#2e1065] via-[#4c1d95] to-[#7c3aed] hover:opacity-95 text-white font-semibold text-sm shadow-md flex items-center justify-center gap-2 cursor-pointer"
             >
               {isSubmitting ? (
                 <>

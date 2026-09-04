@@ -47,19 +47,23 @@ export const LowonganKerjaPage = () => {
         title="Data Lowongan Kerja"
         description="Manajemen pembukaan lowongan kerja, kualifikasi, kuota pelamar, dan jadwal seleksi."
       >
-        <PageHeader.Button
-          variant="primary"
-          icon={<Store className="h-4 w-4" />}
-          onClick={handleOpenCreate}
-        >
-          Tambah Lowongan Kerja
-        </PageHeader.Button>
-        <PageHeader.Button
-          variant="glass"
-          icon={<Printer className="h-4 w-4" />}
-        >
-          Import Excel
-        </PageHeader.Button>
+        <div className="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
+          <PageHeader.Button
+            variant="primary"
+            icon={<Store className="h-4 w-4" />}
+            onClick={handleOpenCreate}
+            className="w-full sm:w-auto justify-center"
+          >
+            Tambah Lowongan Kerja
+          </PageHeader.Button>
+          <PageHeader.Button
+            variant="glass"
+            icon={<Printer className="h-4 w-4" />}
+            className="w-full sm:w-auto justify-center"
+          >
+            Import Excel
+          </PageHeader.Button>
+        </div>
       </PageHeader>
 
       <LowonganKerjaFilter

@@ -34,10 +34,12 @@ function SelectTrigger({
   className,
   children,
   isLoading = false,
+  loadingText = "Memuat data...",
   disabled,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
   isLoading?: boolean;
+  loadingText?: string;
 }) {
   return (
     <SelectPrimitive.Trigger
@@ -49,7 +51,11 @@ function SelectTrigger({
       )}
       {...props}
     >
-      {children}
+      {isLoading ? (
+        <span className="truncate opacity-75">{loadingText}</span>
+      ) : (
+        children
+      )}
       <SelectPrimitive.Icon asChild>
         {isLoading ? (
           <Loader2 className="size-4 animate-spin text-slate-500" />
@@ -86,7 +92,7 @@ function SelectContent({
       >
         <SelectPrimitive.Viewport
           className={cn(
-            "p-1 max-h-60 overflow-y-auto overscroll-contain",
+            "p-1 max-h-60 overflow-y-auto overscroll-contain custom-scrollbar pr-1.5",
             position === "popper" &&
               "w-full min-w-(--radix-select-trigger-width)",
           )}

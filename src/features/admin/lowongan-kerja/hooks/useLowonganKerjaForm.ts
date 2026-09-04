@@ -10,6 +10,19 @@ import {
 } from "../types";
 import { jobVacancyFormSchema } from "../schemas/schemas";
 
+interface ApiErrorResponse {
+  response?: {
+    data?: {
+      message?: string;
+      errors?: Record<string, string[]>;
+    };
+  };
+}
+
+function isApiError(err: unknown): err is ApiErrorResponse {
+  return typeof err === "object" && err !== null && "response" in err;
+}
+
 export interface UseLowonganKerjaFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -137,7 +150,9 @@ export function useLowonganKerjaForm({
         if (Array.isArray(data.targetApplicants))
           setTargetApplicants(data.targetApplicants);
       }
+      return data ?? null;
     } catch {
+      return null;
     } finally {
       setIsLoadingOptions(false);
     }
@@ -183,15 +198,101 @@ export function useLowonganKerjaForm({
       if (vacancy) {
         setIsLoadingData(true);
 
-        if (!initialCompanies || initialCompanies.length === 0) {
-          try {
-            await fetchOptions();
-          } catch {}
+        let currentCompanies =
+          initialCompanies && initialCompanies.length > 0
+            ? initialCompanies
+            : companies;
+        let currentMajors =
+          initialMajors && initialMajors.length > 0 ? initialMajors : majors;
+        let currentTargets =
+          initialTargetApplicants && initialTargetApplicants.length > 0
+            ? initialTargetApplicants
+            : targetApplicants;
+
+        if (
+          currentCompanies.length === 0 ||
+          currentMajors.length === 0 ||
+          currentTargets.length === 0
+        ) {
+          const fetched = await fetchOptions();
+          if (fetched) {
+            if (
+              Array.isArray(fetched.companies) &&
+              fetched.companies.length > 0
+            ) {
+              currentCompanies = fetched.companies;
+            }
+            if (Array.isArray(fetched.majors) && fetched.majors.length > 0) {
+              currentMajors = fetched.majors;
+            }
+            if (
+              Array.isArray(fetched.targetApplicants) &&
+              fetched.targetApplicants.length > 0
+            ) {
+              currentTargets = fetched.targetApplicants;
+            }
+          }
         }
 
         if (!isMounted) return;
 
-        setCompanyId(String(vacancy.companyId || vacancy.company?.id || ""));
+        let resolvedCompanyId = "";
+        const vacCompanyId = vacancy.companyId || vacancy.company?.id;
+        const vacCompanyName = vacancy.company?.name;
+        if (vacCompanyId || vacCompanyName) {
+          const matchedCompany = currentCompanies.find(
+            (c) =>
+              (vacCompanyId && String(c.id) === String(vacCompanyId)) ||
+              (vacCompanyName &&
+                c.name?.toLowerCase() === vacCompanyName.toLowerCase()),
+          );
+          resolvedCompanyId = matchedCompany
+            ? String(matchedCompany.id)
+            : String(vacCompanyId || "");
+        }
+
+        let resolvedMajorId = "all";
+        if (vacancy.majors && vacancy.majors.length > 0) {
+          const vacMajor = vacancy.majors[0];
+          const matchedMajor = currentMajors.find(
+            (m) =>
+              String(m.id) === String(vacMajor.id) ||
+              (vacMajor.code &&
+                m.code?.toLowerCase() === vacMajor.code.toLowerCase()) ||
+              (vacMajor.name &&
+                m.name?.toLowerCase() === vacMajor.name.toLowerCase()),
+          );
+          resolvedMajorId = matchedMajor
+            ? String(matchedMajor.id)
+            : String(vacMajor.id);
+        } else if (vacancy.majorIds && vacancy.majorIds.length > 0) {
+          const firstMajorId = String(vacancy.majorIds[0]);
+          const matchedMajor = currentMajors.find(
+            (m) => String(m.id) === firstMajorId,
+          );
+          resolvedMajorId = matchedMajor
+            ? String(matchedMajor.id)
+            : firstMajorId;
+        }
+
+        let resolvedTargetId = "all";
+        const vacTarget = vacancy.targetApplicant;
+        const vacTargetId = vacancy.targetApplicantId || vacTarget?.id;
+        if (vacTarget || vacTargetId) {
+          const matchedTarget = currentTargets.find(
+            (t) =>
+              (vacTargetId && String(t.id) === String(vacTargetId)) ||
+              (vacTarget?.code &&
+                t.code?.toLowerCase() === vacTarget.code.toLowerCase()) ||
+              (vacTarget?.name &&
+                t.name?.toLowerCase() === vacTarget.name.toLowerCase()),
+          );
+          resolvedTargetId = matchedTarget
+            ? String(matchedTarget.id)
+            : String(vacTargetId || "all");
+        }
+
+        setCompanyId(resolvedCompanyId);
         setPosition(vacancy.position || vacancy.title || "");
         setQuota(
           vacancy.quota !== undefined && vacancy.quota !== null
@@ -201,20 +302,8 @@ export function useLowonganKerjaForm({
         setDeadline(
           vacancy.deadline ? String(vacancy.deadline).substring(0, 10) : "",
         );
-        setMajorId(
-          vacancy.majors && vacancy.majors.length > 0
-            ? String(vacancy.majors[0].id)
-            : vacancy.majorIds && vacancy.majorIds.length > 0
-              ? String(vacancy.majorIds[0])
-              : "all",
-        );
-        setTargetId(
-          vacancy.targetApplicantId
-            ? String(vacancy.targetApplicantId)
-            : vacancy.targetApplicant?.id
-              ? String(vacancy.targetApplicant.id)
-              : "all",
-        );
+        setMajorId(resolvedMajorId);
+        setTargetId(resolvedTargetId);
         setWorkLocation(vacancy.workLocation || "");
         setQualification(vacancy.qualification || vacancy.description || "");
         setSendNotification(false);
@@ -225,7 +314,7 @@ export function useLowonganKerjaForm({
           if (isMounted) {
             setIsLoadingData(false);
           }
-        }, 200);
+        }, 150);
       } else {
         setIsLoadingData(false);
         if (!initialCompanies || initialCompanies.length === 0) {
@@ -293,8 +382,7 @@ export function useLowonganKerjaForm({
           qualification: qualification.trim(),
           send_notification: sendNotification,
           major_ids: majorId && majorId !== "all" ? [majorId] : [],
-          target_applicant_id:
-            targetId && targetId !== "all" ? targetId : null,
+          target_applicant_id: targetId && targetId !== "all" ? targetId : null,
         };
 
         if (isEditMode && activeVacancy?.id) {
@@ -308,18 +396,9 @@ export function useLowonganKerjaForm({
         handleOpenChange(false);
         onSuccess?.();
       } catch (err: unknown) {
-        const axiosErr = err as {
-          response?: {
-            data?: {
-              message?: string;
-              errors?: Record<string, string[]>;
-            };
-          };
-        };
-
-        if (axiosErr.response?.data?.errors) {
+        if (isApiError(err) && err.response?.data?.errors) {
           const backendErrors: Record<string, string> = {};
-          const errMap = axiosErr.response.data.errors;
+          const errMap = err.response.data.errors;
           if (errMap.company_id) backendErrors.companyId = errMap.company_id[0];
           if (errMap.position) backendErrors.position = errMap.position[0];
           if (errMap.quota) backendErrors.quota = errMap.quota[0];
@@ -334,8 +413,12 @@ export function useLowonganKerjaForm({
           setErrors(backendErrors);
         }
 
+        const serverMessage = isApiError(err)
+          ? err.response?.data?.message
+          : undefined;
+
         setErrorMsg(
-          axiosErr.response?.data?.message ||
+          serverMessage ||
             (isEditMode
               ? "Terjadi kesalahan saat memperbarui lowongan kerja."
               : "Terjadi kesalahan saat mempublikasikan lowongan kerja."),

@@ -10,59 +10,13 @@ const DEFAULT_STATUS_OPTIONS: FilterSelectOption[] = [
 ];
 
 const DEFAULT_MAJOR_OPTIONS: FilterSelectOption[] = [
-  {
-    value: "all",
-    label: (
-      <>
-        <span className="hidden in-data-[slot=select-value]:inline">
-          Jurusan: Semua
-        </span>
-        <span className="inline in-data-[slot=select-value]:hidden">
-          Jurusan: Semua
-        </span>
-      </>
-    ) as unknown as string,
-  },
+  { value: "all", label: "Semua Jurusan" },
 ];
 
 const DEFAULT_TARGET_OPTIONS: FilterSelectOption[] = [
-  {
-    value: "all",
-    label: (
-      <>
-        <span className="hidden in-data-[slot=select-value]:inline">
-          Target: Semua
-        </span>
-        <span className="inline in-data-[slot=select-value]:hidden">
-          Target: Semua
-        </span>
-      </>
-    ) as unknown as string,
-  },
-  {
-    value: "alumni",
-    label: (
-      <>
-        <span className="hidden in-data-[slot=select-value]:inline">
-          Target: Alumni
-        </span>
-        <span className="inline in-data-[slot=select-value]:hidden">
-          Alumni
-        </span>
-      </>
-    ) as unknown as string,
-  },
-  {
-    value: "siswa",
-    label: (
-      <>
-        <span className="hidden in-data-[slot=select-value]:inline">
-          Target: Siswa
-        </span>
-        <span className="inline in-data-[slot=select-value]:hidden">Siswa</span>
-      </>
-    ) as unknown as string,
-  },
+  { value: "all", label: "Semua Target" },
+  { value: "alumni", label: "Alumni" },
+  { value: "siswa", label: "Siswa" },
 ];
 
 export function useLowonganKerjaFilter() {
@@ -109,62 +63,20 @@ export function useLowonganKerjaFilter() {
 
         if (Array.isArray(data.majors)) {
           setMajorOptions([
-            {
-              value: "all",
-              label: (
-                <>
-                  <span className="hidden in-data-[slot=select-value]:inline">
-                    Jurusan: Semua
-                  </span>
-                  <span className="inline in-data-[slot=select-value]:hidden">
-                    Jurusan: Semua
-                  </span>
-                </>
-              ) as unknown as string,
-            },
+            { value: "all", label: "Semua Jurusan" },
             ...data.majors.map((m) => ({
               value: String(m.id),
-              label: (
-                <>
-                  <span className="hidden in-data-[slot=select-value]:inline">
-                    Jurusan: {m.code || m.name}
-                  </span>
-                  <span className="inline in-data-[slot=select-value]:hidden">
-                    {m.name}
-                  </span>
-                </>
-              ) as unknown as string,
+              label: m.code ? `${m.name} (${m.code})` : m.name,
             })),
           ]);
         }
 
         if (Array.isArray(data.targetApplicants)) {
           setTargetOptions([
-            {
-              value: "all",
-              label: (
-                <>
-                  <span className="hidden in-data-[slot=select-value]:inline">
-                    Target: Semua
-                  </span>
-                  <span className="inline in-data-[slot=select-value]:hidden">
-                    Target: Semua
-                  </span>
-                </>
-              ) as unknown as string,
-            },
+            { value: "all", label: "Semua Target" },
             ...data.targetApplicants.map((t) => ({
               value: String(t.id),
-              label: (
-                <>
-                  <span className="hidden in-data-[slot=select-value]:inline">
-                    Target: {t.name}
-                  </span>
-                  <span className="inline in-data-[slot=select-value]:hidden">
-                    {t.name}
-                  </span>
-                </>
-              ) as unknown as string,
+              label: t.name,
             })),
           ]);
         }
@@ -242,12 +154,17 @@ export function useLowonganKerjaFilter() {
   }, []);
 
   const totalCompaniesCount = useMemo(() => {
-    const ids = new Set(
-      vacancies
-        .map((v) => v.companyId ?? v.company?.id)
-        .filter((id): id is number => typeof id === "number"),
-    );
-    return ids.size;
+    const uniqueCompanyKeys = new Set<string | number>();
+    for (const v of vacancies) {
+      const key =
+        v.companyId ??
+        v.company?.id ??
+        (v.company?.name ? v.company.name.trim().toLowerCase() : undefined);
+      if (key !== undefined && key !== null && key !== "") {
+        uniqueCompanyKeys.add(key);
+      }
+    }
+    return uniqueCompanyKeys.size;
   }, [vacancies]);
 
   return {
