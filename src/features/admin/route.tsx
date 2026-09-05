@@ -1,35 +1,35 @@
-import { AdminDashboard } from "./pages/dashboard";
-import { DataSiswaPage } from "./pages/siswa";
-import { DataAlumniPage } from "./pages/alumni";
-import { PerusahaanDudiPage } from "./pages/dudi";
-import { LowonganKerjaPage } from "./pages/lowongan";
-import { SeleksiRekrutmenPage } from "./pages/seleksi";
-import { ValidasiAbsensiPage } from "./pages/validasi-absensi";
-import { PenempatanKerjaPage } from "./pages/penempatan";
-import { TracerStudyPage } from "./pages/tracer";
-import { LaporanCetakPage } from "./pages/laporan";
-import { UsersManagementPage } from "./pages/users";
+import { DashboardPage } from "./dashboard/dashboard-page";
+import { UsersPage } from "./users/users-page";
+import { SiswaPage } from "./siswa/siswa-page";
+import { AlumniPage } from "./alumni/alumni-page";
+import { DudiPage } from "./dudi/dudi-page";
+import { LowonganKerjaPage } from "./lowongan-kerja/lowongan-kerja-page";
+import { SeleksiPage } from "./seleksi/seleksi-page";
+import { ValidasiAbsensiPage } from "./validasi-absensi/validasi-absensi-page";
+import { PenempatanPage } from "./penempatan/penempatan-page";
+import { TracerPage } from "./tracer-study/tracer-page";
+import { LaporanPage } from "./laporan/laporan-page";
 
 export const adminRoute = [
   {
     path: "dashboard",
-    element: <AdminDashboard />,
+    element: <DashboardPage />,
   },
   {
     path: "users",
-    element: <UsersManagementPage />,
+    element: <UsersPage />,
   },
   {
     path: "siswa",
-    element: <DataSiswaPage />,
+    element: <SiswaPage />,
   },
   {
     path: "alumni",
-    element: <DataAlumniPage />,
+    element: <AlumniPage />,
   },
   {
     path: "dudi",
-    element: <PerusahaanDudiPage />,
+    element: <DudiPage />,
   },
   {
     path: "lowongan",
@@ -37,7 +37,7 @@ export const adminRoute = [
   },
   {
     path: "seleksi",
-    element: <SeleksiRekrutmenPage />,
+    element: <SeleksiPage />,
   },
   {
     path: "validasi-absensi",
@@ -45,14 +45,14 @@ export const adminRoute = [
   },
   {
     path: "penempatan",
-    element: <PenempatanKerjaPage />,
+    element: <PenempatanPage />,
   },
   {
     path: "tracer",
-    element: <TracerStudyPage />,
+    element: <TracerPage />,
   },
   {
     path: "laporan",
-    element: <LaporanCetakPage />,
+    element: <LaporanPage />,
   },
 ];

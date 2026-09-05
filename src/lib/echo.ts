@@ -21,7 +21,7 @@ export const echo = new Echo({
   authEndpoint: `${import.meta.env.VITE_API_URL}/broadcasting/auth`,
   auth: {
     headers: {
-      Authorization: `Bearer ${localStorage.getItem('access_ token')}`,
+      Authorization: `Bearer ${localStorage.getItem('access_token')}`,
       Accept: 'application/json',
     },
   },

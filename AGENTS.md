@@ -24,10 +24,15 @@ npm run preview                            # Preview production build locally
 ## Critical Rules (READ FIRST)
 
 1. NEVER use `any` in TypeScript. Define explicit `interface` or `type` definitions for all component props, API payloads, and state objects.
-2. ALWAYS organize features under `src/features/{role}/{feature}/` (e.g. `src/features/auth/`, `src/features/student/`, `src/features/admin/`).
-3. File naming conventions:
-   - React components & views: `PascalCase.tsx` (e.g., `ButtonPrimary.tsx`, `JobCard.tsx`).
-   - Hooks, utilities, API clients, and slices: `camelCase.ts` (e.g., `useAuth.ts`, `axios.ts`, `authSlice.ts`).
+2. ALWAYS organize feature code under `src/features/{role}/{feature}/` — one kebab-case folder per business capability (e.g. `src/features/student/e-portfolio/`, `src/features/admin/users/`, `src/features/admin/dudi/`). Role-level `route.tsx` aggregates feature pages. Cross-cutting route guards live at the auth role root (`src/features/auth/protected-route.tsx`, `dashboard-redirector.tsx`).
+3. File naming conventions (kebab-case, matching the feature folder):
+   - Page containers: `{feature}-page.tsx` exporting a PascalCase component (`users-page.tsx` -> `UsersManagementPage`).
+   - Form components: `{feature}-form.tsx`.
+   - Table column definitions: `{feature}-table.tsx`.
+   - Form setup hooks & payload builders: `{feature}.form.ts` exporting `use{Feature}Form()` (wraps `useForm` + `zodResolver` + `defaultValues`) and pure payload builders (`toXxxPayload`).
+   - Zod schemas & inferred types: `{feature}.schema.ts`.
+   - Axios request modules: `{feature}.api.ts` (always built on the central `api` client).
+   - Local feature hooks: `use{Feature}.ts`; global hooks, utilities, and slices: `camelCase.ts` (e.g. `use-mobile.ts`, `axios.ts`, `authSlice.ts`).
 4. NEVER make raw `fetch()` calls or create new Axios instances. Always use the central configured client at `src/api/axios.ts`.
 5. Global authentication and session state MUST be stored in Redux (`src/store/index.ts` and `src/slices/authSlice.ts`).
 6. Component UI styling MUST use Tailwind CSS utility classes, Shadcn UI primitives located in `src/components/ui/`, and custom layout components in `src/components/custom/` (e.g., `PageHeader`).
@@ -40,6 +45,8 @@ npm run preview                            # Preview production build locally
 - Tailwind CSS v4 setup: Styling is imported directly in `src/index.css`. Do not add old Tailwind v3 plugins or deprecated config syntax.
 - Class merging: When accepting custom `className` in UI components, always wrap with the `cn()` helper (`src/lib/utils.ts`) combining `clsx` and `tailwind-merge`.
 - API response unwrapping: The backend returns `{ success: true, message: "...", data: { ... } }`. Always access payload through `response.data.data` or configure the response interceptor in `src/api/axios.ts`.
+- Feature API modules: Each feature owns a `{feature}.api.ts` that wraps endpoint calls in typed functions and returns the unwrapped payload. Feature pages/components must not call `api.get/post` inline; import the feature's `.api.ts` instead.
+- Select components: Use `SearchableSelect` from `@/components/ui/searchable-select`. The `searchable` prop defaults to `false`. When a search bar is required for long lists, specify `searchable={true}` or `searchable`.
 - Routing protection: Role-based navigation is managed in `src/route.tsx`. Add new routes under their respective role layout or protected route wrapper.
 
 ## Git Workflow

@@ -1,9 +1,9 @@
-import { StudentDashboard } from "./pages/dashboard";
-import { LowonganKerja } from "./pages/lowongan";
-import { LamaranSaya } from "./pages/lamaran";
-import { AbsensiRekrutmen } from "./pages/absensi";
-import { EPortofolio } from "./pages/portofolio";
-import { TracerStudy } from "./pages/tracer";
+import { StudentDashboard } from "./dashboard/dashboard-page";
+import { LowonganKerjaPage } from "./lowongan-kerja/lowongan-kerja-page";
+import { LamaranSaya } from "./lamaran/lamaran-page";
+import { AbsensiRekrutmen } from "./absensi/absensi-page";
+import { EPortofolio } from "./e-portfolio/portofolio-page";
+import { TracerStudy } from "./tracer-study/tracer-page";
 
 export const studentRoute = [
   {
@@ -12,7 +12,7 @@ export const studentRoute = [
   },
   {
     path: "lowongan",
-    element: <LowonganKerja />,
+    element: <LowonganKerjaPage />,
   },
   {
     path: "lamaran",

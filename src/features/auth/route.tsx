@@ -1,5 +1,5 @@
-import { LoginPage } from "./pages/login";
-import { ResetPasswordPage } from "./pages/reset-password";
+import { LoginPage } from "./login/login-page";
+import { ResetPasswordPage } from "./reset-password/reset-password-page";
 
 export const authRoute = [
   {
