@@ -1,3 +1,4 @@
+export { LowonganKerjaPage } from "./lowongan-kerja-page";
 export { LowonganKerjaFilter } from "./components/lowongan-kerja-filter";
 export { LowonganKerjaTable } from "./components/lowongan-kerja-table";
 export { LowonganKerjaForm } from "./components/lowongan-kerja-form";

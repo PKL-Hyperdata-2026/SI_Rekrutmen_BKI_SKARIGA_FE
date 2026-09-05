@@ -2,8 +2,8 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { authRoute } from "./features/auth/route";
 import { AuthLayout } from "./layouts/auth.layout";
 import { MainLayout } from "./layouts/main.layout";
-import { ProtectedRoute } from "./features/auth/components/protected-route";
-import { DashboardRedirector } from "./features/auth/components/dashboard-redirector";
+import { ProtectedRoute } from "./features/auth/protected-route";
+import { DashboardRedirector } from "./features/auth/dashboard-redirector";
 import { studentRoute } from "./features/student/route";
 import { adminRoute } from "./features/admin/route";
 

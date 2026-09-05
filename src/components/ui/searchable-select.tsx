@@ -75,16 +75,16 @@ export function SearchableSelect({
     return options.filter((opt) => opt.label.toLowerCase().includes(q));
   }, [options, search, searchable]);
 
-  React.useEffect(() => {
-    if (open && searchable) {
+  const handleOpenChange = (nextOpen: boolean) => {
+    setOpen(nextOpen);
+    if (nextOpen && searchable) {
       setSearch("");
-      const timer = setTimeout(() => inputRef.current?.focus(), 50);
-      return () => clearTimeout(timer);
+      setTimeout(() => inputRef.current?.focus(), 50);
     }
-  }, [open, searchable]);
+  };
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
           id={id}
