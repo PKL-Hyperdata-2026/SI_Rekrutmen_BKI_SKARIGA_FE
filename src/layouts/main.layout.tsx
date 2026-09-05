@@ -1,13 +1,15 @@
 import { Outlet, Navigate, useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/hooks/useApp";
 import { logout, setCredentials } from "@/slices/authSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { api } from "@/api/axios";
 import { Loader2 } from "lucide-react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppSidebar, Topbar } from "@/components/custom";
 import { Toaster } from "@/components/ui/sonner";
+
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function MainLayout() {
   const token = localStorage.getItem("access_token");
@@ -40,8 +42,15 @@ export function MainLayout() {
     return () => document.body.classList.remove(themeClass);
   }, [themeClass]);
 
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (scrollAreaRef.current) {
+      const viewport = scrollAreaRef.current.querySelector('[data-slot="scroll-area-viewport"]');
+      if (viewport) {
+        viewport.scrollTo({ top: 0, behavior: "instant" });
+      }
+    }
   }, [location.pathname]);
 
   if (!token) {
@@ -58,16 +67,16 @@ export function MainLayout() {
 
   return (
     <TooltipProvider>
-      <Toaster position="top-center" />
+      <Toaster position="top-right" />
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset className="w-full flex flex-col min-h-screen bg-slate-50">
-          <Topbar />
-          <main className="flex-1 overflow-x-hidden overflow-y-auto p-6 relative">
-            <div className="h-full">
+        <SidebarInset className="w-full flex flex-col h-screen overflow-hidden bg-slate-50">
+          <ScrollArea ref={scrollAreaRef} className="h-full w-full">
+            <Topbar />
+            <main className="p-6 relative">
               <Outlet />
-            </div>
-          </main>
+            </main>
+          </ScrollArea>
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>

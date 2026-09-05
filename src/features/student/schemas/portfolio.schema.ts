@@ -1,22 +1,20 @@
 import { z } from "zod";
 
+export const socialMediaItemSchema = z.object({
+  platform: z.string(),
+  username: z.string(),
+  url: z.string().optional(),
+});
+
 export const studentProfileSchema = z.object({
-  fullName: z.string().min(1, "Nama lengkap wajib diisi"),
-  nis: z.string().min(1, "NIS/NISN wajib diisi"),
-  email: z
-    .string()
-    .min(1, "Email wajib diisi")
-    .email("Format email tidak valid"),
+  fullName: z.string().optional(),
+  nis: z.string().optional(),
+  email: z.string().optional(),
   phone: z.string().min(1, "Nomor WhatsApp aktif wajib diisi"),
-  majorId: z.number().min(1, "Jurusan wajib dipilih"),
-  classId: z.number().min(1, "Kelas wajib dipilih"),
+  majorId: z.number().optional(),
+  classId: z.number().optional(),
   graduationYear: z.number().nullable().optional(),
-  socialMedia: z.object({
-    linkedin: z.string(),
-    github: z.string(),
-    instagram: z.string(),
-    tiktok: z.string(),
-  }),
+  socialMedia: z.array(socialMediaItemSchema).optional(),
 });
 
 export type StudentProfileSchemaType = z.infer<typeof studentProfileSchema>;
@@ -62,6 +60,12 @@ export interface PortfolioFormOptions {
   graduation_years: number[];
 }
 
+export interface SocialMediaItem {
+  platform: string;
+  username: string;
+  url?: string;
+}
+
 export interface StudentProfileData {
   id: number;
   userId: number;
@@ -75,12 +79,14 @@ export interface StudentProfileData {
   majorId: number | null;
   employmentStatusId: number | null;
   graduationYear: number | null;
-  socialMedia: {
-    linkedin: string;
-    github: string;
-    instagram: string;
-    tiktok: string;
-  };
+  socialMedia:
+    | SocialMediaItem[]
+    | {
+        linkedin?: string;
+        github?: string;
+        instagram?: string;
+        tiktok?: string;
+      };
   isActive: boolean;
   class: StudentOptionItem | null;
   major: StudentOptionItem | null;

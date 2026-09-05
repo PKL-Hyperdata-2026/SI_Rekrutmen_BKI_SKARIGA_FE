@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -18,12 +17,12 @@
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --heading: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
+  font-family: var(--sans);
+  letter-spacing: -0.01em;
   color-scheme: light dark;
   color: var(--text);
   background: var(--bg);
@@ -169,7 +168,7 @@ body {
 
 @theme inline {
   --font-heading: var(--font-sans);
-  --font-sans: 'Geist Variable', sans-serif;
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -249,11 +248,11 @@ body {
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;}
-  body {
-    @apply bg-background text-foreground;}
-  html {
-    @apply font-sans;
+    @apply border-border outline-ring/50 font-sans;
+  }
+  body, html {
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 }
 /* Cutout Container */
@@ -290,6 +289,34 @@ body {
   bottom: -16px;
   border-top-right-radius: 16px;
   box-shadow: 4px -4px 0 4px var(--background);
+}
+
+/* ==========================================================================
+   Semantic Icon & Badge Container Tokens
+   ========================================================================== */
+@utility icon-primary {
+  @apply bg-primary/10 text-primary border-primary/20;
+}
+@utility icon-danger {
+  @apply bg-rose-500/10 text-rose-600 border-rose-500/20 dark:text-rose-400;
+}
+@utility icon-success {
+  @apply bg-emerald-500/10 text-emerald-600 border-emerald-500/20 dark:text-emerald-400;
+}
+@utility icon-warning {
+  @apply bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400;
+}
+@utility icon-info {
+  @apply bg-sky-500/10 text-sky-600 border-sky-500/20 dark:text-sky-400;
+}
+@utility icon-purple {
+  @apply bg-purple-500/10 text-purple-600 border-purple-500/20 dark:text-purple-400;
+}
+@utility icon-indigo {
+  @apply bg-indigo-500/10 text-indigo-600 border-indigo-500/20 dark:text-indigo-400;
+}
+@utility icon-neutral {
+  @apply bg-slate-500/10 text-slate-600 border-slate-500/20 dark:text-slate-400;
 }
 
 /* Custom Role-Themed Scrollbar */
