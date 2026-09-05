@@ -11,6 +11,10 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss()
     ],
+    define: {
+      __BUNDLED_DEV__: "false",
+      __SERVER_FORWARD_CONSOLE__: '{"enabled": false}',
+    },
     base: env.VITE_BASE_URL || "/",
     server: {
       host: "0.0.0.0",

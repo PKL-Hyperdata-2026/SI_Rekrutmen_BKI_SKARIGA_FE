@@ -1,5 +1,7 @@
 import { useState, useEffect, useId } from "react";
 import { PageHeader, StatCard, DataTable, type DataTableColumn } from "@/components/custom";
+import { useAppSelector } from "@/hooks/useApp";
+import { SearchableSelect } from "@/components/ui/searchable-select";
 import {
   UserPlus,
   Search,
@@ -41,7 +43,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "@/components/ui/sonner";
 
 interface UserItem {
-  id: number;
+  id: number | string;
   fullName: string;
   email: string;
   phone: string | null;
@@ -49,18 +51,19 @@ interface UserItem {
   isActive: boolean;
   createdAt: string;
   company?: {
-    id: number;
+    id: number | string;
     name: string;
   } | null;
 }
 
 interface CompanyOption {
-  id: number;
+  id: number | string;
   name: string;
-  user_id: number | null;
+  user_id: number | string | null;
 }
 
 export const UsersManagementPage = () => {
+  const currentUser = useAppSelector((state) => state.auth.user);
   const roleSelectId = useId();
   const companySelectId = useId();
 
@@ -112,7 +115,11 @@ export const UsersManagementPage = () => {
       if (statusFilter !== "all") params.is_active = statusFilter === "active" ? "1" : "0";
 
       const res = await api.get("/admin/users", { params });
-      setUsers(res.data?.data?.data || []);
+      const rawUsers: UserItem[] = res.data?.data?.data || [];
+      const filtered = rawUsers.filter(
+        (u) => u.id !== currentUser?.id && u.role !== "superadmin"
+      );
+      setUsers(filtered);
     } catch {
       setUsers([]);
       toast.error("Gagal memuat data pengguna.");
@@ -174,7 +181,7 @@ export const UsersManagementPage = () => {
       }
 
       if (formData.role === "hrd") {
-        payload.company_id = formData.company_id ? Number(formData.company_id) : null;
+        payload.company_id = formData.company_id || null;
       }
 
       if (editingUser) {
@@ -466,8 +473,8 @@ export const UsersManagementPage = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all" className="text-xs">Semua Role</SelectItem>
-              <SelectItem value="admin" className="text-xs">Admin BKI</SelectItem>
-              <SelectItem value="hrd" className="text-xs">HRD Mitra</SelectItem>
+              <SelectItem value="admin" className="text-xs">Admin</SelectItem>
+              <SelectItem value="hrd" className="text-xs">HRD</SelectItem>
               <SelectItem value="siswa" className="text-xs">Siswa</SelectItem>
               <SelectItem value="alumni" className="text-xs">Alumni</SelectItem>
             </SelectContent>
@@ -494,6 +501,7 @@ export const UsersManagementPage = () => {
         emptyMessage="Tidak ada pengguna yang ditemukan"
         emptyDescription="Coba sesuaikan kata kunci pencarian atau filter peran"
         emptyIcon={<Users className="h-8 w-8 text-slate-400" />}
+        getRowId={(user) => user.id}
       />
 
       {/* Modal Form Tambah / Edit User */}
@@ -553,18 +561,18 @@ export const UsersManagementPage = () => {
 
             <div className="space-y-1.5">
               <label htmlFor={roleSelectId} className="text-xs font-bold text-slate-700">Role</label>
-              <Select
+              <SearchableSelect
+                id={roleSelectId}
                 value={formData.role}
                 onValueChange={(val) => setFormData({ ...formData, role: val })}
-              >
-                <SelectTrigger id={roleSelectId} className="h-10 rounded-xl">
-                  <SelectValue placeholder="Pilih Role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="admin" className="text-xs font-medium">Admin BKI (Operasional Sekolah)</SelectItem>
-                  <SelectItem value="hrd" className="text-xs font-medium">HRD Perusahaan Mitra</SelectItem>
-                </SelectContent>
-              </Select>
+                placeholder="Pilih Role"
+                options={[
+                  { value: "admin", label: "Admin" },
+                  { value: "hrd", label: "HRD" },
+                  { value: "siswa", label: "Siswa" },
+                  { value: "alumni", label: "Alumni" },
+                ]}
+              />
             </div>
           </div>
 
@@ -585,21 +593,18 @@ export const UsersManagementPage = () => {
           {formData.role === "hrd" && (
             <div className="space-y-1.5 pt-1">
               <label htmlFor={companySelectId} className="text-xs font-bold text-slate-700">Pilih Perusahaan DUDI Mitra</label>
-              <Select
+              <SearchableSelect
+                id={companySelectId}
+                searchable
                 value={formData.company_id}
                 onValueChange={(val) => setFormData({ ...formData, company_id: val })}
-              >
-                <SelectTrigger id={companySelectId} className="h-10 rounded-xl">
-                  <SelectValue placeholder="Pilih Perusahaan Terdaftar" />
-                </SelectTrigger>
-                <SelectContent>
-                  {companies.map((c) => (
-                    <SelectItem key={c.id} value={String(c.id)} className="text-xs font-medium">
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                placeholder="Pilih Perusahaan Terdaftar"
+                searchPlaceholder="Cari perusahaan..."
+                options={companies.map((c) => ({
+                  value: String(c.id),
+                  label: c.name,
+                }))}
+              />
               <p className="text-[11px] text-slate-400">
                 Akun HRD ini akan memiliki wewenang untuk mengelola lowongan & seleksi dari perusahaan yang dipilih.
               </p>

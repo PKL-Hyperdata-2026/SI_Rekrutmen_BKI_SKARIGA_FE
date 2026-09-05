@@ -31,8 +31,8 @@ export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { state: sidebarState, toggleSidebar, setOpenMobile } = useSidebar();
-  const isCollapsed = sidebarState === "collapsed";
+  const { state: sidebarState, toggleSidebar, setOpenMobile, isMobile } = useSidebar();
+  const isCollapsed = !isMobile && sidebarState === "collapsed";
 
   useEffect(() => {
     setOpenMobile(false);
@@ -60,16 +60,15 @@ export function AppSidebar() {
       collapsible="icon"
       side="left"
       variant="sidebar"
-      className="border-none border-r-0 shadow-none bg-transparent p-2 pr-0 overflow-x-hidden"
+      className="border-none border-r-0 shadow-none bg-transparent p-0 md:p-2 md:pr-0 overflow-x-hidden"
     >
       {/* Role-based Gradient Background Container */}
       <div className={cn(
-        "absolute top-2 bottom-2 left-2 right-0 z-0 rounded-2xl overflow-hidden pointer-events-none transition-opacity duration-200 ease-linear bg-gradient-to-b from-sidebar-gradient-from to-sidebar-gradient-to border border-white/20 border-r-0",
+        "absolute inset-0 md:top-2 md:bottom-2 md:left-2 md:right-0 z-0 rounded-none rounded-r-2xl md:rounded-2xl overflow-hidden pointer-events-none transition-opacity duration-200 ease-linear bg-gradient-to-b from-sidebar-gradient-from to-sidebar-gradient-to border-y-0 border-l-0 md:border md:border-r-0 border-white/20",
         isCollapsed ? "opacity-0" : "opacity-100"
       )} />
-
       {/* Role-based Dark Strip Background (w-14 di left-2) */}
-      <div className="absolute top-2 bottom-2 left-2 w-14 z-0 bg-sidebar-strip rounded-2xl border border-white/10 transition-all duration-200 ease-linear" />
+      <div className="absolute inset-y-0 left-0 md:top-2 md:bottom-2 md:left-2 w-14 z-0 bg-sidebar-strip rounded-none md:rounded-2xl border-r md:border border-white/10 transition-all duration-200 ease-linear" />
 
       <div className="relative z-10 flex flex-col h-full text-white py-2">
         {/* Custom Header */}
