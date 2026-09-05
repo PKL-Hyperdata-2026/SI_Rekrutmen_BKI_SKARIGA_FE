@@ -137,9 +137,10 @@ export function PersonalAcademicForm({
               </label>
               <input
                 type="text"
+                disabled
                 {...register("fullName")}
                 placeholder="e.g nama lengkap"
-                className="w-full h-11 px-3.5 bg-slate-50/50 hover:bg-slate-50/80 focus:bg-white border border-slate-200 focus:border-blue-500 rounded-xl text-xs sm:text-sm text-slate-800 transition-all outline-none"
+                className="w-full h-11 px-3.5 bg-slate-100/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-500 transition-all outline-none cursor-not-allowed"
               />
               {errors.fullName && (
                 <p className="text-[11px] text-rose-500 mt-1 font-medium">
@@ -157,9 +158,10 @@ export function PersonalAcademicForm({
               </label>
               <input
                 type="text"
+                disabled
                 {...register("nis")}
                 placeholder="e.g 21098/210987654"
-                className="w-full h-11 px-3.5 bg-slate-50/50 hover:bg-slate-50/80 focus:bg-white border border-slate-200 focus:border-blue-500 rounded-xl text-xs sm:text-sm text-slate-800 transition-all outline-none"
+                className="w-full h-11 px-3.5 bg-slate-100/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-500 transition-all outline-none cursor-not-allowed"
               />
               {errors.nis && (
                 <p className="text-[11px] text-rose-500 mt-1 font-medium">
@@ -174,8 +176,9 @@ export function PersonalAcademicForm({
               </label>
               <div className="relative">
                 <select
+                  disabled
                   {...register("majorId", { valueAsNumber: true })}
-                  className="w-full h-11 px-3.5 bg-slate-50/50 hover:bg-slate-50/80 focus:bg-white border border-slate-200 focus:border-blue-500 rounded-xl text-xs sm:text-sm text-slate-800 transition-all outline-none appearance-none cursor-pointer"
+                  className="w-full h-11 px-3.5 bg-slate-100/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-500 transition-all outline-none appearance-none cursor-not-allowed"
                 >
                   <option value={0}>Pilih Jurusan</option>
                   {options?.majors?.map((major) => (
@@ -204,8 +207,9 @@ export function PersonalAcademicForm({
               </label>
               <div className="relative">
                 <select
+                  disabled
                   {...register("classId", { valueAsNumber: true })}
-                  className="w-full h-11 px-3.5 bg-slate-50/50 hover:bg-slate-50/80 focus:bg-white border border-slate-200 focus:border-blue-500 rounded-xl text-xs sm:text-sm text-slate-800 transition-all outline-none appearance-none cursor-pointer"
+                  className="w-full h-11 px-3.5 bg-slate-100/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-500 transition-all outline-none appearance-none cursor-not-allowed"
                 >
                   <option value={0}>Pilih Kelas</option>
                   {options?.classes?.map((cls) => (
@@ -231,10 +235,11 @@ export function PersonalAcademicForm({
               </label>
               <div className="relative">
                 <select
+                  disabled
                   {...register("graduationYear", {
                     setValueAs: (v) => (v === "" || v === null ? null : Number(v)),
                   })}
-                  className="w-full h-11 px-3.5 bg-slate-50/50 hover:bg-slate-50/80 focus:bg-white border border-slate-200 focus:border-blue-500 rounded-xl text-xs sm:text-sm text-slate-800 transition-all outline-none appearance-none cursor-pointer"
+                  className="w-full h-11 px-3.5 bg-slate-100/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-500 transition-all outline-none appearance-none cursor-not-allowed"
                 >
                   <option value="">Pilih Tahun Lulus</option>
                   {options?.graduation_years?.map((year) => (
@@ -280,9 +285,10 @@ export function PersonalAcademicForm({
               </label>
               <input
                 type="email"
+                disabled
                 {...register("email")}
                 placeholder="e.g email@email.com"
-                className="w-full h-11 px-3.5 bg-slate-50/50 hover:bg-slate-50/80 focus:bg-white border border-slate-200 focus:border-blue-500 rounded-xl text-xs sm:text-sm text-slate-800 transition-all outline-none"
+                className="w-full h-11 px-3.5 bg-slate-100/80 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-500 transition-all outline-none cursor-not-allowed"
               />
               {errors.email && (
                 <p className="text-[11px] text-rose-500 mt-1 font-medium">
