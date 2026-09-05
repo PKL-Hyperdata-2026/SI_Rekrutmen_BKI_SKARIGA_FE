@@ -133,6 +133,7 @@ export function LowonganKerjaForm({
               <SearchableSelect
                 value={companyId}
                 onValueChange={setCompanyId}
+                searchable
                 placeholder="Pilih Perusahaan"
                 searchPlaceholder="Cari nama perusahaan..."
                 emptyMessage="Perusahaan tidak ditemukan"

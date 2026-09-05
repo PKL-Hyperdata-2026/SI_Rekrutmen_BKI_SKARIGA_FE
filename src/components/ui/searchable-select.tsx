@@ -29,6 +29,7 @@ export interface SearchableSelectProps {
   id?: string;
   variant?: SearchableSelectVariant;
   isLoading?: boolean;
+  searchable?: boolean;
 }
 
 const roleThemeClasses: Record<string, string> = {
@@ -53,6 +54,7 @@ export function SearchableSelect({
   id,
   variant = "auto",
   isLoading = false,
+  searchable = false,
 }: SearchableSelectProps) {
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
@@ -68,18 +70,18 @@ export function SearchableSelect({
   );
 
   const filteredOptions = React.useMemo(() => {
-    if (!search.trim()) return options;
+    if (!searchable || !search.trim()) return options;
     const q = search.toLowerCase();
     return options.filter((opt) => opt.label.toLowerCase().includes(q));
-  }, [options, search]);
+  }, [options, search, searchable]);
 
   React.useEffect(() => {
-    if (open) {
+    if (open && searchable) {
       setSearch("");
       const timer = setTimeout(() => inputRef.current?.focus(), 50);
       return () => clearTimeout(timer);
     }
-  }, [open]);
+  }, [open, searchable]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -125,28 +127,30 @@ export function SearchableSelect({
         align="start"
         onWheel={(e) => e.stopPropagation()}
       >
-        <div className="p-1.5 border-b border-slate-100 bg-slate-50/70">
-          <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-white border border-slate-200 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 transition-all">
-            <Search className="size-3.5 text-slate-400 shrink-0" />
-            <input
-              ref={inputRef}
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={searchPlaceholder}
-              className="w-full bg-transparent text-xs text-slate-800 placeholder:text-slate-400 outline-none"
-            />
-            {search && (
-              <button
-                type="button"
-                onClick={() => setSearch("")}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer"
-              >
-                <X className="size-3" />
-              </button>
-            )}
+        {searchable && (
+          <div className="p-1.5 border-b border-slate-100 bg-slate-50/70">
+            <div className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-white border border-slate-200 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20 transition-all">
+              <Search className="size-3.5 text-slate-400 shrink-0" />
+              <input
+                ref={inputRef}
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={searchPlaceholder}
+                className="w-full bg-transparent text-xs text-slate-800 placeholder:text-slate-400 outline-none"
+              />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch("")}
+                  className="text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  <X className="size-3" />
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
         <div
           className="max-h-60 overflow-y-auto overscroll-contain p-1 custom-scrollbar pr-1.5"
           onWheel={(e) => e.stopPropagation()}
