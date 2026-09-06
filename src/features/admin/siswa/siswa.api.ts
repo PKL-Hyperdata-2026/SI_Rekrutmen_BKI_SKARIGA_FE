@@ -1,31 +1,17 @@
 import { api } from "@/api/axios";
 import type {
+  SiswaFilterParams,
   SiswaItem,
   SiswaOptionsData,
+  SiswaPaginatedResponse,
 } from "./siswa.schema";
 
 export const siswaApi = {
-  getStudents: (params?: {
-    search?: string;
-    major_id?: string;
-    class_id?: string;
-    employment_status_id?: string;
-    graduation_year?: string | number;
-    is_active?: string;
-    sort_by?: string;
-    sort_dir?: string;
-    per_page?: number;
-    page?: number;
-  }) =>
+  getStudents: (params?: SiswaFilterParams) =>
     api.get<{
       success: boolean;
       message?: string;
-      data: {
-        data: SiswaItem[];
-        current_page?: number;
-        last_page?: number;
-        total?: number;
-      };
+      data: SiswaPaginatedResponse;
     }>("/admin/students", { params }),
 
   getStudentOptions: () =>
@@ -61,4 +47,22 @@ export const siswaApi = {
       success: boolean;
       message?: string;
     }>(`/admin/students/${id}`),
+
+  uploadPortfolio: (studentId: number | string, formData: FormData) =>
+    api.post<{
+      success: boolean;
+      message?: string;
+      data: SiswaItem;
+    }>(`/admin/students/${studentId}/portfolios`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }),
+
+  deletePortfolio: (studentId: number | string, portfolioId: number | string) =>
+    api.delete<{
+      success: boolean;
+      message?: string;
+      data: SiswaItem;
+    }>(`/admin/students/${studentId}/portfolios/${portfolioId}`),
 };
