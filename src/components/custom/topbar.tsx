@@ -1,12 +1,32 @@
-import { Search, Mail, Bell, PanelLeft } from "lucide-react";
+import { Search, Mail, Bell, PanelLeft, Power } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { useSidebar } from "@/components/ui/sidebar";
-import { useAppSelector } from "@/hooks/useApp";
+import { useAppSelector, useAppDispatch } from "@/hooks/useApp";
+import { useNavigate } from "react-router-dom";
+import { logout } from "@/slices/authSlice";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export function Topbar() {
   const { user } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { toggleSidebar } = useSidebar();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login");
+  };
 
   return (
     <div className="sticky top-0 z-30 pt-3 pb-1 px-4 lg:px-6 w-full bg-transparent transition-all pointer-events-none">
@@ -53,12 +73,50 @@ export function Topbar() {
               <AvatarFallback className="rounded-lg text-xs">{user?.full_name?.charAt(0) || "U"}</AvatarFallback>
             </Avatar>
             <div className="hidden md:flex flex-col justify-center">
-              <span className="text-xs font-bold text-slate-800 leading-tight truncate max-w-[140px]">{user?.full_name || "User"}</span>
-              <span className="text-[11px] font-medium text-slate-400 leading-tight">
+              <span className="text-xs font-bold text-slate-800 leading-tight truncate max-w-36">{user?.full_name || "User"}</span>
+              <span className="text-xs font-medium text-slate-400 leading-tight">
                 {user?.role === "siswa" ? "XII RPL A • Siswa Aktif" : user?.role || "Guest"}
               </span>
             </div>
           </div>
+
+          <div className="w-px h-5 bg-slate-200/80 mx-1" />
+
+          {/* Red Power Off Logout Button */}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button
+                aria-label="Keluar / Logout"
+                title="Keluar dari sistem"
+                className="relative h-8 w-8 flex items-center justify-center rounded-lg text-destructive hover:bg-destructive/10 transition-colors cursor-pointer shrink-0"
+              >
+                <Power className="h-4 w-4" strokeWidth={2.2} />
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Konfirmasi Keluar</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Apakah Anda yakin ingin keluar dari sistem? Sesi Anda akan berakhir dan Anda harus masuk kembali.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="border-none bg-transparent mt-4 p-0 sm:p-0 m-0">
+                <AlertDialogCancel
+                  variant="secondary"
+                  className="border-none bg-secondary text-secondary-foreground hover:bg-secondary/80 cursor-pointer"
+                >
+                  Batal
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  variant="destructive"
+                  onClick={handleLogout}
+                  className="cursor-pointer"
+                >
+                  Ya, Keluar
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </header>
     </div>

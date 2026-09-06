@@ -35,8 +35,8 @@ export const MONOCHROME_PLATFORMS: PlatformConfig[] = [
     id: "portfolio",
     name: "Portfolio / CV",
     baseUrl: "",
-    placeholder: "https://namasiswa.my.id atau tautan CV/Portofolio",
-    exampleUrl: "https://namasiswa.my.id (atau Carrd/Notion/Drive)",
+    placeholder: "johndoe.com",
+    exampleUrl: "johndoe.com",
     domain: "",
     icon: (
       <svg
@@ -56,8 +56,8 @@ export const MONOCHROME_PLATFORMS: PlatformConfig[] = [
     id: "linkedin",
     name: "LinkedIn",
     baseUrl: "https://linkedin.com/in/",
-    placeholder: "https://linkedin.com/in/username",
-    exampleUrl: "https://linkedin.com/in/nama-anda",
+    placeholder: "linkedin.com/in/username",
+    exampleUrl: "linkedin.com/in/nama-anda",
     domain: "linkedin.com",
     icon: (
       <svg
@@ -78,8 +78,8 @@ export const MONOCHROME_PLATFORMS: PlatformConfig[] = [
     id: "github",
     name: "GitHub",
     baseUrl: "https://github.com/",
-    placeholder: "https://github.com/username",
-    exampleUrl: "https://github.com/username",
+    placeholder: "github.com/username",
+    exampleUrl: "github.com/username",
     domain: "github.com",
     icon: (
       <svg
@@ -99,8 +99,8 @@ export const MONOCHROME_PLATFORMS: PlatformConfig[] = [
     id: "instagram",
     name: "Instagram",
     baseUrl: "https://instagram.com/",
-    placeholder: "https://instagram.com/username",
-    exampleUrl: "https://instagram.com/username",
+    placeholder: "instagram.com/username",
+    exampleUrl: "instagram.com/username",
     domain: "instagram.com",
     icon: (
       <svg
@@ -121,8 +121,8 @@ export const MONOCHROME_PLATFORMS: PlatformConfig[] = [
     id: "tiktok",
     name: "TikTok",
     baseUrl: "https://tiktok.com/@",
-    placeholder: "https://tiktok.com/@username",
-    exampleUrl: "https://tiktok.com/@username",
+    placeholder: "tiktok.com/@username",
+    exampleUrl: "tiktok.com/@username",
     domain: "tiktok.com",
     icon: (
       <svg
@@ -141,8 +141,8 @@ export const MONOCHROME_PLATFORMS: PlatformConfig[] = [
     id: "behance",
     name: "Behance",
     baseUrl: "https://behance.net/",
-    placeholder: "https://behance.net/username",
-    exampleUrl: "https://behance.net/username",
+    placeholder: "behance.net/username",
+    exampleUrl: "behance.net/username",
     domain: "behance.net",
     icon: (
       <svg
@@ -164,8 +164,8 @@ export const MONOCHROME_PLATFORMS: PlatformConfig[] = [
     id: "dribbble",
     name: "Dribbble",
     baseUrl: "https://dribbble.com/",
-    placeholder: "https://dribbble.com/username",
-    exampleUrl: "https://dribbble.com/username",
+    placeholder: "dribbble.com/username",
+    exampleUrl: "dribbble.com/username",
     domain: "dribbble.com",
     icon: (
       <svg
@@ -187,8 +187,8 @@ export const MONOCHROME_PLATFORMS: PlatformConfig[] = [
     id: "artstation",
     name: "ArtStation",
     baseUrl: "https://artstation.com/",
-    placeholder: "https://artstation.com/username",
-    exampleUrl: "https://artstation.com/username",
+    placeholder: "artstation.com/username",
+    exampleUrl: "artstation.com/username",
     domain: "artstation.com",
     icon: (
       <svg
@@ -208,8 +208,8 @@ export const MONOCHROME_PLATFORMS: PlatformConfig[] = [
     id: "youtube",
     name: "YouTube",
     baseUrl: "https://youtube.com/@",
-    placeholder: "https://youtube.com/@nama-channel",
-    exampleUrl: "https://youtube.com/@channel",
+    placeholder: "youtube.com/@nama-channel",
+    exampleUrl: "youtube.com/@channel",
     domain: "youtube.com",
     icon: (
       <svg
@@ -229,8 +229,8 @@ export const MONOCHROME_PLATFORMS: PlatformConfig[] = [
     id: "twitter",
     name: "X (Twitter)",
     baseUrl: "https://x.com/",
-    placeholder: "https://x.com/username",
-    exampleUrl: "https://x.com/username",
+    placeholder: "x.com/username",
+    exampleUrl: "x.com/username",
     domain: "x.com",
     icon: (
       <svg
@@ -299,19 +299,19 @@ export function validateAndParseSocialUrl(
       if (!parsed.hostname || !parsed.hostname.includes(".")) {
         return {
           isValid: false,
-          error: "Harap masukkan URL yang valid (contoh: https://namasiswa.my.id atau link Google Drive/Notion/Carrd).",
+          error: "Harap masukkan tautan yang valid (contoh: johndoe.com).",
         };
       }
     } catch {
       return {
         isValid: false,
-        error: "Format tautan tidak valid. Pastikan tautan berupa URL lengkap yang benar.",
+        error: "Format tautan tidak valid. Pastikan tautan berupa domain atau URL yang benar.",
       };
     }
 
     return {
       isValid: true,
-      username: urlString,
+      username: trimmed,
       normalizedUrl: urlString,
     };
   }
@@ -488,7 +488,11 @@ export function AddSocialMediaModal({
 
     setSelectedPlatformId(platformId);
     setInputValue(
-      existing ? existing.url || `${platform?.baseUrl || ""}${existing.username}` : ""
+      existing
+        ? platformId === "portfolio"
+          ? existing.username || existing.url || ""
+          : existing.url || `${platform?.baseUrl || ""}${existing.username}`
+        : ""
     );
     setSubmitError("");
   };
@@ -537,7 +541,7 @@ export function AddSocialMediaModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl max-w-[380px] w-full shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col h-[460px] max-h-[85vh]">
+      <div className="bg-white rounded-3xl max-w-sm w-full shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col h-[460px] max-h-[85vh]">
         <div className="px-5 pt-3.5 pb-2.5 flex items-center justify-between border-b border-slate-50">
           <div className="w-8">
             {selectedPlatformId && (
@@ -583,7 +587,7 @@ export function AddSocialMediaModal({
               />
             </div>
 
-            <div className="flex-1 min-h-0 overflow-y-auto space-y-1 pr-1.5 [scrollbar-width:thin] [scrollbar-color:#cbd5e1_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-300">
+            <div className="flex-1 min-h-0 overflow-y-auto space-y-1 pr-1.5 custom-scrollbar">
               {filteredPlatforms.length === 0 ? (
                 <div className="py-8 text-center text-xs text-slate-400">
                   Platform tidak ditemukan.

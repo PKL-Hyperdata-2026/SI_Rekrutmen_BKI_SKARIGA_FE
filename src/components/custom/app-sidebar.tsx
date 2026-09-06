@@ -1,5 +1,5 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { useEffect, useState, useRef, useCallback } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -7,45 +7,71 @@ import {
   SidebarGroupContent,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { useAppSelector, useAppDispatch } from "@/hooks/useApp";
-import { logout } from "@/slices/authSlice";
+import { useAppSelector } from "@/hooks/useApp";
 import { STUDENT_MENUS, ADMIN_MENUS, HRD_MENUS } from "@/config/menus";
 import type { MenuItem } from "@/config/menus";
-import { Building2, LogOut, PanelLeft } from "lucide-react";
+import { Building2, PanelLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SidebarMenuItem } from "./sidebar-menu-item";
 
 export function AppSidebar() {
   const { user } = useAppSelector((state) => state.auth);
   const location = useLocation();
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   const { state: sidebarState, toggleSidebar, setOpenMobile, isMobile } = useSidebar();
   const isCollapsed = !isMobile && sidebarState === "collapsed";
+
+  const sidebarContainerRef = useRef<HTMLDivElement>(null);
+  const [notchData, setNotchData] = useState<{ y: number; height: number; width: number; totalHeight: number } | null>(null);
+
+  const updateNotch = useCallback(() => {
+    if (isMobile) {
+      setNotchData(null);
+      return;
+    }
+
+    const container = sidebarContainerRef.current;
+    if (!container) return;
+
+    const activeEl = container.querySelector<HTMLElement>('[data-sidebar-active="true"]');
+    const bgEl = container.querySelector<HTMLElement>('[data-sidebar-gradient="true"]');
+
+    if (activeEl && bgEl) {
+      const bgRect = bgEl.getBoundingClientRect();
+      const activeRect = activeEl.getBoundingClientRect();
+      const y = activeRect.top - bgRect.top;
+      setNotchData((prev) => ({
+        y,
+        height: activeRect.height || 40,
+        width: bgRect.width > 150 ? bgRect.width : (prev?.width || 248),
+        totalHeight: bgRect.height || 800,
+      }));
+    }
+  }, [isMobile]);
+
+  useEffect(() => {
+    updateNotch();
+    const frameId = requestAnimationFrame(updateNotch);
+    const timer = setTimeout(updateNotch, 320);
+    window.addEventListener("resize", updateNotch);
+    return () => {
+      cancelAnimationFrame(frameId);
+      clearTimeout(timer);
+      window.removeEventListener("resize", updateNotch);
+    };
+  }, [location.pathname, isCollapsed, updateNotch]);
 
   useEffect(() => {
     setOpenMobile(false);
   }, [location.pathname, setOpenMobile]);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate("/login");
-  };
-
   let menus: MenuItem[] = [];
   if (user?.role === "siswa" || user?.role === "alumni") {
-    menus = STUDENT_MENUS;
+    menus = STUDENT_MENUS.filter((item) => {
+      if (item.alumniOnly || item.link === "/student/tracer") {
+        return user?.role === "alumni";
+      }
+      return true;
+    });
   } else if (user?.role === "superadmin") {
     menus = ADMIN_MENUS;
   } else if (user?.role === "admin") {
@@ -54,71 +80,112 @@ export function AppSidebar() {
     menus = HRD_MENUS;
   }
 
+  const clipPathD = (!isMobile && notchData)
+    ? [
+        `M 0 0`,
+        `H ${notchData.width - 16}`,
+        `A 16 16 0 0 1 ${notchData.width} 16`,
+        `V ${notchData.y - 14}`,
+        `A 14 14 0 0 1 ${notchData.width - 14} ${notchData.y}`,
+        `H 80`,
+        `A 12 12 0 0 0 68 ${notchData.y + 12}`,
+        `V ${notchData.y + notchData.height - 12}`,
+        `A 12 12 0 0 0 80 ${notchData.y + notchData.height}`,
+        `H ${notchData.width - 14}`,
+        `A 14 14 0 0 1 ${notchData.width} ${notchData.y + notchData.height + 14}`,
+        `V ${notchData.totalHeight - 16}`,
+        `A 16 16 0 0 1 ${notchData.width - 16} ${notchData.totalHeight}`,
+        `H 0`,
+        `Z`,
+      ].join(" ")
+    : undefined;
+
   return (
     <Sidebar
-      style={{ "--sidebar-width-icon": "4rem" } as React.CSSProperties}
       collapsible="icon"
       side="left"
       variant="sidebar"
-      className="border-none border-r-0 shadow-none bg-transparent p-0 md:p-2 md:pr-0 overflow-x-hidden"
+      className="border-none border-r-0 shadow-none bg-transparent p-0 overflow-x-hidden [&>[data-slot=sidebar-inner]]:bg-transparent"
     >
-      {/* Role-based Gradient Background Container */}
-      <div className={cn(
-        "absolute inset-0 md:top-2 md:bottom-2 md:left-2 md:right-0 z-0 rounded-none rounded-r-2xl md:rounded-2xl overflow-hidden pointer-events-none transition-opacity duration-200 ease-linear bg-gradient-to-b from-sidebar-gradient-from to-sidebar-gradient-to border-y-0 border-l-0 md:border md:border-r-0 border-white/20",
-        isCollapsed ? "opacity-0" : "opacity-100"
-      )} />
-      {/* Role-based Dark Strip Background (w-14 di left-2) */}
-      <div className="absolute inset-y-0 left-0 md:top-2 md:bottom-2 md:left-2 w-14 z-0 bg-sidebar-strip rounded-none md:rounded-2xl border-r md:border border-white/10 transition-all duration-200 ease-linear" />
+      <div ref={sidebarContainerRef} className="relative h-full w-full">
+        {/* SVG ClipPath Definition for True Vector Cutout */}
+        {clipPathD && (
+          <svg width="0" height="0" className="absolute pointer-events-none" aria-hidden="true">
+            <defs>
+              <clipPath id="sidebar-true-cutout-clip" clipPathUnits="userSpaceOnUse">
+                <path d={clipPathD} />
+              </clipPath>
+            </defs>
+          </svg>
+        )}
 
-      <div className="relative z-10 flex flex-col h-full text-white py-2">
+        {/* Role-based Gradient Background Container with True Vector Cutout */}
+        <div
+          data-sidebar-gradient="true"
+          className={cn(
+            "absolute inset-0 md:top-2 md:bottom-2 md:left-2 md:right-0 z-0 rounded-none rounded-r-2xl md:rounded-2xl pointer-events-none transition-opacity duration-300 ease-in-out bg-gradient-to-b from-sidebar-gradient-from to-sidebar-gradient-to border-y-0 border-l-0 md:border md:border-r-0 border-white/20",
+            isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
+          )}
+          style={
+            clipPathD
+              ? {
+                  clipPath: "url(#sidebar-true-cutout-clip)",
+                }
+              : undefined
+          }
+        />
+        {/* Role-based Dark Strip Background */}
+        <div
+          className={cn(
+            "absolute inset-y-0 left-0 md:top-2 md:bottom-2 md:left-2 w-14 z-0 bg-sidebar-strip transition-all duration-300 ease-in-out",
+            "rounded-none md:rounded-2xl border md:border-white/10",
+            isCollapsed && "shadow-lg"
+          )}
+        />
+
+      <div className="relative z-10 flex flex-col h-full text-white md:py-2 md:pl-2 w-full">
         {/* Custom Header */}
-        <div className="h-20 flex items-center shrink-0 relative">
-          {/* Toggle Button di Strip Dark */}
-          <div className="w-14 flex justify-center items-center shrink-0 h-full relative">
-            {/* Toggle Button (Muncul Saat Collapsed) */}
-            <button
-              onClick={toggleSidebar}
-              className={cn(
-                "flex justify-center items-center h-10 w-10 text-white hover:bg-white/10 rounded-lg transition-all duration-200 absolute",
-                isCollapsed ? "opacity-100 z-50 scale-100" : "opacity-0 pointer-events-none scale-90"
-              )}
-            >
-              <PanelLeft className="h-6 w-6" />
-            </button>
+        <div className="pt-5 pb-3 flex items-center shrink-0 relative pr-3">
+          {/* Brand Icon in Dark Strip */}
+          <div className="w-14 flex justify-center items-center shrink-0 h-10 relative">
+            <Building2 className="h-5 w-5 text-white shrink-0" strokeWidth={1.5} />
           </div>
 
-          <div className={cn(
-            "flex-1 h-full relative transition-opacity duration-200 overflow-hidden whitespace-nowrap",
-            isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
-          )}>
-            {/* Toggle Button (Expanded State) */}
-            <button
-              onClick={toggleSidebar}
-              className="absolute top-1 right-2 flex items-center justify-center h-9 w-9 rounded-lg text-white hover:bg-white/10 transition-all duration-200 cursor-pointer"
-            >
-              <PanelLeft className="h-5 w-5" />
-            </button>
-
-            {/* Logo and Text (Sejajar dengan teks menu di pl-7) */}
-            <div className="absolute bottom-1 left-0 flex items-center pl-7 gap-2.5">
-              <Building2 className="h-8 w-8 text-white shrink-0" strokeWidth={1.5} />
-              <div className="flex flex-col justify-end">
-                <span className="font-bold text-[14px] leading-tight text-white">
-                  BKI SKARIGA
-                </span>
-                <span className="text-[10px] text-white/90 capitalize mt-0.5">
-                  Portal {user?.role === 'siswa' || user?.role === 'alumni' ? 'Siswa & Alumni' : user?.role === 'superadmin' ? 'Super Admin' : user?.role || 'Sistem'}
-                </span>
-              </div>
+          {/* Brand Info in Expanded Area */}
+          <div
+            className={cn(
+              "flex-1 h-10 flex items-center overflow-hidden whitespace-nowrap pl-6 transition-all duration-300 ease-in-out",
+              isCollapsed ? "opacity-0 pointer-events-none -translate-x-3" : "opacity-100 translate-x-0"
+            )}
+          >
+            <div className="flex flex-col justify-center">
+              <span className="font-bold text-xs leading-tight text-white tracking-wide">
+                BKI SKARIGA
+              </span>
+              <span className="text-xs text-white/75 capitalize mt-0.5 font-medium">
+                Portal {user?.role === 'siswa' || user?.role === 'alumni' ? 'Siswa & Alumni' : user?.role === 'superadmin' ? 'Super Admin' : user?.role || 'Sistem'}
+              </span>
             </div>
           </div>
+
+          {/* Mobile Collapse/Close Button */}
+          {isMobile && (
+            <button
+              onClick={() => setOpenMobile(false)}
+              className="h-8 w-8 flex items-center justify-center rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+              title="Tutup Menu"
+              aria-label="Tutup Menu"
+            >
+              <PanelLeft className="h-4 w-4" />
+            </button>
+          )}
         </div>
 
-        {/* Custom Menu Content - Ditambahkan pt-6 agar cutout Dashboard tidak menabrak Header */}
-        <SidebarContent className="p-0 flex-1 overflow-y-auto overflow-x-visible">
+        {/* Custom Menu Content */}
+        <SidebarContent onScroll={updateNotch} className="p-0 flex-1 overflow-y-auto overflow-x-visible">
           <SidebarGroup className="p-0 overflow-visible">
             <SidebarGroupContent className="overflow-visible">
-              <ul className="flex flex-col gap-1.5 h-full relative pt-6 pb-6 overflow-x-hidden  ">
+              <ul className="flex flex-col gap-1 h-full relative pt-3 pb-3 overflow-x-hidden">
                 {menus.map((menu) => {
                   const isActive = location.pathname.startsWith(menu.link);
 
@@ -136,48 +203,27 @@ export function AppSidebar() {
           </SidebarGroup>
         </SidebarContent>
 
-        {/* Custom Footer Compact */}
-        <AlertDialog>
-          <div className="h-12 shrink-0 border-none flex items-center pt-1 pb-2 relative">
+        {/* Custom Footer: Collapse / Expand Toggle Button in Dark Strip (Desktop Only) */}
+        {!isMobile && (
+          <div className="h-12 shrink-0 border-none flex items-center pb-1.5 pt-1 relative">
             <div className="w-14 flex justify-center items-center shrink-0">
-              <AlertDialogTrigger asChild>
-                <button className={cn(
-                  "flex justify-center items-center h-9 w-9 text-white/90 hover:text-white rounded-lg hover:bg-white/10 transition-all duration-200 absolute",
-                  isCollapsed ? "opacity-100 z-50" : "opacity-0 pointer-events-none"
-                )}>
-                  <LogOut className="h-4 w-4" />
-                </button>
-              </AlertDialogTrigger>
-            </div>
-
-            <div className={cn(
-              "flex-1 h-full transition-opacity duration-200 overflow-hidden whitespace-nowrap",
-              isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
-            )}>
-              <AlertDialogTrigger asChild className="cursor-pointer">
-                <button className="flex items-center w-[calc(100%-1rem)] h-9 text-white/90 hover:text-white transition-colors rounded-lg hover:bg-white/10 mx-2 pl-3 gap-3">
-                  <LogOut className="h-4 w-4 shrink-0" />
-                  <span className="font-semibold text-[13px]">Log Out</span>
-                </button>
-              </AlertDialogTrigger>
+              <button
+                onClick={toggleSidebar}
+                title={isCollapsed ? "Perluas Sidebar" : "Perkecil Sidebar"}
+                aria-label={isCollapsed ? "Perluas Sidebar" : "Perkecil Sidebar"}
+                className="flex justify-center items-center h-8 w-8 text-white/80 hover:text-white rounded-lg hover:bg-white/10 transition-all duration-300 ease-in-out cursor-pointer"
+              >
+                <PanelLeft
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-300 ease-in-out",
+                    isCollapsed ? "rotate-180" : "rotate-0"
+                  )}
+                />
+              </button>
             </div>
           </div>
-
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Konfirmasi Keluar</AlertDialogTitle>
-              <AlertDialogDescription>
-                Apakah Anda yakin ingin keluar dari sistem? Sesi Anda akan berakhir dan Anda harus masuk kembali.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter className="border-none bg-transparent mt-4 p-0 sm:p-0 m-0">
-              <AlertDialogCancel className="cursor-pointer">Batal</AlertDialogCancel>
-              <AlertDialogAction onClick={handleLogout} className="bg-red-600 hover:bg-red-700 text-white cursor-pointer">
-                Ya, Keluar
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        )}
+      </div>
       </div>
     </Sidebar>
   );
