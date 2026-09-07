@@ -15,6 +15,7 @@ import {
   CalendarClock,
   CheckCircle,
   UserCog,
+  Network,
   type LucideIcon,
 } from "lucide-react";
 
@@ -37,6 +38,8 @@ export const STUDENT_MENUS: MenuItem[] = [
 
 export const ADMIN_MENUS: MenuItem[] = [
   { name: "Dashboard", link: "/admin/dashboard", icon: LayoutDashboard },
+  { name: "Data Departemen", link: "/admin/departemen", icon: Network },
+  { name: "Data Jurusan", link: "/admin/jurusan", icon: GraduationCap },
   { name: "Manajemen Pengguna", link: "/admin/users", icon: UserCog, superadminOnly: true },
   { name: "Data Siswa", link: "/admin/siswa", icon: Users },
   { name: "Data Alumni", link: "/admin/alumni", icon: GraduationCap },
