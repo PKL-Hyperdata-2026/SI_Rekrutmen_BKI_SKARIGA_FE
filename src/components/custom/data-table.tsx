@@ -90,12 +90,12 @@ export function DataTableDeleteButton({
           size="icon"
           disabled={disabled}
           className={cn(
-            "h-8.5 w-8.5 rounded-md border-rose-200 text-rose-500 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-300 cursor-pointer shadow-none transition-colors",
+            "h-8 w-8 rounded-lg border-rose-200 text-rose-500 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-300 cursor-pointer shadow-none transition-colors",
             className,
           )}
           title={buttonTitle}
         >
-          <Trash2 className="size-4" />
+          <Trash2 className="size-3.5" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
@@ -113,7 +113,7 @@ export function DataTableDeleteButton({
               <h4 className="text-xs font-semibold text-slate-900 leading-tight">
                 {popoverTitle}
               </h4>
-              <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                 {message}
               </p>
             </div>
@@ -182,7 +182,7 @@ export function DataTableActions<T>({
 
   return (
     <div
-      className={cn("flex items-center justify-center gap-2", className)}
+      className={cn("flex items-center justify-center gap-1.5", className)}
       onClick={(e) => e.stopPropagation()}
     >
       {extraActions}
@@ -195,10 +195,10 @@ export function DataTableActions<T>({
             e.stopPropagation();
             onView?.(row);
           }}
-          className="h-8.5 w-8.5 rounded-md border-blue-200 text-blue-500 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 cursor-pointer shadow-none transition-colors"
+          className="h-8 w-8 rounded-lg border-blue-200 text-blue-500 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 cursor-pointer shadow-none transition-colors"
           title="Lihat Detail"
         >
-          <FileText className="size-4" />
+          <FileText className="size-3.5" />
         </Button>
       )}
       {showEdit && (
@@ -210,10 +210,10 @@ export function DataTableActions<T>({
             e.stopPropagation();
             onEdit?.(row);
           }}
-          className="h-8.5 w-8.5 rounded-md border-purple-200 text-purple-600 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-300 cursor-pointer shadow-none transition-colors"
+          className="h-8 w-8 rounded-lg border-purple-200 text-purple-600 hover:bg-purple-50 hover:text-purple-700 hover:border-purple-300 cursor-pointer shadow-none transition-colors"
           title="Edit"
         >
-          <Pencil className="size-4" />
+          <Pencil className="size-3.5" />
         </Button>
       )}
       {showDelete && (
@@ -357,7 +357,7 @@ export function DataTable<T extends Record<string, any>>({
             >
               {/* Selectable Checkbox Header */}
               {selectable && (
-                <th scope="col" className="py-3.5 px-4 w-12 text-center">
+                <th scope="col" className="py-2.5 px-3 w-10 text-center">
                   <input
                     type="checkbox"
                     aria-label="Pilih semua baris"
@@ -368,7 +368,7 @@ export function DataTable<T extends Record<string, any>>({
                       if (el) el.indeterminate = someSelected;
                     }}
                     onChange={(e) => onSelectAll?.(e.target.checked)}
-                    className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary/20 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="h-3.5 w-3.5 rounded border-slate-300 text-primary focus:ring-primary/20 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                   />
                 </th>
               )}
@@ -377,7 +377,7 @@ export function DataTable<T extends Record<string, any>>({
               {showNumbering && (
                 <th
                   scope="col"
-                  className="py-3.5 px-5 font-bold text-xs w-16 text-center select-none"
+                  className="py-2.5 px-4 font-bold text-xs w-14 text-center select-none"
                 >
                   NO
                 </th>
@@ -389,7 +389,7 @@ export function DataTable<T extends Record<string, any>>({
                   key={idx}
                   scope="col"
                   className={cn(
-                    "py-3.5 px-5 font-bold text-xs uppercase tracking-wider select-none",
+                    "py-2.5 px-4 font-bold text-xs uppercase tracking-wider select-none",
                     col.align === "center" && "text-center",
                     col.align === "right" && "text-right",
                     col.align === "left" && "text-left",
@@ -406,20 +406,20 @@ export function DataTable<T extends Record<string, any>>({
               Array.from({ length: 5 }).map((_, i) => (
                 <tr key={i} className="animate-pulse">
                   {selectable && (
-                    <td className="py-4 px-4 text-center">
-                      <Skeleton className="h-4 w-4 rounded mx-auto" />
+                    <td className="py-3 px-3 text-center">
+                      <Skeleton className="h-3.5 w-3.5 rounded mx-auto" />
                     </td>
                   )}
                   {showNumbering && (
-                    <td className="py-4 px-5 text-center">
-                      <Skeleton className="h-4 w-6 rounded mx-auto" />
+                    <td className="py-3 px-4 text-center">
+                      <Skeleton className="h-3.5 w-5 rounded mx-auto" />
                     </td>
                   )}
                   {effectiveColumns.map((col, cIdx) => (
                     <td
                       key={cIdx}
                       className={cn(
-                        "py-4 px-5",
+                        "py-3 px-4",
                         col.align === "center" && "text-center",
                         col.align === "right" && "text-right",
                         col.align === "left" && "text-left",
@@ -434,13 +434,13 @@ export function DataTable<T extends Record<string, any>>({
                       >
                         <Skeleton
                           className={cn(
-                            "h-4 w-3/4",
+                            "h-3.5 w-3/4",
                             col.align === "center" && "mx-auto",
                           )}
                         />
                         <Skeleton
                           className={cn(
-                            "h-3 w-1/2",
+                            "h-2.5 w-1/2",
                             col.align === "center" && "mx-auto",
                           )}
                         />
@@ -453,10 +453,10 @@ export function DataTable<T extends Record<string, any>>({
               <tr>
                 <td
                   colSpan={totalCols}
-                  className="py-16 text-center text-slate-500"
+                  className="py-12 text-center text-slate-500"
                 >
                   {emptyIcon && (
-                    <div className="mb-3 flex justify-center">{emptyIcon}</div>
+                    <div className="mb-2.5 flex justify-center">{emptyIcon}</div>
                   )}
                   <p className="text-sm font-semibold text-slate-700">
                     {emptyMessage}
@@ -485,7 +485,7 @@ export function DataTable<T extends Record<string, any>>({
                     {/* Selectable Checkbox */}
                     {selectable && (
                       <td
-                        className="py-3.5 px-4 text-center align-middle"
+                        className="py-2.5 px-3 text-center align-middle"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <input
@@ -496,14 +496,14 @@ export function DataTable<T extends Record<string, any>>({
                             onSelectRow?.(rowId, e.target.checked)
                           }
                           onClick={(e) => e.stopPropagation()}
-                          className="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary/20 cursor-pointer"
+                          className="h-3.5 w-3.5 rounded border-slate-300 text-primary focus:ring-primary/20 cursor-pointer"
                         />
                       </td>
                     )}
 
                     {/* Numbering Cell */}
                     {showNumbering && (
-                      <td className="py-3.5 px-5 text-center font-bold text-xs sm:text-sm text-slate-700 align-middle">
+                      <td className="py-2.5 px-4 text-center font-bold text-xs text-slate-700 align-middle">
                         {numberStartIndex + rowIdx}
                       </td>
                     )}
@@ -513,7 +513,7 @@ export function DataTable<T extends Record<string, any>>({
                       <td
                         key={colIdx}
                         className={cn(
-                          "py-3.5 px-5 text-sm text-slate-700 align-middle",
+                          "py-2.5 px-4 text-xs sm:text-sm text-slate-700 align-middle",
                           col.align === "center" && "text-center",
                           col.align === "right" && "text-right",
                           col.align === "left" && "text-left",

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { LineChart } from "lucide-react";
 import { PageHeader } from "@/components/custom/page-header";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/components/custom/sonner";
 import { tracerApi } from "./tracer.api";
 import { type TracerStudyData, type SubmitTracerPayload } from "./tracer.schema";
 import { TracerCareerForm } from "./tracer-career-form";
@@ -83,7 +83,6 @@ export function TracerStudy() {
       {/* Header Banner */}
       <PageHeader
         variant="student"
-        size="compact"
         badge="Penelusuran Keterserapan Kerja Alumni"
         badgeIcon={<LineChart className="h-3 w-3" />}
         title="Tracer Studi SKARIGA"

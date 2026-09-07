@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { api } from "@/api/axios";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/components/custom/sonner";
 import {
   type Company,
   type MajorItem,

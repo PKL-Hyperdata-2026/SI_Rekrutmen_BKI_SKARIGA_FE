@@ -27,10 +27,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/components/custom/sonner";
 import { siswaApi } from "./siswa.api";
 import { useSiswaForm, toCreateSiswaPayload } from "./siswa.form";
 import { SiswaForm } from "./siswa-form";
+import { SiswaPortfolioModal } from "./siswa-portfolio-modal";
 import { buildSiswaColumns } from "./siswa-table";
 import type { SiswaItem, SiswaOptionItem } from "./siswa.schema";
 
@@ -47,6 +48,9 @@ export function SiswaPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingStudent, setEditingStudent] = useState<SiswaItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const [selectedPortfolioStudent, setSelectedPortfolioStudent] = useState<SiswaItem | null>(null);
+  const [isPortfolioOpen, setIsPortfolioOpen] = useState(false);
 
   const [deleteStudent, setDeleteStudent] = useState<SiswaItem | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -169,13 +173,19 @@ export function SiswaPage() {
     [students]
   );
 
+  const handleOpenPortfolio = useCallback((item: SiswaItem) => {
+    setSelectedPortfolioStudent(item);
+    setIsPortfolioOpen(true);
+  }, []);
+
   const columns = useMemo(
     () =>
       buildSiswaColumns({
+        onViewPortfolio: handleOpenPortfolio,
         onEdit: handleOpenEdit,
         onDelete: (item) => setDeleteStudent(item),
       }),
-    [handleOpenEdit]
+    [handleOpenPortfolio, handleOpenEdit]
   );
 
 
@@ -294,6 +304,12 @@ export function SiswaPage() {
           />
         </form>
       </Modal>
+
+      <SiswaPortfolioModal
+        student={selectedPortfolioStudent}
+        open={isPortfolioOpen}
+        onOpenChange={setIsPortfolioOpen}
+      />
 
       <AlertDialog open={!!deleteStudent} onOpenChange={(open) => !open && setDeleteStudent(null)}>
         <AlertDialogContent className="rounded-3xl p-6 sm:p-7 border-none shadow-xl bg-white">

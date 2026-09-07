@@ -27,7 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/components/custom/sonner";
 import { alumniApi } from "./alumni.api";
 import { useAlumniForm, toCreateAlumniPayload } from "./alumni.form";
 import { AlumniForm } from "./alumni-form";

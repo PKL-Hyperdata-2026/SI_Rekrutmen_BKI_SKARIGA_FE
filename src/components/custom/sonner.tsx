@@ -100,7 +100,7 @@ export function Toaster({
   return (
     <div
       className={cn(
-        "fixed z-[9999] flex flex-col gap-2.5 pointer-events-none p-4 w-full max-w-[420px] transition-all",
+        "fixed z-50 flex flex-col gap-2.5 pointer-events-none p-4 w-full max-w-sm transition-all",
         position === "top-center" && "top-4 left-1/2 -translate-x-1/2 items-center",
         position === "top-right" && "top-4 right-4 items-end",
         position === "bottom-right" && "bottom-4 right-4 items-end"
@@ -110,61 +110,81 @@ export function Toaster({
         <div
           key={t.id}
           className={cn(
-            "pointer-events-auto w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl border shadow-lg backdrop-blur-md transition-all duration-300 ease-out",
+            "pointer-events-auto w-full relative overflow-hidden flex flex-col rounded-2xl border shadow-lg backdrop-blur-md transition-all duration-300 ease-out",
             t.isExiting
               ? "opacity-0 -translate-y-5 scale-95 pointer-events-none"
               : "opacity-100 translate-y-0 scale-100 animate-in fade-in slide-in-from-top-3",
-            "bg-white/95 text-slate-900 border-slate-200/90",
+            "bg-white text-slate-900 border-slate-200",
             t.type === "success" && "border-emerald-500/30 bg-emerald-50/95",
             t.type === "error" && "border-rose-500/30 bg-rose-50/95",
             t.type === "warning" && "border-amber-500/30 bg-amber-50/95",
-            t.type === "info" && "border-primary/30 bg-white/95"
+            t.type === "info" && "border-primary/30 bg-white"
           )}
         >
-          <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="shrink-0">
-              {t.type === "success" && (
-                <div className="h-8 w-8 rounded-xl bg-emerald-500/15 flex items-center justify-center text-emerald-600">
-                  <CheckCircle2 className="h-4.5 w-4.5" />
+          <div className="flex items-center justify-between gap-3 px-4 py-3">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="shrink-0">
+                {t.type === "success" && (
+                  <div className="h-8 w-8 rounded-xl bg-emerald-500/15 flex items-center justify-center text-emerald-600">
+                    <CheckCircle2 className="h-4 w-4" />
+                  </div>
+                )}
+                {t.type === "error" && (
+                  <div className="h-8 w-8 rounded-xl bg-rose-500/15 flex items-center justify-center text-rose-600">
+                    <AlertCircle className="h-4 w-4" />
+                  </div>
+                )}
+                {t.type === "warning" && (
+                  <div className="h-8 w-8 rounded-xl bg-amber-500/15 flex items-center justify-center text-amber-600">
+                    <AlertTriangle className="h-4 w-4" />
+                  </div>
+                )}
+                {t.type === "info" && (
+                  <div className="h-8 w-8 rounded-xl bg-primary/15 flex items-center justify-center text-primary">
+                    <Info className="h-4 w-4" />
+                  </div>
+                )}
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <div className="font-bold text-xs sm:text-sm text-slate-900 leading-tight">
+                  {t.title}
                 </div>
-              )}
-              {t.type === "error" && (
-                <div className="h-8 w-8 rounded-xl bg-rose-500/15 flex items-center justify-center text-rose-600">
-                  <AlertCircle className="h-4.5 w-4.5" />
-                </div>
-              )}
-              {t.type === "warning" && (
-                <div className="h-8 w-8 rounded-xl bg-amber-500/15 flex items-center justify-center text-amber-600">
-                  <AlertTriangle className="h-4.5 w-4.5" />
-                </div>
-              )}
-              {t.type === "info" && (
-                <div className="h-8 w-8 rounded-xl bg-primary/15 flex items-center justify-center text-primary">
-                  <Info className="h-4.5 w-4.5" />
-                </div>
-              )}
+                {t.description && (
+                  <div className="text-xs text-slate-600 mt-0.5 leading-snug">
+                    {t.description}
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="flex-1 min-w-0">
-              <div className="font-bold text-xs sm:text-sm text-slate-900 leading-tight">
-                {t.title}
-              </div>
-              {t.description && (
-                <div className="text-xs text-slate-600 mt-0.5 leading-snug">
-                  {t.description}
-                </div>
-              )}
-            </div>
+            <button
+              type="button"
+              onClick={() => toast.dismiss(t.id)}
+              aria-label="Tutup notifikasi"
+              className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:text-slate-700 hover:bg-black/5 transition-colors cursor-pointer self-center"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
 
-          <button
-            type="button"
-            onClick={() => toast.dismiss(t.id)}
-            aria-label="Tutup notifikasi"
-            className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:text-slate-700 hover:bg-black/5 transition-colors cursor-pointer self-center"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          {/* Animated Countdown Progress Line */}
+          {t.duration > 0 && (
+            <div className="w-full h-1 bg-black/5 overflow-hidden">
+              <div
+                className={cn(
+                  "h-full w-full origin-left",
+                  t.type === "success" && "bg-emerald-500",
+                  t.type === "error" && "bg-rose-500",
+                  t.type === "warning" && "bg-amber-500",
+                  t.type === "info" && "bg-primary"
+                )}
+                style={{
+                  animation: `toast-progress ${t.duration}ms linear forwards`,
+                }}
+              />
+            </div>
+          )}
         </div>
       ))}
     </div>
