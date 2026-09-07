@@ -19,6 +19,22 @@ export interface SiswaOptionItem {
   name: string;
 }
 
+export interface SiswaPortfolioItem {
+  id: number | string;
+  studentAlumniId?: number | string;
+  categoryId?: number | string;
+  category?: {
+    id: number | string;
+    code: string;
+    name: string;
+  } | null;
+  title?: string;
+  description?: string | null;
+  filePath?: string;
+  fileUrl?: string | null;
+  createdAt?: string | null;
+}
+
 export interface SiswaItem {
   id: number | string;
   userId?: number | string | null;
@@ -32,6 +48,8 @@ export interface SiswaItem {
   createdAt?: string | null;
   class?: SiswaOptionItem | null;
   major?: SiswaOptionItem | null;
+  socialMedia?: Record<string, string> | Array<{ platform: string; username: string; url?: string }> | null;
+  portfolios?: SiswaPortfolioItem[];
 }
 
 export interface SiswaOptionsData {

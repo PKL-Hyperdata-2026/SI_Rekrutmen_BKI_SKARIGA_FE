@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { PageHeader } from "@/components/custom/page-header";
 import { SectionCard } from "@/components/custom";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/components/custom/sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -424,7 +424,6 @@ export function EPortofolio() {
     <div className="space-y-3.5 pb-6">
       <PageHeader
         variant="student"
-        size="compact"
         badge="Berkas Terverifikasi Sistem"
         badgeIcon={<FileText className="h-3 w-3" />}
         title="E-Portofolio & Profil Pelamar"

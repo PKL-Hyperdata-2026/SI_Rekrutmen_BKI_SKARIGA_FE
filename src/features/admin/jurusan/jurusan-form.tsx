@@ -42,7 +42,7 @@ export function MajorForm({ form, departments }: MajorFormProps) {
           }))}
         />
         {errors.department_id && (
-          <p className="text-[11px] text-rose-500 font-medium">{errors.department_id.message}</p>
+          <p className="text-xs text-rose-500 font-medium">{errors.department_id.message}</p>
         )}
       </div>
 
@@ -57,7 +57,7 @@ export function MajorForm({ form, departments }: MajorFormProps) {
             className="h-10 rounded-xl uppercase"
           />
           {errors.code && (
-            <p className="text-[11px] text-rose-500 font-medium">{errors.code.message}</p>
+            <p className="text-xs text-rose-500 font-medium">{errors.code.message}</p>
           )}
         </div>
 
@@ -71,7 +71,7 @@ export function MajorForm({ form, departments }: MajorFormProps) {
             className="h-10 rounded-xl"
           />
           {errors.name && (
-            <p className="text-[11px] text-rose-500 font-medium">{errors.name.message}</p>
+            <p className="text-xs text-rose-500 font-medium">{errors.name.message}</p>
           )}
         </div>
       </div>
@@ -81,17 +81,17 @@ export function MajorForm({ form, departments }: MajorFormProps) {
         <textarea
           {...register("description")}
           placeholder="Keterangan kurikulum keahlian..."
-          className="w-full rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-2xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary min-h-[90px]"
+          className="w-full rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-2xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary min-h-24"
         />
         {errors.description && (
-          <p className="text-[11px] text-rose-500 font-medium">{errors.description.message}</p>
+          <p className="text-xs text-rose-500 font-medium">{errors.description.message}</p>
         )}
       </div>
 
       <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200">
         <div className="space-y-0.5">
           <div className="text-xs font-bold text-slate-800">Status Aktif</div>
-          <div className="text-[11px] text-slate-400">
+          <div className="text-xs text-slate-400">
             Jurusan aktif dapat dipilih saat registrasi siswa, alumni, dan lowongan kerja.
           </div>
         </div>

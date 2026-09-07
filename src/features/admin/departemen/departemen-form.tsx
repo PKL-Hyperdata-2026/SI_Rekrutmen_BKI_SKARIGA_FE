@@ -29,7 +29,7 @@ export function DepartmentForm({ form }: DepartmentFormProps) {
           className="h-10 rounded-xl uppercase"
         />
         {errors.code && (
-          <p className="text-[11px] text-rose-500 font-medium">{errors.code.message}</p>
+          <p className="text-xs text-rose-500 font-medium">{errors.code.message}</p>
         )}
       </div>
 
@@ -43,7 +43,7 @@ export function DepartmentForm({ form }: DepartmentFormProps) {
           className="h-10 rounded-xl"
         />
         {errors.name && (
-          <p className="text-[11px] text-rose-500 font-medium">{errors.name.message}</p>
+          <p className="text-xs text-rose-500 font-medium">{errors.name.message}</p>
         )}
       </div>
 
@@ -52,17 +52,17 @@ export function DepartmentForm({ form }: DepartmentFormProps) {
         <textarea
           {...register("description")}
           placeholder="Keterangan lingkup bidang keahlian..."
-          className="w-full rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-2xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary min-h-[90px]"
+          className="w-full rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-2xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary min-h-24"
         />
         {errors.description && (
-          <p className="text-[11px] text-rose-500 font-medium">{errors.description.message}</p>
+          <p className="text-xs text-rose-500 font-medium">{errors.description.message}</p>
         )}
       </div>
 
       <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200">
         <div className="space-y-0.5">
           <div className="text-xs font-bold text-slate-800">Status Aktif</div>
-          <div className="text-[11px] text-slate-400">
+          <div className="text-xs text-slate-400">
             Departemen aktif dapat dipilih saat registrasi dan pemetaan jurusan.
           </div>
         </div>

@@ -28,7 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/components/custom/sonner";
 import { departemenApi } from "./departemen.api";
 import { useDepartmentForm, toCreateDepartmentPayload } from "./departemen.form";
 import { DepartmentForm } from "./departemen-form";

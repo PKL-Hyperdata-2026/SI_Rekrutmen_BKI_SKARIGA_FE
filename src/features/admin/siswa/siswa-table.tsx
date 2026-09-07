@@ -6,10 +6,12 @@ import {
   Phone,
   Pencil,
   Trash2,
+  FileText,
 } from "lucide-react";
 import type { SiswaItem } from "./siswa.schema";
 
 export interface SiswaTableActionHandlers {
+  onViewPortfolio: (item: SiswaItem) => void;
   onEdit: (item: SiswaItem) => void;
   onDelete: (item: SiswaItem) => void;
 }
@@ -51,9 +53,9 @@ export function buildSiswaColumns(
         <div className="space-y-0.5">
           <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
             <GraduationCap className="h-3.5 w-3.5 text-blue-600 shrink-0" />
-            <span className="truncate max-w-[200px]">{siswa.major?.name || "-"}</span>
+            <span className="truncate max-w-48">{siswa.major?.name || "-"}</span>
           </div>
-          <div className="text-[11px] text-slate-500 font-medium pl-5">
+          <div className="text-xs text-slate-500 font-medium pl-5">
             {siswa.class?.name || "Kelas -"}
           </div>
         </div>
@@ -66,7 +68,7 @@ export function buildSiswaColumns(
         <div className="space-y-1">
           <div className="flex items-center gap-1.5 text-xs text-slate-600">
             <Mail className="h-3 w-3 text-slate-400 shrink-0" />
-            <span className="truncate max-w-[180px]">{siswa.email}</span>
+            <span className="truncate max-w-44">{siswa.email}</span>
           </div>
           {siswa.phone && (
             <div className="flex items-center gap-1.5 text-xs text-slate-600 font-medium">
@@ -97,6 +99,14 @@ export function buildSiswaColumns(
       align: "right",
       cell: (siswa) => (
         <div className="flex items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => handlers.onViewPortfolio(siswa)}
+            title="Lihat E-Portofolio Siswa"
+            className="h-8 w-8 rounded-lg border border-sky-200/80 bg-sky-50/70 text-sky-600 hover:bg-sky-100 hover:text-sky-700 flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
+          >
+            <FileText className="h-3.5 w-3.5" />
+          </button>
           <button
             type="button"
             onClick={() => handlers.onEdit(siswa)}

@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppSidebar, Topbar } from "@/components/custom";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "@/components/custom/sonner";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -59,7 +59,7 @@ export function MainLayout() {
 
   if (fetchingUser) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-900 text-white">
+      <div className="flex min-h-screen items-center justify-center bg-white">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );

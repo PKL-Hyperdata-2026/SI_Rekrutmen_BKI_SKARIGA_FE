@@ -224,7 +224,7 @@ export function DataTablePagination({
           <SelectTrigger
             style={activeInlineStyle}
             className={cn(
-              "h-8 min-w-26.25 px-3 rounded-lg text-xs font-semibold gap-1.5 cursor-pointer justify-between transition-all",
+              "h-8 min-w-28 px-3 rounded-lg text-xs font-semibold gap-1.5 cursor-pointer justify-between transition-all",
               resolvedActiveClass,
               "[&_svg]:text-white! [&_svg]:opacity-100! text-white! data-placeholder:text-white!",
             )}
@@ -238,7 +238,7 @@ export function DataTablePagination({
             align="center"
             sideOffset={6}
             className={cn(
-              "rounded-lg text-xs max-h-56 min-w-27.5",
+              "rounded-lg text-xs max-h-56 min-w-28",
               roleThemeClasses[resolvedRole],
             )}
           >
@@ -282,7 +282,7 @@ export function DataTablePagination({
       </div>
 
       {/* Desktop Pagination */}
-      <div className="hidden md:flex w-full items-center justify-between gap-4 px-6 py-4">
+      <div className="hidden md:flex w-full items-center justify-between gap-4 px-4 py-3">
         <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-500">
           {showItemInfo && (
             <p className="text-slate-600">

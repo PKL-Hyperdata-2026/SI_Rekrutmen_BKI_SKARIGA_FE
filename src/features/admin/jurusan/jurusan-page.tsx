@@ -27,7 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/components/custom/sonner";
 import { jurusanApi } from "./jurusan.api";
 import { useMajorForm, toCreateMajorPayload } from "./jurusan.form";
 import { MajorForm } from "./jurusan-form";

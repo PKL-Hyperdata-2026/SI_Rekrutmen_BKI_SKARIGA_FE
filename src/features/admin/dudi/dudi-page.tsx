@@ -27,7 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/components/custom/sonner";
 import { dudiApi } from "./dudi.api";
 import { useDudiForm, toCreateDudiPayload } from "./dudi.form";
 import { DudiForm } from "./dudi-form";
