@@ -23,6 +23,7 @@ export interface MenuItem {
   link: string;
   icon?: LucideIcon;
   superadminOnly?: boolean;
+  alumniOnly?: boolean;
 }
 
 export const STUDENT_MENUS: MenuItem[] = [
@@ -31,7 +32,7 @@ export const STUDENT_MENUS: MenuItem[] = [
   { name: "Lamaran Saya", link: "/student/lamaran", icon: FileText },
   { name: "Absensi Rekrutmen", link: "/student/absensi", icon: CalendarCheck },
   { name: "E-Portofolio", link: "/student/portofolio", icon: FolderOpen },
-  { name: "Tracer Study", link: "/student/tracer", icon: LineChart },
+  { name: "Tracer Study", link: "/student/tracer", icon: LineChart, alumniOnly: true },
 ];
 
 export const ADMIN_MENUS: MenuItem[] = [

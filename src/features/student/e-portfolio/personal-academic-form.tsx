@@ -1,17 +1,10 @@
 import { useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
-import { User, Lock, Plus, Globe, ExternalLink, Trash2, RotateCcw, Save, Loader2 } from "lucide-react";
+import { User, Lock, Plus, Globe, Trash2, RotateCcw, Save, Loader2 } from "lucide-react";
 import { SectionCard } from "@/components/custom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import type {
   StudentProfileData,
   PortfolioFormOptions,
@@ -58,10 +51,32 @@ export function PersonalAcademicForm({
     [profileData?.role]
   );
 
+  const majorDisplay = useMemo(
+    () =>
+      profileData?.major?.name ||
+      options?.majors?.find((m) => m.id === profileData?.majorId)?.name ||
+      "-",
+    [profileData?.major, profileData?.majorId, options?.majors]
+  );
+
+  const classDisplay = useMemo(
+    () =>
+      profileData?.class?.name ||
+      options?.classes?.find((c) => c.id === profileData?.classId)?.name ||
+      "-",
+    [profileData?.class, profileData?.classId, options?.classes]
+  );
+
+  const graduationYearDisplay = useMemo(
+    () =>
+      profileData?.graduationYear ? String(profileData.graduationYear) : "-",
+    [profileData?.graduationYear]
+  );
+
   return (
     <SectionCard
-      className="rounded-xl p-3.5 sm:p-4 shadow-xs border border-slate-100/90 flex-1 flex flex-col"
-      headerClassName="pb-2.5 border-b border-slate-100 mb-3"
+      className="rounded-xl p-4 sm:p-5 shadow-xs border border-slate-100/90 flex-1 flex flex-col"
+      headerClassName="pb-3 sm:pb-3.5 border-b border-slate-100 mb-4 sm:mb-5"
       title={
         <div className="flex items-center gap-2">
           <User className="h-4 w-4 text-primary" />
@@ -71,8 +86,8 @@ export function PersonalAcademicForm({
         </div>
       }
       action={
-        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 text-xs font-medium border border-slate-200/80 select-none">
-          <Lock className="h-2.5 w-2.5 text-slate-400" />
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 text-xs font-medium border border-slate-200/80 select-none">
+          <Lock className="h-3 w-3 text-slate-400" />
           <span>Data Akademik Terkunci</span>
         </div>
       }
@@ -85,160 +100,123 @@ export function PersonalAcademicForm({
       ) : (
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="space-y-2.5 flex-1 flex flex-col justify-between"
+          className="space-y-4 sm:space-y-5 flex-1 flex flex-col justify-between"
         >
-          <div className="space-y-2.5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+          <div className="space-y-3.5 sm:space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4.5">
               <div>
-                <Label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                <Label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                   STATUS
                 </Label>
-                <Select disabled value={roleDisplay}>
-                  <SelectTrigger className="w-full h-8 px-2.5 bg-slate-100/70 border-input text-xs font-medium text-slate-500 cursor-not-allowed shadow-none">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="SISWA">SISWA</SelectItem>
-                    <SelectItem value="ALUMNI">ALUMNI</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Input
+                  type="text"
+                  readOnly
+                  value={roleDisplay}
+                  className="h-9 text-xs bg-slate-100/70 text-slate-700 font-medium focus-visible:ring-0 focus-visible:border-input select-text"
+                />
               </div>
 
               <div>
-                <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1">
+                <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1.5">
                   Nama Lengkap
                 </Label>
                 <Input
                   type="text"
-                  disabled
+                  readOnly
                   value={profileData?.fullName || ""}
-                  className="h-8 text-xs bg-slate-100/70 text-slate-500 font-medium cursor-not-allowed"
+                  className="h-9 text-xs bg-slate-100/70 text-slate-700 font-medium focus-visible:ring-0 focus-visible:border-input select-text"
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4.5">
               <div>
-                <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1">
+                <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1.5">
                   NIS/NISN
                 </Label>
                 <Input
                   type="text"
-                  disabled
+                  readOnly
                   value={profileData?.nis || "-"}
-                  className="h-8 text-xs bg-slate-100/70 text-slate-500 font-medium cursor-not-allowed"
+                  className="h-9 text-xs bg-slate-100/70 text-slate-700 font-medium focus-visible:ring-0 focus-visible:border-input select-text"
                 />
               </div>
 
               <div>
-                <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1">
+                <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1.5">
                   Jurusan
                 </Label>
-                <Select
-                  disabled
-                  value={profileData?.majorId ? String(profileData.majorId) : "0"}
-                >
-                  <SelectTrigger className="w-full h-8 px-2.5 bg-slate-100/70 border-input text-xs font-medium text-slate-500 cursor-not-allowed shadow-none">
-                    <SelectValue placeholder="Pilih Jurusan" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0">Pilih Jurusan</SelectItem>
-                    {options?.majors?.map((major) => (
-                      <SelectItem key={major.id} value={String(major.id)}>
-                        {major.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Input
+                  type="text"
+                  readOnly
+                  value={majorDisplay}
+                  className="h-9 text-xs bg-slate-100/70 text-slate-700 font-medium focus-visible:ring-0 focus-visible:border-input select-text"
+                />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4.5">
               <div>
-                <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1">
+                <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1.5">
                   Kelas
                 </Label>
-                <Select
-                  disabled
-                  value={profileData?.classId ? String(profileData.classId) : "0"}
-                >
-                  <SelectTrigger className="w-full h-8 px-2.5 bg-slate-100/70 border-input text-xs font-medium text-slate-500 cursor-not-allowed shadow-none">
-                    <SelectValue placeholder="Pilih Kelas" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0">Pilih Kelas</SelectItem>
-                    {options?.classes?.map((cls) => (
-                      <SelectItem key={cls.id} value={String(cls.id)}>
-                        {cls.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Input
+                  type="text"
+                  readOnly
+                  value={classDisplay}
+                  className="h-9 text-xs bg-slate-100/70 text-slate-700 font-medium focus-visible:ring-0 focus-visible:border-input select-text"
+                />
               </div>
 
               <div>
-                <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1">
+                <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1.5">
                   Tahun Lulus
                 </Label>
-                <Select
-                  disabled
-                  value={
-                    profileData?.graduationYear
-                      ? String(profileData.graduationYear)
-                      : "default"
-                  }
-                >
-                  <SelectTrigger className="w-full h-8 px-2.5 bg-slate-100/70 border-input text-xs font-medium text-slate-500 cursor-not-allowed shadow-none">
-                    <SelectValue placeholder="Pilih Tahun Lulus" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="default">Pilih Tahun Lulus</SelectItem>
-                    {options?.graduation_years?.map((year) => (
-                      <SelectItem key={year} value={String(year)}>
-                        {year}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Input
+                  type="text"
+                  readOnly
+                  value={graduationYearDisplay}
+                  className="h-9 text-xs bg-slate-100/70 text-slate-700 font-medium focus-visible:ring-0 focus-visible:border-input select-text"
+                />
               </div>
             </div>
 
             <div>
-              <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1">
+              <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1.5">
                 Email
               </Label>
               <Input
                 type="email"
-                disabled
+                readOnly
                 value={profileData?.email || ""}
-                className="h-8 text-xs bg-slate-100/70 text-slate-500 font-medium cursor-not-allowed"
+                className="h-9 text-xs bg-slate-100/70 text-slate-700 font-medium focus-visible:ring-0 focus-visible:border-input select-text"
               />
             </div>
 
             <div>
-              <Label className="block text-xs font-bold text-slate-800 tracking-wider mb-1">
+              <Label className="block text-xs font-bold text-slate-800 tracking-wider mb-1.5">
                 No . WhatsApp Aktif <span className="text-rose-500">*</span>
               </Label>
               <Input
                 type="text"
                 {...register("phone")}
                 placeholder="e.g +62 123-4567-890"
-                className="h-8 text-xs bg-white text-slate-800 focus-visible:border-primary"
+                className="h-9 text-xs bg-white text-slate-800 focus-visible:border-primary"
               />
               {errors.phone && (
-                <p className="text-xs text-rose-500 mt-0.5 font-medium">
+                <p className="text-xs text-rose-500 mt-1 font-medium">
                   {errors.phone.message}
                 </p>
               )}
             </div>
 
-            <div className="pt-2.5 border-t border-slate-100">
-              <div className="flex items-center justify-between mb-2">
+            <div className="pt-3.5 sm:pt-4 border-t border-slate-100">
+              <div className="flex items-center justify-between mb-2.5 sm:mb-3">
                 <div>
                   <h3 className="text-xs font-bold text-slate-700">
                     Media Sosial (Opsional)
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-400 mt-0.5">
                     Tautkan akun LinkedIn, GitHub, Instagram, TikTok, Portofolio/CV, dll.
                   </p>
                 </div>
@@ -248,7 +226,7 @@ export function PersonalAcademicForm({
                     variant="outline"
                     size="xs"
                     onClick={onOpenAddSocialModal}
-                    className="border-slate-200 hover:border-primary hover:bg-primary/5 text-slate-700 hover:text-primary cursor-pointer"
+                    className="h-7 px-2.5 border-slate-200 hover:border-primary hover:bg-primary/5 text-slate-700 hover:text-primary cursor-pointer"
                   >
                     <Plus className="h-3 w-3" />
                     <span>Tambah</span>
@@ -259,13 +237,13 @@ export function PersonalAcademicForm({
               {socialMediaList.length === 0 ? (
                 <div
                   onClick={onOpenAddSocialModal}
-                  className="p-3 rounded-xl border border-dashed border-slate-200 hover:border-primary/40 hover:bg-primary/5 transition-all flex items-center justify-center gap-2 text-xs text-slate-400 cursor-pointer select-none"
+                  className="p-3.5 rounded-xl border border-dashed border-slate-200 hover:border-primary/40 hover:bg-primary/5 transition-all flex items-center justify-center gap-2 text-xs text-slate-400 cursor-pointer select-none"
                 >
                   <Plus className="h-3.5 w-3.5 text-slate-400" />
                   <span>Belum ada media sosial ditambahkan. Klik untuk menambah.</span>
                 </div>
               ) : (
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {socialMediaList.map((item) => {
                     const config =
                       MONOCHROME_PLATFORMS.find(
@@ -276,13 +254,30 @@ export function PersonalAcademicForm({
                         baseUrl: "",
                       };
 
+                    const targetUrl = item.url
+                      ? item.url.startsWith("http://") || item.url.startsWith("https://")
+                        ? item.url
+                        : `https://${item.url}`
+                      : config.baseUrl
+                      ? `${config.baseUrl}${item.username.replace(/^@/, "")}`
+                      : item.username.startsWith("http://") || item.username.startsWith("https://")
+                      ? item.username
+                      : `https://${item.username}`;
+
                     return (
                       <div
                         key={item.platform}
-                        className="p-2 rounded-xl border border-slate-100 bg-white hover:border-slate-200 hover:shadow-2xs transition-all flex items-center justify-between gap-2.5"
+                        className="group relative p-2.5 rounded-xl border border-slate-100 bg-white hover:border-slate-300 hover:shadow-2xs transition-all flex items-center justify-between gap-2.5"
                       >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="h-7 w-7 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                        <a
+                          href={targetUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={`Buka tautan ${config.name} (${targetUrl})`}
+                          className="absolute inset-0 rounded-xl"
+                        />
+                        <div className="flex items-center gap-2.5 min-w-0 flex-1 pointer-events-none">
+                          <div className="h-7 w-7 rounded-full bg-slate-100 group-hover:bg-slate-200/80 flex items-center justify-center shrink-0 transition-colors">
                             {config.icon}
                           </div>
                           <div className="flex items-center gap-1.5 min-w-0 flex-wrap">
@@ -290,41 +285,26 @@ export function PersonalAcademicForm({
                               {config.name}
                             </span>
                             <span className="text-slate-300">•</span>
-                            <span className="text-xs font-bold text-slate-800 truncate">
+                            <span className="text-xs font-bold text-slate-800 group-hover:text-primary transition-colors truncate">
                               {item.username}
                             </span>
                           </div>
                         </div>
 
-                        <div className="shrink-0 flex items-center gap-1">
-                          {item.url && (
-                            <Button
-                              variant="ghost"
-                              size="icon-xs"
-                              asChild
-                              className="text-slate-400 hover:text-slate-900 hover:bg-slate-100"
-                            >
-                              <a
-                                href={item.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                title={`Buka tautan ${config.name}`}
-                              >
-                                <ExternalLink className="h-3 w-3" />
-                              </a>
-                            </Button>
-                          )}
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon-xs"
-                            onClick={() => onRemoveSocialMedia(item.platform)}
-                            title="Hapus Media Sosial"
-                            className="text-slate-400 hover:text-rose-500 hover:bg-rose-50"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
-                        </div>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-xs"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            onRemoveSocialMedia(item.platform);
+                          }}
+                          title="Hapus Media Sosial"
+                          className="relative z-10 text-slate-400 hover:text-destructive hover:bg-destructive/10 shrink-0 cursor-pointer"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
                       </div>
                     );
                   })}
@@ -333,31 +313,31 @@ export function PersonalAcademicForm({
             </div>
           </div>
 
-          <div className="pt-3 mt-1 flex items-center justify-end gap-2 border-t border-slate-100/60">
+          <div className="pt-4 mt-2 sm:mt-3 flex items-center justify-end gap-2.5 border-t border-slate-100/60">
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               onClick={onReset}
               disabled={!isFormChanged || isSaving}
-              className="h-8 px-3 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              className="h-9 px-3.5 text-xs font-semibold border-none bg-secondary text-secondary-foreground hover:bg-secondary/80 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <RotateCcw className="h-3 w-3" />
+              <RotateCcw className="h-3.5 w-3.5" />
               Reset
             </Button>
 
             <Button
               type="submit"
               disabled={!isFormChanged || isSaving}
-              className="h-8 px-4 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              className="h-9 px-4 sm:px-5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isSaving ? (
                 <>
-                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   Menyimpan...
                 </>
               ) : (
                 <>
-                  <Save className="h-3 w-3" />
+                  <Save className="h-3.5 w-3.5" />
                   Simpan Perubahan
                 </>
               )}

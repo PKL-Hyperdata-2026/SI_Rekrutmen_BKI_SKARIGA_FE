@@ -68,7 +68,15 @@ export function MainLayout() {
   return (
     <TooltipProvider>
       <Toaster position="top-right" />
-      <SidebarProvider>
+      <SidebarProvider
+        style={
+          {
+            "--sidebar-width": "16rem",
+            "--sidebar-width-icon": "4.5rem",
+          } as React.CSSProperties
+        }
+        className="bg-slate-50"
+      >
         <AppSidebar />
         <SidebarInset className="w-full flex flex-col h-screen overflow-hidden bg-slate-50">
           <ScrollArea ref={scrollAreaRef} className="h-full w-full">
