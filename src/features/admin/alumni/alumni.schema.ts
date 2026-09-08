@@ -124,10 +124,25 @@ export interface AlumniPaginatedResponse {
 export const alumniFormSchema = z.object({
   mode: z.enum(["graduate", "manual"]),
   user_id: z.string().optional().or(z.literal("")),
-  nis: z.string().trim().min(3, "NIS minimal 3 karakter").max(30, "NIS maksimal 30 karakter"),
-  full_name: z.string().trim().min(2, "Nama lengkap minimal 2 karakter").max(150, "Nama lengkap maksimal 150 karakter"),
+  nis: z
+    .string()
+    .trim()
+    .min(3, "NIS minimal 3 karakter")
+    .max(30, "NIS maksimal 30 karakter"),
+  full_name: z
+    .string()
+    .trim()
+    .min(2, "Nama lengkap minimal 2 karakter")
+    .max(150, "Nama lengkap maksimal 150 karakter"),
   phone: z.string().trim().optional().or(z.literal("")),
-  email: z.string().trim().email("Format email tidak valid").optional().or(z.literal("")),
+  email: z
+    .string()
+    .trim()
+    .refine((val) => !val || z.string().email().safeParse(val).success, {
+      message: "Format email tidak valid",
+    })
+    .optional()
+    .or(z.literal("")),
   major_id: z.string().min(1, "Jurusan wajib dipilih"),
   class_id: z.string().optional().or(z.literal("")),
   graduation_year: z.string().min(1, "Tahun kelulusan wajib diisi"),
@@ -149,4 +164,6 @@ export const alumniPortfolioUploadSchema = z.object({
   description: z.string().optional().or(z.literal("")),
 });
 
-export type AlumniPortfolioUploadSchemaType = z.infer<typeof alumniPortfolioUploadSchema>;
+export type AlumniPortfolioUploadSchemaType = z.infer<
+  typeof alumniPortfolioUploadSchema
+>;
