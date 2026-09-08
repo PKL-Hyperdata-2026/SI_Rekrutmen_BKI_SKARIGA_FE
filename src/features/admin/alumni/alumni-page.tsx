@@ -1,12 +1,14 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { PageHeader, StatCard, DataTable } from "@/components/custom";
+import { FormProvider } from "react-hook-form";
+import { PageHeader, DataTable } from "@/components/custom";
 import {
-  UserPlus,
-  Search,
-  Users,
   GraduationCap,
   Briefcase,
-  Pencil,
+  Plus,
+  FileSpreadsheet,
+  Sparkles,
+  Search,
+  Loader2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,7 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Modal } from "@/components/ui/modal";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,14 +30,36 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/components/ui/sonner";
 import { alumniApi } from "./alumni.api";
-import { useAlumniForm, toCreateAlumniPayload } from "./alumni.form";
-import { AlumniForm } from "./alumni-form";
+import {
+  useAlumniForm,
+  toCreateAlumniPayload,
+  findMatchingClassId,
+  findMatchingMajorId,
+  findMatchingOptionId,
+} from "./alumni.form";
+import { AlumniFormModal } from "./alumni-form";
+import { AlumniDetailModal } from "./alumni-detail-modal";
 import { buildAlumniColumns } from "./alumni-table";
-import type { AlumniItem, AlumniOptionsData } from "./alumni.schema";
+import type {
+  AlumniItem,
+  AlumniOptionsData,
+  AlumniPaginationMeta,
+} from "./alumni.schema";
+
+const FALLBACK_EMPLOYMENT_STATUSES = [
+  { id: "1", name: "Bekerja (Kolektif/Mandiri)" },
+  { id: "2", name: "Wirausaha" },
+  { id: "3", name: "Melanjutkan Studi" },
+  { id: "4", name: "Belum Bekerja" },
+];
 
 export function AlumniPage() {
   const [alumniList, setAlumniList] = useState<AlumniItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [meta, setMeta] = useState<AlumniPaginationMeta | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const perPage = 15;
+
   const [options, setOptions] = useState<AlumniOptionsData>({
     companies: [],
     majors: [],
@@ -46,35 +69,94 @@ export function AlumniPage() {
   });
 
   const [search, setSearch] = useState("");
-  const [yearFilter, setYearFilter] = useState("all");
-  const [majorFilter, setMajorFilter] = useState("all");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  const [yearFilter, setYearFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  // Form modal state
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingAlumni, setEditingAlumni] = useState<AlumniItem | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  // Detail modal state
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [activeDetailAlumni, setActiveDetailAlumni] =
+    useState<AlumniItem | null>(null);
+
+  // Delete dialog state
   const [deleteAlumni, setDeleteAlumni] = useState<AlumniItem | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const form = useAlumniForm(editingAlumni);
+  const form = useAlumniForm(editingAlumni, options);
 
   const fetchAlumni = useCallback(async () => {
     setLoading(true);
     try {
-      const params: Record<string, string> = {};
-      if (search) params.search = search;
+      const params: Record<string, unknown> = {
+        page: currentPage,
+        per_page: perPage,
+      };
+      if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
       if (yearFilter !== "all") params.graduation_year = yearFilter;
-      if (majorFilter !== "all") params.major_id = majorFilter;
+      if (statusFilter !== "all") params.employment_status_id = statusFilter;
 
       const res = await alumniApi.getAlumni(params);
-      setAlumniList(res.data?.data?.data || []);
+      const resPayload = res.data as Record<string, any> | undefined;
+      const nested = resPayload?.data;
+
+      if (Array.isArray(nested)) {
+        setAlumniList(nested as AlumniItem[]);
+        const metaObj = resPayload?.meta;
+        if (metaObj) {
+          setMeta(metaObj);
+        } else {
+          setMeta({
+            current_page: resPayload?.current_page || currentPage,
+            last_page: resPayload?.last_page || 1,
+            per_page: resPayload?.per_page || perPage,
+            total: resPayload?.total ?? nested.length,
+            from: resPayload?.from ?? 1,
+            to: resPayload?.to ?? nested.length,
+          });
+        }
+      } else if (
+        nested &&
+        typeof nested === "object" &&
+        Array.isArray(nested.data)
+      ) {
+        setAlumniList(nested.data as AlumniItem[]);
+        if (nested.meta) {
+          setMeta(nested.meta);
+        } else {
+          setMeta({
+            current_page: nested.current_page || currentPage,
+            last_page: nested.last_page || 1,
+            per_page: nested.per_page || perPage,
+            total: nested.total ?? nested.data.length,
+            from: nested.from ?? 1,
+            to: nested.to ?? nested.data.length,
+          });
+        }
+      } else {
+        setAlumniList([]);
+        setMeta(null);
+      }
     } catch {
       setAlumniList([]);
+      setMeta(null);
       toast.error("Gagal memuat data alumni.");
     } finally {
       setLoading(false);
     }
-  }, [search, yearFilter, majorFilter]);
+  }, [currentPage, perPage, debouncedSearch, yearFilter, statusFilter]);
 
   useEffect(() => {
     let ignore = false;
@@ -92,25 +174,36 @@ export function AlumniPage() {
   }, []);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      fetchAlumni();
-    }, 300);
-    return () => clearTimeout(timeout);
+    fetchAlumni();
   }, [fetchAlumni]);
+
+  const handleYearFilterChange = (val: string) => {
+    setYearFilter(val);
+    setCurrentPage(1);
+  };
+
+  const handleStatusFilterChange = (val: string) => {
+    setStatusFilter(val);
+    setCurrentPage(1);
+  };
 
   const handleOpenCreate = () => {
     setEditingAlumni(null);
     form.reset({
+      mode: "graduate",
       user_id: "",
       nis: "",
       full_name: "",
       phone: "",
+      email: "",
       major_id: "",
       class_id: "",
       graduation_year: String(new Date().getFullYear()),
       employment_status_id: "",
       current_company_id: "",
       current_position: "",
+      profile_url: "",
+      company_name_manual: "",
       starting_salary: "",
       waiting_time_months: "",
       is_active: true,
@@ -118,33 +211,86 @@ export function AlumniPage() {
     setIsFormOpen(true);
   };
 
-  const handleOpenEdit = useCallback((item: AlumniItem) => {
-    setEditingAlumni(item);
-    form.reset({
-      user_id: item.userId ? String(item.userId) : "",
-      nis: item.nis || "",
-      full_name: item.fullName || item.user?.fullName || "",
-      phone: item.phone || item.user?.phone || "",
-      major_id: item.majorId ? String(item.majorId) : "",
-      class_id: item.classId ? String(item.classId) : "",
-      graduation_year: item.graduationYear
-        ? String(item.graduationYear)
-        : String(new Date().getFullYear()),
-      employment_status_id: item.employmentStatusId
-        ? String(item.employmentStatusId)
-        : "",
-      current_company_id: item.currentCompanyId
-        ? String(item.currentCompanyId)
-        : "",
-      current_position: item.currentPosition || "",
-      starting_salary: item.startingSalary ? String(item.startingSalary) : "",
-      waiting_time_months: item.waitingTimeMonths
-        ? String(item.waitingTimeMonths)
-        : "",
-      is_active: item.isActive,
-    });
-    setIsFormOpen(true);
-  }, [form]);
+  const handleOpenEdit = useCallback(
+    (item: AlumniItem) => {
+      setEditingAlumni(item);
+
+      const resolvedClassId =
+        findMatchingClassId(options.classes, item.class) ||
+        (item.classId
+          ? findMatchingOptionId(options.classes, String(item.classId)) ||
+            String(item.classId)
+          : "");
+
+      const resolvedMajorId =
+        findMatchingMajorId(options.majors, item.major) ||
+        (item.majorId
+          ? findMatchingOptionId(options.majors, String(item.majorId)) ||
+            String(item.majorId)
+          : "");
+
+      const resolvedStatusId =
+        findMatchingOptionId(
+          options.employment_statuses,
+          item.employmentStatus,
+        ) ||
+        (item.employmentStatusId
+          ? findMatchingOptionId(
+              options.employment_statuses,
+              String(item.employmentStatusId),
+            ) || String(item.employmentStatusId)
+          : "");
+
+      const resolvedCompanyId = options.companies?.find(
+        (comp) =>
+          comp.name.toLowerCase() ===
+          (item.currentCompany?.name || "").toLowerCase(),
+      )
+        ? String(
+            options.companies.find(
+              (comp) =>
+                comp.name.toLowerCase() ===
+                (item.currentCompany?.name || "").toLowerCase(),
+            )!.id,
+          )
+        : item.currentCompanyId
+          ? String(item.currentCompanyId)
+          : "";
+
+      const profileUrl =
+        typeof item.socialMedia === "string"
+          ? item.socialMedia
+          : (item.socialMedia?.profile_url as string) ||
+            (item.socialMedia?.linkedin as string) ||
+            "";
+
+      form.reset({
+        mode: item.userId ? "graduate" : "manual",
+        user_id: item.userId ? String(item.userId) : "",
+        nis: item.nis || "",
+        full_name: item.fullName || item.user?.fullName || "",
+        phone: item.phone || item.user?.phone || "",
+        email: item.email || item.user?.email || "",
+        major_id: resolvedMajorId,
+        class_id: resolvedClassId,
+        graduation_year: item.graduationYear
+          ? String(item.graduationYear)
+          : String(new Date().getFullYear()),
+        employment_status_id: resolvedStatusId,
+        current_company_id: resolvedCompanyId,
+        current_position: item.currentPosition || "",
+        profile_url: profileUrl,
+        company_name_manual: item.currentCompany?.name || "",
+        starting_salary: item.startingSalary ? String(item.startingSalary) : "",
+        waiting_time_months: item.waitingTimeMonths
+          ? String(item.waitingTimeMonths)
+          : "",
+        is_active: item.isActive ?? true,
+      });
+      setIsFormOpen(true);
+    },
+    [form, options],
+  );
 
   const handleSubmitForm = form.handleSubmit(async (values) => {
     setSubmitting(true);
@@ -171,151 +317,262 @@ export function AlumniPage() {
     }
   });
 
+  const handleOpenDetail = useCallback(async (item: AlumniItem) => {
+    setActiveDetailAlumni(item);
+    setIsDetailOpen(true);
+    try {
+      const res = await alumniApi.getAlumniById(item.id);
+      const detail = res.data?.data || res.data;
+      if (detail && typeof detail === "object") {
+        setActiveDetailAlumni(detail as AlumniItem);
+      }
+    } catch {
+      // Retain item if request fails
+    }
+  }, []);
+
+  const handleUploadPortfolio = async (
+    alumniId: string | number,
+    formData: FormData,
+  ) => {
+    await alumniApi.uploadPortfolio(alumniId, formData);
+    fetchAlumni();
+  };
+
+  const handleDeletePortfolio = async (
+    alumniId: string | number,
+    portfolioId: string | number,
+  ) => {
+    await alumniApi.deletePortfolio(alumniId, portfolioId);
+    fetchAlumni();
+  };
+
+  const handleUpdateAlumniFromDetail = async (
+    id: string | number,
+    payload: Record<string, unknown>,
+  ) => {
+    const res = await alumniApi.updateAlumni(id, payload);
+    const updated = res.data?.data;
+    if (updated && typeof updated === "object") {
+      setActiveDetailAlumni((prev) =>
+        prev ? { ...prev, ...updated } : (updated as AlumniItem),
+      );
+    }
+    fetchAlumni();
+  };
+
+  const handleRefreshDetail = async () => {
+    if (activeDetailAlumni?.id) {
+      try {
+        const res = await alumniApi.getAlumniById(activeDetailAlumni.id);
+        const detail = res.data?.data || res.data;
+        if (detail && typeof detail === "object") {
+          setActiveDetailAlumni(detail as AlumniItem);
+        }
+      } catch {}
+    }
+    fetchAlumni();
+  };
+
   const handleDelete = async () => {
     if (!deleteAlumni) return;
     setDeleting(true);
     try {
       await alumniApi.deleteAlumni(deleteAlumni.id);
-      const name = deleteAlumni.fullName || deleteAlumni.user?.fullName || "Alumni";
+      const name =
+        deleteAlumni.fullName || deleteAlumni.user?.fullName || "Alumni";
       toast.success(`Data alumni ${name} berhasil dihapus.`);
       setDeleteAlumni(null);
       fetchAlumni();
-    } catch {
-      toast.error("Gagal menghapus data alumni.");
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || "Gagal menghapus data alumni.";
+      toast.error(msg);
     } finally {
       setDeleting(false);
     }
   };
 
+  const employmentStatusOptions = useMemo(() => {
+    if (options.employment_statuses && options.employment_statuses.length > 0) {
+      return options.employment_statuses;
+    }
+    return FALLBACK_EMPLOYMENT_STATUSES;
+  }, [options.employment_statuses]);
+
   const columns = useMemo(
     () =>
       buildAlumniColumns({
+        onDetail: handleOpenDetail,
         onEdit: handleOpenEdit,
         onDelete: (item) => setDeleteAlumni(item),
+        currentPage,
+        perPage,
       }),
-    [handleOpenEdit]
+    [handleOpenDetail, handleOpenEdit, currentPage, perPage],
   );
 
+  const paginationConfig = useMemo(() => {
+    if (!meta || meta.last_page <= 1) return undefined;
+    return {
+      currentPage,
+      totalPages: meta.last_page,
+      totalItems: meta.total,
+      pageSize: perPage,
+      onPageChange: (page: number) => setCurrentPage(page),
+    };
+  }, [meta, currentPage, perPage]);
 
   return (
     <div className="space-y-6">
+      {/* 1. Page Header Sesuai Desain Figma & Theme Admin */}
       <PageHeader
         variant="admin"
+        badge="Master data Modul"
+        badgeIcon={<Sparkles className="h-3.5 w-3.5" />}
         title="Data Alumni Skariga"
-        description="Database riwayat lulusan, status keterserapan kerja, wirausaha, dan lanjut studi."
+        description="Temukan peluang karir terbaik dari industri mitra resmi SKARIGA."
       >
         <PageHeader.Button
           variant="primary"
-          icon={<UserPlus className="h-4 w-4" />}
+          icon={<Plus className="h-4 w-4" />}
           onClick={handleOpenCreate}
         >
           Tambah Alumni
         </PageHeader.Button>
+        <PageHeader.Button
+          variant="glass"
+          icon={<FileSpreadsheet className="h-4 w-4 text-purple-200" />}
+          onClick={() => toast.info("Fitur Import Excel akan segera hadir.")}
+        >
+          Import Excel
+        </PageHeader.Button>
       </PageHeader>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard
-          label="Total Alumni Terdata"
-          value={alumniList.length}
-          icon={Users}
-          color="blue"
-        />
-        <StatCard
-          label="Terserap Kerja & Wirausaha"
-          value={
-            alumniList.filter((a) => Boolean(a.employmentStatus || a.currentCompany))
-              .length
-          }
-          icon={Briefcase}
-          color="teal"
-        />
-        <StatCard
-          label="Angkatan Kelulusan"
-          value={options.graduation_years?.length || 0}
-          icon={GraduationCap}
-          color="sky"
-        />
-      </div>
-
-      <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/90 shadow-xs flex flex-col md:flex-row gap-4 justify-between items-center">
-        <div className="relative w-full md:w-80">
+      {/* 2. Filter Bar Sesuai Desain Figma + Master Siswa Search */}
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+        {/* Search Bar */}
+        <div className="relative w-full lg:flex-1 lg:max-w-md min-w-0">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input
-            placeholder="Cari nama alumni, NIS, perusahaan..."
+            placeholder="Cari nama alumni, NIS, email..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9.5 pr-4 bg-slate-50 border-slate-200 rounded-xl h-10 text-xs placeholder:text-slate-400 shadow-2xs"
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="w-full pl-9.5 pr-4 bg-slate-50/60 border-slate-200 rounded-xl h-10 text-xs placeholder:text-slate-400 shadow-2xs focus-visible:bg-white"
           />
         </div>
 
-        <div className="flex w-full md:w-auto items-center gap-3">
-          <Select value={yearFilter} onValueChange={setYearFilter}>
-            <SelectTrigger className="w-full md:w-44 h-10 rounded-xl bg-slate-50 border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer">
-              <SelectValue placeholder="Semua Angkatan" />
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          {/* Dropdown 1: Angkatan */}
+          <Select value={yearFilter} onValueChange={handleYearFilterChange}>
+            <SelectTrigger className="w-[150px] sm:w-[170px] h-10 rounded-xl bg-white border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50/80 transition-colors shadow-2xs cursor-pointer">
+              <div className="flex items-center gap-2 truncate">
+                <GraduationCap className="h-4 w-4 text-purple-600 shrink-0" />
+                <SelectValue placeholder="Semua Angkatan" />
+              </div>
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all" className="text-xs">Semua Angkatan</SelectItem>
+            <SelectContent className="rounded-xl border-slate-200 shadow-md">
+              <SelectItem value="all" className="text-xs font-medium">
+                Semua Angkatan
+              </SelectItem>
               {(options.graduation_years || []).map((yr) => (
-                <SelectItem key={yr} value={String(yr)} className="text-xs">
+                <SelectItem
+                  key={yr}
+                  value={String(yr)}
+                  className="text-xs font-medium"
+                >
                   Lulusan {yr}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <Select value={majorFilter} onValueChange={setMajorFilter}>
-            <SelectTrigger className="w-full md:w-48 h-10 rounded-xl bg-slate-50 border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer">
-              <SelectValue placeholder="Semua Jurusan" />
+          {/* Dropdown 2: Status Karir */}
+          <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+            <SelectTrigger className="w-[175px] sm:w-[200px] h-10 rounded-xl bg-white border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50/80 transition-colors shadow-2xs cursor-pointer">
+              <div className="flex items-center gap-2 truncate">
+                <Briefcase className="h-4 w-4 text-purple-600 shrink-0" />
+                <SelectValue placeholder="Status Karir : Semua" />
+              </div>
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all" className="text-xs">Semua Jurusan</SelectItem>
-              {(options.majors || []).map((m) => (
-                <SelectItem key={m.id} value={String(m.id)} className="text-xs">
-                  {m.name}
+            <SelectContent className="rounded-xl border-slate-200 shadow-md">
+              <SelectItem value="all" className="text-xs font-medium">
+                Status Karir : Semua
+              </SelectItem>
+              {employmentStatusOptions.map((st) => (
+                <SelectItem
+                  key={st.id}
+                  value={String(st.id)}
+                  className="text-xs font-medium"
+                >
+                  {st.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+
+          {/* Total Count Pill */}
+          <div className="font-bold text-purple-700 bg-purple-50/70 border border-purple-100 px-3.5 py-2 rounded-xl text-xs whitespace-nowrap shadow-2xs">
+            Total : {meta?.total !== undefined ? meta.total : alumniList.length}{" "}
+            Alumni
+          </div>
         </div>
       </div>
 
+      {/* 3. Data Table & Pagination */}
       <DataTable
         columns={columns}
         data={alumniList}
         loading={loading}
+        showNumbering={false}
+        pagination={paginationConfig}
         emptyMessage="Tidak ada data alumni yang ditemukan"
-        emptyDescription="Coba sesuaikan kata kunci pencarian atau filter angkatan/jurusan"
-        emptyIcon={<Users className="h-8 w-8 text-slate-400" />}
+        emptyDescription="Coba sesuaikan filter angkatan atau status karir."
+        emptyIcon={<GraduationCap className="h-8 w-8 text-slate-400" />}
         getRowId={(alumni) => String(alumni.id)}
       />
 
-      <Modal
-        open={isFormOpen}
-        onOpenChange={setIsFormOpen}
-        variant="admin"
-        size="md"
-        headerIcon={editingAlumni ? <Pencil className="h-5 w-5" /> : <UserPlus className="h-5 w-5" />}
-        title={editingAlumni ? "Edit Data Alumni" : "Tambah Data Alumni"}
-        description={
-          editingAlumni
-            ? "Perbarui riwayat penelusuran karir, status keterserapan, dan profil alumni."
-            : "Lengkapi data alumni untuk integrasi pelacakan tracer study BKI Skariga."
-        }
-        confirmText={editingAlumni ? "Perbarui Alumni" : "Simpan Alumni"}
-        cancelText="Batal"
-        isLoading={submitting}
-        onConfirm={handleSubmitForm}
-      >
-        <form onSubmit={handleSubmitForm}>
-          <AlumniForm
-            form={form}
-            options={options}
-            isEditing={!!editingAlumni}
-          />
-        </form>
-      </Modal>
+      {/* 4. Form Modal (Create / Edit) */}
+      <FormProvider {...form}>
+        <AlumniFormModal
+          form={form}
+          options={options}
+          isEditing={Boolean(editingAlumni)}
+          isOpen={isFormOpen}
+          onClose={() => setIsFormOpen(false)}
+          onSubmit={handleSubmitForm}
+          isSubmitting={submitting}
+        />
+      </FormProvider>
 
-      <AlertDialog open={!!deleteAlumni} onOpenChange={(open) => !open && setDeleteAlumni(null)}>
+      {/* 5. Detail & E-Portfolio Modal */}
+      <AlumniDetailModal
+        open={isDetailOpen}
+        onClose={() => {
+          setIsDetailOpen(false);
+          setActiveDetailAlumni(null);
+        }}
+        onOpenChange={(open) => {
+          setIsDetailOpen(open);
+          if (!open) setActiveDetailAlumni(null);
+        }}
+        alumni={activeDetailAlumni}
+        options={options}
+        onUpdateAlumni={handleUpdateAlumniFromDetail}
+        onUploadPortfolio={handleUploadPortfolio}
+        onDeletePortfolio={handleDeletePortfolio}
+        onRefresh={handleRefreshDetail}
+      />
+
+      {/* 6. Delete Confirmation Alert Dialog */}
+      <AlertDialog
+        open={Boolean(deleteAlumni)}
+        onOpenChange={(open) => !open && setDeleteAlumni(null)}
+      >
         <AlertDialogContent className="rounded-3xl p-6 sm:p-7 border-none shadow-xl bg-white">
           <AlertDialogHeader>
             <AlertDialogTitle className="font-bold text-lg text-slate-900">
@@ -324,21 +581,33 @@ export function AlumniPage() {
             <AlertDialogDescription className="text-xs sm:text-sm text-slate-500 leading-relaxed mt-1">
               Apakah Anda yakin ingin menghapus data alumni{" "}
               <strong className="text-slate-900 font-semibold">
-                {deleteAlumni?.fullName || deleteAlumni?.user?.fullName}
+                {deleteAlumni?.fullName ||
+                  deleteAlumni?.user?.fullName ||
+                  "ini"}
               </strong>
               ? Data ini akan dipindahkan ke arsip sistem.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-5 border-none bg-transparent p-0 flex-row justify-end gap-2.5">
-            <AlertDialogCancel className="h-10 rounded-xl px-5 border-slate-200 text-slate-700 hover:bg-slate-100 font-medium cursor-pointer">
+            <AlertDialogCancel
+              disabled={deleting}
+              className="h-10 rounded-xl px-5 border-slate-200 text-slate-700 hover:bg-slate-100 font-medium cursor-pointer"
+            >
               Batal
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={deleting}
-              className="h-10 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl px-5 cursor-pointer shadow-sm"
+              className="h-10 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl px-5 cursor-pointer shadow-sm disabled:opacity-50"
             >
-              {deleting ? "Menghapus..." : "Ya, Hapus Alumni"}
+              {deleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+                  <span>Menghapus...</span>
+                </>
+              ) : (
+                "Ya, Hapus Alumni"
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
