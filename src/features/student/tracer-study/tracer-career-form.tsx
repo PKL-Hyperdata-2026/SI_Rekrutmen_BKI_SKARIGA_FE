@@ -14,7 +14,7 @@ import { SectionCard } from "@/components/custom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DatePicker } from "@/components/custom/date-picker";
+// import { DatePicker } from "@/components/custom/date-picker";
 import {
   Select,
   SelectContent,
@@ -532,12 +532,12 @@ export function TracerCareerForm({
                       Tanggal Masuk Kerja{" "}
                       <span className="text-rose-500">*</span>
                     </Label>
-                    <DatePicker
+                    {/* <DatePicker
                       value={formData.start_date}
                       onChange={(val) => handleFieldChange("start_date", val)}
                       placeholder="dd/mm/yyyy"
                       className="h-9 text-xs bg-white text-slate-800"
-                    />
+                    /> */}
                     {formErrors.start_date && (
                       <p className="text-xs text-rose-500 mt-1 font-medium">
                         {formErrors.start_date}
@@ -668,14 +668,14 @@ export function TracerCareerForm({
                     <Label className="block text-xs font-bold text-slate-800 tracking-wider mb-1.5">
                       Tanggal Berdiri Usaha
                     </Label>
-                    <DatePicker
+                    {/* <DatePicker
                       value={formData.business_start_date}
                       onChange={(val) =>
                         handleFieldChange("business_start_date", val)
                       }
                       placeholder="dd/mm/yyyy"
                       className="h-9 text-xs bg-white text-slate-800"
-                    />
+                    /> */}
                   </div>
                 </div>
               </div>
