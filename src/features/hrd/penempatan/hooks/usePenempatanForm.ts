@@ -131,12 +131,6 @@ export function usePenempatanForm({
     }
   }, [open, placement, fetchOptions, resetForm, authUser?.company?.id]);
 
-  useEffect(() => {
-    if (authUser?.company?.id && !companyId && !placement) {
-      setCompanyId(String(authUser.company.id));
-    }
-  }, [authUser?.company?.id, companyId, placement]);
-
   const clearFieldError = useCallback((field: string) => {
     setErrors((prev) => {
       if (!prev[field]) return prev;

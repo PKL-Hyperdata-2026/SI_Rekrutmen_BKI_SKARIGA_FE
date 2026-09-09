@@ -21,7 +21,7 @@ export function AppSidebar() {
   const isCollapsed = !isMobile && sidebarState === "collapsed";
 
   const isHrd = user?.role === "hrd";
-  const brandTitle = isHrd ? (user?.company?.name || "PT Kejayaan Terraloka") : "BKI SKARIGA";
+  const brandTitle = isHrd ? (user?.company?.name || "Perusahaan Mitra") : "BKI SKARIGA";
   const brandSubtitle = isHrd
     ? "Portal HRD"
     : user?.role === "siswa" || user?.role === "alumni"
