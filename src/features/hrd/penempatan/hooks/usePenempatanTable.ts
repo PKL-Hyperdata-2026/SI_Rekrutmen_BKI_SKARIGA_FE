@@ -220,7 +220,7 @@ export function usePenempatanTable(options: UsePenempatanTableOptions = {}) {
       if (year) params.year = year;
       if (search) params.search = search;
 
-      const response = await api.get("/admin/job-placements", { params });
+      const response = await api.get("/hrd/job-placements", { params });
       const rawData = response.data?.data;
 
       const rows: JobPlacement[] = Array.isArray(rawData?.data)

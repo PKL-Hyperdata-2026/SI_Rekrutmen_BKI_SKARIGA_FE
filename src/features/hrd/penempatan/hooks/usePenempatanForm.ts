@@ -86,7 +86,7 @@ export function usePenempatanForm({
       const response = await api.get<{
         success: boolean;
         data: PenempatanFormOptionsData;
-      }>("/admin/job-placements/options");
+      }>("/hrd/job-placements/options");
 
       const data = response.data?.data;
       if (data) {
@@ -264,10 +264,10 @@ export function usePenempatanForm({
         }
 
         if (isEditMode && placement?.id) {
-          await api.put(`/admin/job-placements/${placement.id}`, payload);
+          await api.put(`/hrd/job-placements/${placement.id}`, payload);
           toast.success("Data penempatan kerja berhasil diperbarui.");
         } else {
-          await api.post("/admin/job-placements", payload);
+          await api.post("/hrd/job-placements", payload);
           toast.success("Data penempatan kerja berhasil disimpan.");
         }
 

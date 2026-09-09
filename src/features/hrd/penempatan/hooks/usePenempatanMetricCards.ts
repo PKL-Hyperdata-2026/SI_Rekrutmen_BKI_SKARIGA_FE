@@ -68,7 +68,7 @@ export function usePenempatanMetricCards(
           success: boolean;
           message?: string;
           data: PenempatanMetricsData;
-        }>("/admin/job-placements/metrics", {
+        }>("/hrd/job-placements/metrics", {
           params: { company_id: companyId, year },
         });
 

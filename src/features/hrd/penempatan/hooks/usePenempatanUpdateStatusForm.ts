@@ -106,7 +106,7 @@ export function usePenempatanUpdateStatusForm({
       const response = await api.get<{
         success: boolean;
         data: PenempatanFormOptionsData;
-      }>("/admin/job-placements/options");
+      }>("/hrd/job-placements/options");
 
       const data = response.data?.data;
       if (data && Array.isArray(data.placement_statuses)) {
@@ -360,7 +360,7 @@ export function usePenempatanUpdateStatusForm({
         }
 
         const placementId = encodeURIComponent(String(placement.id));
-        await api.put(`/admin/job-placements/${placementId}`, payload);
+        await api.put(`/hrd/job-placements/${placementId}`, payload);
         toast.success("Status evaluasi retensi berhasil diperbarui.");
         onSuccess?.();
         handleOpenChange(false);
