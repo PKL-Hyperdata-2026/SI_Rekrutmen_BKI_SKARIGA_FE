@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import axios from "axios";
 import { echo } from "../lib/echo";
 import { api } from "@/api/axios";
 import { toast } from "@/components/custom/sonner";
@@ -16,55 +17,49 @@ export interface NotificationItem {
 export const useNotification = (userId?: string | number | null) => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(Boolean(userId));
+  const [error, setError] = useState<string | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
-  const fetchNotifications = useCallback(async () => {
-    if (!userId) return;
-    try {
-      const response = await api.get<{
-        success: boolean;
-        data: NotificationItem[];
-        total_unread?: number;
-      }>("/notification/unread");
-
-      setNotifications(response.data.data || []);
-      setUnreadCount(response.data.total_unread ?? response.data.data?.length ?? 0);
-    } catch (err: unknown) {
-      void err;
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
+  const refetch = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    setRefreshTrigger((prev) => prev + 1);
+  }, []);
 
   useEffect(() => {
     if (!userId) return;
-    let active = true;
+
+    const controller = new AbortController();
 
     api
       .get<{
         success: boolean;
         data: NotificationItem[];
         total_unread?: number;
-      }>("/notification/unread")
+      }>("/notification/unread", {
+        signal: controller.signal,
+      })
       .then((response) => {
-        if (!active) return;
         setNotifications(response.data.data || []);
         setUnreadCount(response.data.total_unread ?? response.data.data?.length ?? 0);
-        setLoading(false);
+        setError(null);
       })
       .catch((err: unknown) => {
-        if (!active) return;
+        if (axios.isCancel(err)) return;
+        setError("Gagal memuat notifikasi.");
+      })
+      .finally(() => {
         setLoading(false);
-        void err;
       });
 
     return () => {
-      active = false;
+      controller.abort();
     };
-  }, [userId]);
+  }, [userId, refreshTrigger]);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !echo) return;
 
     const channel = echo.private(`user.${userId}`);
 
@@ -80,7 +75,7 @@ export const useNotification = (userId?: string | number | null) => {
 
     return () => {
       channel.stopListening(".notification.sent");
-      echo.leaveChannel(`private-user.${userId}`);
+      echo?.leaveChannel(`private-user.${userId}`);
     };
   }, [userId]);
 
@@ -112,7 +107,8 @@ export const useNotification = (userId?: string | number | null) => {
     notifications,
     unreadCount,
     loading,
-    refetch: fetchNotifications,
+    error,
+    refetch,
     markAsRead,
     markAllAsRead,
   };
