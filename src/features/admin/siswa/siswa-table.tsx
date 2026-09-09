@@ -1,5 +1,6 @@
 import type { DataTableColumn } from "@/components/custom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getAvatarUrl } from "@/lib/utils";
 import {
   GraduationCap,
   Mail,
@@ -31,7 +32,7 @@ export function buildSiswaColumns(
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9 rounded-full border border-slate-100 shadow-2xs shrink-0">
               <AvatarImage
-                src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(studentName)}`}
+                src={getAvatarUrl(studentName)}
                 alt={studentName}
                 className="rounded-full"
               />

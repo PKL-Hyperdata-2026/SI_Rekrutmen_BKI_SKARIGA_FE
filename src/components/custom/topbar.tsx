@@ -16,6 +16,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { getAvatarUrl } from "@/lib/utils";
 
 export function Topbar() {
   const { user } = useAppSelector((state) => state.auth);
@@ -69,13 +70,23 @@ export function Topbar() {
 
           <div className="flex items-center gap-2 pl-0.5">
             <Avatar className="h-8 w-8 rounded-lg border border-slate-100 shadow-2xs">
-              <AvatarImage src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${user?.full_name}`} alt="Avatar" className="rounded-lg" />
-              <AvatarFallback className="rounded-lg text-xs">{user?.full_name?.charAt(0) || "U"}</AvatarFallback>
+              <AvatarImage
+                src={getAvatarUrl(user?.full_name || "")}
+                alt="Avatar"
+                className="rounded-lg"
+              />
+              <AvatarFallback className="rounded-lg text-xs">
+                {user?.full_name?.charAt(0) || "U"}
+              </AvatarFallback>
             </Avatar>
             <div className="hidden md:flex flex-col justify-center">
-              <span className="text-xs font-bold text-slate-800 leading-tight truncate max-w-36">{user?.full_name || "User"}</span>
+              <span className="text-xs font-bold text-slate-800 leading-tight truncate max-w-36">
+                {user?.full_name || "User"}
+              </span>
               <span className="text-xs font-medium text-slate-400 leading-tight">
-                {user?.role === "siswa" ? "XII RPL A • Siswa Aktif" : user?.role || "Guest"}
+                {user?.role === "siswa"
+                  ? "XII RPL A • Siswa Aktif"
+                  : user?.role || "Guest"}
               </span>
             </div>
           </div>
@@ -97,7 +108,8 @@ export function Topbar() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Konfirmasi Keluar</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Apakah Anda yakin ingin keluar dari sistem? Sesi Anda akan berakhir dan Anda harus masuk kembali.
+                  Apakah Anda yakin ingin keluar dari sistem? Sesi Anda akan
+                  berakhir dan Anda harus masuk kembali.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter className="border-none bg-transparent mt-4 p-0 sm:p-0 m-0">
