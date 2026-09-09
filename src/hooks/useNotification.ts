@@ -1,48 +1,81 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { echo } from "../lib/echo";
 import { api } from "@/api/axios";
+import { toast } from "@/components/custom/sonner";
 
-interface NotificationItem {
+export interface NotificationItem {
   id: string;
   type: string;
   title: string;
   message: string;
-  data?: Record<string, any>;
-  read_at?: string;
+  data?: Record<string, unknown>;
+  read_at?: string | null;
   created_at: string;
 }
 
-export const useNotification = (userId: string) => {
+export const useNotification = (userId?: string | number | null) => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
+  const fetchNotifications = useCallback(async () => {
     if (!userId) return;
+    try {
+      const response = await api.get<{
+        success: boolean;
+        data: NotificationItem[];
+        total_unread?: number;
+      }>("/notification/unread");
 
-    const fetchNotifications = async () => {
-      try {
-        const response = await api.get("/notifications/unread");
-        setNotifications(response.data.data);
-        setUnreadCount(response.data.unread_count);
-      } catch (error) {
-        console.error(`Failed to fetch notifications over ws/wss: ${error}`);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchNotifications();
+      setNotifications(response.data.data || []);
+      setUnreadCount(response.data.total_unread ?? response.data.data?.length ?? 0);
+    } catch (err: unknown) {
+      void err;
+    } finally {
+      setLoading(false);
+    }
   }, [userId]);
 
   useEffect(() => {
     if (!userId) return;
+    let active = true;
+
+    api
+      .get<{
+        success: boolean;
+        data: NotificationItem[];
+        total_unread?: number;
+      }>("/notification/unread")
+      .then((response) => {
+        if (!active) return;
+        setNotifications(response.data.data || []);
+        setUnreadCount(response.data.total_unread ?? response.data.data?.length ?? 0);
+        setLoading(false);
+      })
+      .catch((err: unknown) => {
+        if (!active) return;
+        setLoading(false);
+        void err;
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [userId]);
+
+  useEffect(() => {
+    if (!userId) return;
+
     const channel = echo.private(`user.${userId}`);
 
     channel.listen(".notification.sent", (data: { notificationData: NotificationItem }) => {
-      setNotifications((prev) => [data.notificationData, ...prev]);
-      setUnreadCount((prev) => prev + 1);
+      if (data?.notificationData) {
+        setNotifications((prev) => [data.notificationData, ...prev]);
+        setUnreadCount((prev) => prev + 1);
+        toast.info(data.notificationData.title, {
+          description: data.notificationData.message,
+        });
+      }
     });
 
     return () => {
@@ -53,21 +86,25 @@ export const useNotification = (userId: string) => {
 
   const markAsRead = async (id: string) => {
     try {
-      await api.patch(`/notifications/${id}/read`);
-      setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n)));
+      await api.patch(`/notification/${id}/read`);
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n))
+      );
       setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch (error) {
-      console.error(`Failed to mark notification as read: ${error}`);
+    } catch (err: unknown) {
+      void err;
     }
   };
 
   const markAllAsRead = async () => {
     try {
-      await api.patch("/notifications/read-all");
-      setNotifications([]);
+      await api.patch("/notification/read-all");
+      setNotifications((prev) =>
+        prev.map((n) => ({ ...n, read_at: n.read_at || new Date().toISOString() }))
+      );
       setUnreadCount(0);
-    } catch (error) {
-      console.error(`Failed to mark all notifications as read: ${error}`);
+    } catch (err: unknown) {
+      void err;
     }
   };
 
@@ -75,6 +112,7 @@ export const useNotification = (userId: string) => {
     notifications,
     unreadCount,
     loading,
+    refetch: fetchNotifications,
     markAsRead,
     markAllAsRead,
   };

@@ -4,7 +4,7 @@ import { LowonganKerjaTable } from "./components/lowongan-kerja-table";
 import { LowonganKerjaForm } from "./components/lowongan-kerja-form";
 import { LowonganKerjaDetailForm } from "./components/lowongan-kerja-detail-form";
 import { useLowonganKerja } from "./hooks/useLowonganKerja";
-import { Store, Printer } from "lucide-react";
+import { Store } from "lucide-react";
 
 export function LowonganKerjaPage() {
   const {
@@ -56,13 +56,13 @@ export function LowonganKerjaPage() {
           >
             Tambah Lowongan Kerja
           </PageHeader.Button>
-          <PageHeader.Button
+          {/* <PageHeader.Button
             variant="glass"
             icon={<Printer className="h-4 w-4" />}
             className="w-full sm:w-auto justify-center"
           >
             Import Excel
-          </PageHeader.Button>
+          </PageHeader.Button> */}
         </div>
       </PageHeader>
 

@@ -22,7 +22,7 @@ import {
   type StandardTypeItem,
   type JobVacancy,
 } from "../types";
-import { DatePicker } from "@/components/ui/date-picker";
+// import { DatePicker } from "@/components/custom/date-picker";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Send, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -219,11 +219,11 @@ export function LowonganKerjaForm({
                   *
                 </Badge>
               </Label>
-              <DatePicker
+              {/* <DatePicker
                 value={deadline}
                 onChange={setDeadline}
                 hasError={Boolean(errors.deadline)}
-              />
+              /> */}
               {errors.deadline && (
                 <FieldError className="text-[11px] font-medium text-red-500 ml-0.5">
                   {errors.deadline}

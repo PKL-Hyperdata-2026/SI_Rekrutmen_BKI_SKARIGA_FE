@@ -47,7 +47,6 @@ export const ADMIN_MENUS: MenuItem[] = [
   { name: "Lowongan Kerja", link: "/admin/lowongan", icon: Briefcase },
   { name: "Seleksi Rekrutmen", link: "/admin/seleksi", icon: CheckSquare },
   { name: "Validasi Absensi", link: "/admin/validasi-absensi", icon: CalendarCheck },
-  { name: "Penempatan (3/6/12)", link: "/admin/penempatan", icon: MapPin },
   { name: "Tracer Study", link: "/admin/tracer", icon: LineChart },
   { name: "Laporan & Cetak", link: "/admin/laporan", icon: Printer },
 ];
@@ -58,4 +57,5 @@ export const HRD_MENUS: MenuItem[] = [
   { name: "Review Pelamar", link: "/hrd/review", icon: ClipboardList },
   { name: "Kirim Jadwal Tes", link: "/hrd/jadwal", icon: CalendarClock },
   { name: "Input Hasil Seleksi", link: "/hrd/hasil", icon: CheckCircle },
+  { name: "Penempatan (3/6/12)", link: "/hrd/penempatan", icon: MapPin },
 ];
