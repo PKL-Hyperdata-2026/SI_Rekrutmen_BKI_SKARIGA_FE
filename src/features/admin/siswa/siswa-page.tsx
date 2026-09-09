@@ -335,11 +335,6 @@ export function SiswaPage() {
     }
   };
 
-  const handleOpenPortfolio = useCallback((item: SiswaItem) => {
-    setSelectedPortfolioStudent(item);
-    setIsPortfolioOpen(true);
-  }, []);
-
   const columns = useMemo(
     () =>
       buildSiswaColumns({

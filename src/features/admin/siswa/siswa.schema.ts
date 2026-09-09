@@ -18,6 +18,8 @@ export interface SiswaPortfolio {
   createdAt: string;
 }
 
+export type SiswaPortfolioItem = SiswaPortfolio;
+
 export interface SiswaItem {
   id: number | string;
   userId?: number | string | null;
