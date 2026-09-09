@@ -9,7 +9,10 @@ import {
   Briefcase,
   FileText,
   Sparkles,
+  RotateCw,
+  AlertCircle,
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { useSidebar } from "@/components/ui/sidebar";
@@ -74,6 +77,8 @@ export function Topbar() {
     notifications,
     unreadCount,
     loading,
+    error,
+    refetch,
     markAsRead,
     markAllAsRead,
   } = useNotification(user?.rawId ?? user?.id);
@@ -152,30 +157,58 @@ export function Topbar() {
                     </span>
                   )}
                 </div>
-                {unreadCount > 0 && (
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
-                    onClick={() => markAllAsRead()}
-                    className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:text-primary/80 transition-colors cursor-pointer"
+                    onClick={() => refetch()}
+                    disabled={loading}
+                    title="Muat ulang notifikasi"
+                    aria-label="Muat ulang notifikasi"
+                    className="p-1 rounded-md text-slate-400 hover:text-primary hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-50"
                   >
-                    <CheckCheck className="h-3.5 w-3.5" />
-                    <span>Tandai dibaca</span>
+                    <RotateCw className={cn("h-3 w-3", loading && "animate-spin text-primary")} />
                   </button>
-                )}
+                  {unreadCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => markAllAsRead()}
+                      className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:text-primary/80 transition-colors cursor-pointer"
+                    >
+                      <CheckCheck className="h-3.5 w-3.5" />
+                      <span>Tandai dibaca</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="max-h-80 overflow-y-auto divide-y divide-slate-100 custom-scrollbar">
-                {loading ? (
+                {loading && notifications.length === 0 ? (
                   <div className="p-4 space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (
-                      <div key={i} className="flex gap-3 animate-pulse">
-                        <div className="h-8 w-8 rounded-lg bg-slate-100 shrink-0" />
+                      <div key={i} className="flex items-start gap-3">
+                        <Skeleton className="h-8 w-8 rounded-lg shrink-0" />
                         <div className="flex-1 space-y-1.5 py-0.5">
-                          <div className="h-3 w-3/4 rounded bg-slate-100" />
-                          <div className="h-2.5 w-full rounded bg-slate-100" />
+                          <Skeleton className="h-3.5 w-3/4 rounded" />
+                          <Skeleton className="h-3 w-full rounded" />
+                          <Skeleton className="h-2.5 w-1/3 rounded" />
                         </div>
                       </div>
                     ))}
+                  </div>
+                ) : error ? (
+                  <div className="py-8 px-4 text-center">
+                    <div className="h-10 w-10 mx-auto rounded-full bg-rose-50 text-rose-500 flex items-center justify-center mb-2.5">
+                      <AlertCircle className="h-5 w-5" />
+                    </div>
+                    <p className="text-xs font-bold text-slate-700">{error}</p>
+                    <button
+                      type="button"
+                      onClick={() => refetch()}
+                      className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline cursor-pointer"
+                    >
+                      <RotateCw className="h-3 w-3" />
+                      <span>Coba lagi</span>
+                    </button>
                   </div>
                 ) : notifications.length === 0 ? (
                   <div className="py-10 px-4 text-center">
