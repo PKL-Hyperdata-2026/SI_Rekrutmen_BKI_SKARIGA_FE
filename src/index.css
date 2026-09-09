@@ -55,13 +55,15 @@
 
   --secondary-foreground: oklch(0.205 0 0);
 
-  --muted: oklch(0.97 0 0);
+  --muted: #e2e8f0;
 
   --muted-foreground: oklch(0.556 0 0);
 
   --accent-foreground: oklch(0.205 0 0);
 
   --destructive: oklch(0.577 0.245 27.325);
+
+  --destructive-foreground: oklch(0.985 0 0);
 
   --input: oklch(0.922 0 0);
 
@@ -189,6 +191,7 @@ body {
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -314,6 +317,15 @@ body {
 }
 @utility icon-indigo {
   @apply bg-indigo-500/10 text-indigo-600 border-indigo-500/20 dark:text-indigo-400;
+}
+
+@keyframes toast-progress {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
 }
 @utility icon-neutral {
   @apply bg-slate-500/10 text-slate-600 border-slate-500/20 dark:text-slate-400;

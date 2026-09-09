@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { PageHeader } from "@/components/custom/page-header";
 import { SectionCard } from "@/components/custom";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/components/custom/sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -97,7 +97,13 @@ function extractSocialMediaList(rawSocialMedia: unknown): SocialMediaItem[] {
           list.push({
             platform,
             username,
-            url: rawUrl || (config && config.baseUrl ? `${config.baseUrl}${username}` : undefined),
+            url:
+              rawUrl ||
+              (config && config.baseUrl
+                ? `${config.baseUrl}${username}`
+                : username.startsWith("http://") || username.startsWith("https://")
+                ? username
+                : `https://${username}`),
           });
         }
       }
@@ -112,7 +118,12 @@ function extractSocialMediaList(rawSocialMedia: unknown): SocialMediaItem[] {
         list.push({
           platform,
           username,
-          url: config && config.baseUrl ? `${config.baseUrl}${username}` : undefined,
+          url:
+            config && config.baseUrl
+              ? `${config.baseUrl}${username}`
+              : username.startsWith("http://") || username.startsWith("https://")
+              ? username
+              : `https://${username}`,
         });
       }
     }
@@ -413,13 +424,12 @@ export function EPortofolio() {
     <div className="space-y-3.5 pb-6">
       <PageHeader
         variant="student"
-        size="compact"
         badge="Berkas Terverifikasi Sistem"
         badgeIcon={<FileText className="h-3 w-3" />}
         title="E-Portofolio & Profil Pelamar"
         description="Kelola biodata dan lampiran berkas PDF yang dapat di-review secara langsung oleh HRD Perusahaan."
       >
-        <div className="bg-white/10 border border-white/25 backdrop-blur-[4px] shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_4px_12px_rgba(0,0,0,0.15)] rounded-xl px-3.5 py-2 sm:px-4 sm:py-2.5 flex items-center gap-3">
+        {/* <div className="bg-white/10 border border-white/25 backdrop-blur-xs shadow-md rounded-xl px-3.5 py-2 sm:px-4 sm:py-2.5 flex items-center gap-3">
           <div className="h-8 w-8 rounded-lg bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 shrink-0 shadow-inner">
             <Eye className="h-4 w-4" />
           </div>
@@ -434,7 +444,7 @@ export function EPortofolio() {
               Siap di-Review oleh HRD
             </span>
           </div>
-        </div>
+        </div> */}
       </PageHeader>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
@@ -456,8 +466,8 @@ export function EPortofolio() {
 
         <div className="lg:col-span-5 flex flex-col justify-between space-y-4">
           <SectionCard
-            className="rounded-xl p-3.5 sm:p-4 shadow-xs border border-slate-100/90 flex flex-col"
-            headerClassName="pb-2.5 border-b border-slate-100 mb-3"
+            className="rounded-xl p-4 sm:p-5 shadow-xs border border-slate-100/90 flex flex-col"
+            headerClassName="pb-3 sm:pb-3.5 border-b border-slate-100 mb-4"
             title={
               <div className="flex items-center gap-2">
                 <FileText className="h-4 w-4 text-primary stroke-[2.2]" />
@@ -606,8 +616,8 @@ export function EPortofolio() {
           </SectionCard>
 
           <SectionCard
-            className="rounded-xl p-3.5 sm:p-4 shadow-xs border border-slate-100/90"
-            headerClassName="pb-2 border-b border-slate-100 mb-2.5"
+            className="rounded-xl p-4 sm:p-5 shadow-xs border border-slate-100/90"
+            headerClassName="pb-3 sm:pb-3.5 border-b border-slate-100 mb-3.5"
             title={
               <div className="flex items-center gap-2">
                 <ShieldCheck className="h-4 w-4 text-primary stroke-[2.2]" />
@@ -705,12 +715,14 @@ export function EPortofolio() {
           </AlertDialogHeader>
           <AlertDialogFooter className="border-none bg-transparent mt-4 p-0 sm:p-0 m-0">
             <AlertDialogCancel
+              variant="secondary"
               disabled={isDeletingId !== null}
-              className="cursor-pointer"
+              className="border-none bg-secondary text-secondary-foreground hover:bg-secondary/80 cursor-pointer"
             >
               Batal
             </AlertDialogCancel>
             <AlertDialogAction
+              variant="destructive"
               disabled={isDeletingId !== null}
               onClick={(e) => {
                 e.preventDefault();
@@ -718,7 +730,7 @@ export function EPortofolio() {
                   handleConfirmDeleteDocument(portfolioToDelete);
                 }
               }}
-              className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
+              className="cursor-pointer"
             >
               {isDeletingId !== null ? (
                 <>

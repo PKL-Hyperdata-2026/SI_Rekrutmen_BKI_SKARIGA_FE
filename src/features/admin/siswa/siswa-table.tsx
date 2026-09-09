@@ -119,6 +119,14 @@ export function buildSiswaColumns(
           </button>
           <button
             type="button"
+            onClick={() => handlers.onViewPortfolio(siswa)}
+            title="Lihat E-Portofolio Siswa"
+            className="h-8 w-8 rounded-lg border border-sky-200/80 bg-sky-50/70 text-sky-600 hover:bg-sky-100 hover:text-sky-700 flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
+          >
+            <FileText className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
             onClick={() => handlers.onEdit(siswa)}
             title="Edit Siswa"
             className="h-8 w-8 rounded-lg border border-purple-200/80 bg-purple-50/70 text-purple-600 hover:bg-purple-100 hover:text-purple-700 flex items-center justify-center transition-colors cursor-pointer shadow-2xs"

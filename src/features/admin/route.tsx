@@ -1,4 +1,6 @@
 import { DashboardPage } from "./dashboard/dashboard-page";
+import { DepartemenPage } from "./departemen/departemen-page";
+import { JurusanPage } from "./jurusan/jurusan-page";
 import { UsersPage } from "./users/users-page";
 import { SiswaPage } from "./siswa/siswa-page";
 import { AlumniPage } from "./alumni/alumni-page";
@@ -14,6 +16,14 @@ export const adminRoute = [
   {
     path: "dashboard",
     element: <DashboardPage />,
+  },
+  {
+    path: "departemen",
+    element: <DepartemenPage />,
+  },
+  {
+    path: "jurusan",
+    element: <JurusanPage />,
   },
   {
     path: "users",

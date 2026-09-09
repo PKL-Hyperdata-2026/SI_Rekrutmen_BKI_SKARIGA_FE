@@ -29,7 +29,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/components/custom/sonner";
 import { usersApi } from "./users.api";
 import {
   useUsersForm,

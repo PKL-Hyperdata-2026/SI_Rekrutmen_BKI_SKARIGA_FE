@@ -2,7 +2,7 @@ import { useState, useCallback, useRef } from "react";
 import { useLowonganKerjaFilter } from "./useLowonganKerjaFilter";
 import { type JobVacancy } from "../types";
 import { api } from "@/api/axios";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/components/custom/sonner";
 
 interface ApiErrorResponse {
   response?: {

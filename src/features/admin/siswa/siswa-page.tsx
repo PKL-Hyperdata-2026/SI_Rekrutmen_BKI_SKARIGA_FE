@@ -27,7 +27,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/components/custom/sonner";
 import { siswaApi } from "./siswa.api";
 import {
   useSiswaForm,
@@ -334,6 +334,11 @@ export function SiswaPage() {
       toast.error("Gagal menghapus berkas portofolio.");
     }
   };
+
+  const handleOpenPortfolio = useCallback((item: SiswaItem) => {
+    setSelectedPortfolioStudent(item);
+    setIsPortfolioOpen(true);
+  }, []);
 
   const columns = useMemo(
     () =>
