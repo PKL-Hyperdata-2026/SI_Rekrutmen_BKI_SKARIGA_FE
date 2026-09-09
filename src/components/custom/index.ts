@@ -10,3 +10,5 @@ export * from "./app-sidebar";
 export * from "./topbar";
 export * from "./sonner";
 export * from "./generic-dummy-page";
+export * from "./date-picker";
+export * from "./metric-card";
