@@ -20,6 +20,18 @@ export function AppSidebar() {
   const { state: sidebarState, toggleSidebar, setOpenMobile, isMobile } = useSidebar();
   const isCollapsed = !isMobile && sidebarState === "collapsed";
 
+  const isHrd = user?.role === "hrd";
+  const brandTitle = isHrd ? (user?.company?.name || "PT Kejayaan Terraloka") : "BKI SKARIGA";
+  const brandSubtitle = isHrd
+    ? "Portal HRD"
+    : user?.role === "siswa" || user?.role === "alumni"
+      ? "Portal Siswa & Alumni"
+      : user?.role === "superadmin"
+        ? "Portal Super Admin"
+        : user?.role === "admin"
+          ? "Portal Admin"
+          : `Portal ${user?.role || "Sistem"}`;
+
   const sidebarContainerRef = useRef<HTMLDivElement>(null);
   const [notchData, setNotchData] = useState<{ y: number; height: number; width: number; totalHeight: number } | null>(null);
 
@@ -158,12 +170,15 @@ export function AppSidebar() {
               isCollapsed ? "opacity-0 pointer-events-none -translate-x-3" : "opacity-100 translate-x-0"
             )}
           >
-            <div className="flex flex-col justify-center">
-              <span className="font-bold text-xs leading-tight text-white tracking-wide">
-                BKI SKARIGA
+            <div className="flex flex-col justify-center min-w-0 pr-2">
+              <span
+                className="font-bold text-xs leading-tight text-white tracking-wide truncate"
+                title={brandTitle}
+              >
+                {brandTitle}
               </span>
-              <span className="text-xs text-white/75 capitalize mt-0.5 font-medium">
-                Portal {user?.role === 'siswa' || user?.role === 'alumni' ? 'Siswa & Alumni' : user?.role === 'superadmin' ? 'Super Admin' : user?.role || 'Sistem'}
+              <span className="text-xs text-white/75 mt-0.5 font-medium whitespace-nowrap">
+                {brandSubtitle}
               </span>
             </div>
           </div>
