@@ -1,6 +1,6 @@
 # Frontend Codebase Reference (React 19 + TypeScript + Vite)
 
-Deep, factual reference for AI agents and developers. **Last verified: 2026-09-05.**
+Deep, factual reference for AI agents and developers. **Last verified: 2026-09-08.**
 If you modify code that alters any architecture, feature modules, state slices, or routes documented here, update this file in the same change.
 Operational instructions & boundaries: [`AGENTS.md`](./AGENTS.md).
 
@@ -72,7 +72,7 @@ frontend/src/
 │   │   ├── users/                     # users-page.tsx, users-form.tsx, users-table.tsx, users.api.ts, users.schema.ts, users.form.ts
 │   │   ├── dudi/                      # dudi-page.tsx, dudi-form.tsx, dudi-table.tsx, dudi.api.ts, dudi.schema.ts, dudi.form.ts
 │   │   ├── siswa/                     # siswa-page.tsx, siswa-form.tsx, siswa-table.tsx, siswa.api.ts, siswa.schema.ts, siswa.form.ts
-│   │   ├── alumni/                    # alumni-page.tsx, alumni-form.tsx, alumni-table.tsx, alumni.api.ts, alumni.schema.ts, alumni.form.ts
+│   │   ├── alumni/                    # alumni-page.tsx, alumni-form.tsx, alumni-detail-modal.tsx, alumni-table.tsx, alumni.api.ts, alumni.schema.ts, alumni.form.ts
 │   │   ├── lowongan-kerja/            # lowongan-kerja-page.tsx and lowongan-kerja subcomponents
 │   │   ├── seleksi/                   # seleksi-page.tsx
 │   │   ├── validasi-absensi/          # validasi-absensi-page.tsx

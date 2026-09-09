@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { PageHeader, StatCard, DataTable } from "@/components/custom";
+import { PageHeader, DataTable } from "@/components/custom";
 import {
   UserPlus,
-  Search,
-  Users,
+  Layers,
   GraduationCap,
-  School,
   Pencil,
+  Search,
+  Briefcase,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -29,51 +29,132 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/components/custom/sonner";
 import { siswaApi } from "./siswa.api";
-import { useSiswaForm, toCreateSiswaPayload } from "./siswa.form";
+import {
+  useSiswaForm,
+  toSiswaPayload,
+  findMatchingClassId,
+  findMatchingMajorId,
+  findMatchingOptionId,
+} from "./siswa.form";
 import { SiswaForm } from "./siswa-form";
-import { SiswaPortfolioModal } from "./siswa-portfolio-modal";
+import { SiswaDetailModal } from "./siswa-detail-modal";
 import { buildSiswaColumns } from "./siswa-table";
-import type { SiswaItem, SiswaOptionItem } from "./siswa.schema";
+import type {
+  SiswaItem,
+  SiswaOptionsData,
+  SiswaPaginationMeta,
+} from "./siswa.schema";
 
 export function SiswaPage() {
   const [students, setStudents] = useState<SiswaItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [majors, setMajors] = useState<SiswaOptionItem[]>([]);
-  const [classes, setClasses] = useState<SiswaOptionItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [options, setOptions] = useState<SiswaOptionsData>({
+    majors: [],
+    classes: [],
+    employment_statuses: [],
+    companies: [],
+    portfolio_types: [],
+    graduation_years: [],
+  });
 
-  const [search, setSearch] = useState("");
-  const [majorFilter, setMajorFilter] = useState("all");
-  const [classFilter, setClassFilter] = useState("all");
+  const [search, setSearch] = useState<string>("");
+  const [majorFilter, setMajorFilter] = useState<string>("all");
+  const [classFilter, setClassFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [perPage, setPerPage] = useState<number>(15);
+  const [meta, setMeta] = useState<SiswaPaginationMeta>({
+    current_page: 1,
+    from: 1,
+    last_page: 1,
+    per_page: 15,
+    to: 15,
+    total: 0,
+  });
+
+  // Modal Form State
+  const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [editingStudent, setEditingStudent] = useState<SiswaItem | null>(null);
-  const [submitting, setSubmitting] = useState(false);
 
-  const [selectedPortfolioStudent, setSelectedPortfolioStudent] = useState<SiswaItem | null>(null);
-  const [isPortfolioOpen, setIsPortfolioOpen] = useState(false);
+  // Modal Detail State
+  const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
+  const [activeDetailStudent, setActiveDetailStudent] = useState<SiswaItem | null>(null);
 
+  // Delete Dialog State
   const [deleteStudent, setDeleteStudent] = useState<SiswaItem | null>(null);
-  const [deleting, setDeleting] = useState(false);
+  const [deleting, setDeleting] = useState<boolean>(false);
 
-  const form = useSiswaForm(editingStudent);
+  const form = useSiswaForm(editingStudent, options);
 
   const fetchStudents = useCallback(async () => {
     setLoading(true);
     try {
-      const params: Record<string, string> = {};
-      if (search) params.search = search;
+      const params: Record<string, string | number> = {
+        page: currentPage,
+        per_page: perPage,
+      };
+
+      if (search.trim()) params.search = search.trim();
       if (majorFilter !== "all") params.major_id = majorFilter;
       if (classFilter !== "all") params.class_id = classFilter;
+      if (statusFilter !== "all") params.employment_status_id = statusFilter;
 
       const res = await siswaApi.getStudents(params);
-      setStudents(res.data?.data?.data || []);
+      const resData = res.data?.data;
+
+      if (Array.isArray(resData)) {
+        setStudents(resData);
+        setMeta({
+          current_page: 1,
+          from: 1,
+          last_page: 1,
+          per_page: perPage,
+          to: resData.length,
+          total: resData.length,
+        });
+      } else if (resData?.data && Array.isArray(resData.data)) {
+        setStudents(resData.data);
+        const metaObj = resData.meta || resData;
+        const totalCount =
+          typeof metaObj.total === "number"
+            ? metaObj.total
+            : resData.data.length;
+
+        setMeta({
+          current_page: Number(metaObj.current_page) || currentPage,
+          from: metaObj.from ?? 1,
+          last_page: Number(metaObj.last_page) || 1,
+          per_page: Number(metaObj.per_page) || perPage,
+          to: metaObj.to ?? resData.data.length,
+          total: totalCount,
+        });
+      } else {
+        setStudents([]);
+        setMeta({
+          current_page: 1,
+          from: 0,
+          last_page: 1,
+          per_page: perPage,
+          to: 0,
+          total: 0,
+        });
+      }
     } catch {
       setStudents([]);
+      setMeta({
+        current_page: 1,
+        from: 0,
+        last_page: 1,
+        per_page: perPage,
+        to: 0,
+        total: 0,
+      });
       toast.error("Gagal memuat data siswa.");
     } finally {
       setLoading(false);
     }
-  }, [search, majorFilter, classFilter]);
+  }, [currentPage, perPage, search, majorFilter, classFilter, statusFilter]);
 
   useEffect(() => {
     let ignore = false;
@@ -81,8 +162,7 @@ export function SiswaPage() {
       .getStudentOptions()
       .then((res) => {
         if (!ignore && res.data?.data) {
-          setMajors(res.data.data.majors || []);
-          setClasses(res.data.data.classes || []);
+          setOptions(res.data.data);
         }
       })
       .catch(() => {});
@@ -108,37 +188,92 @@ export function SiswaPage() {
       major_id: "",
       class_id: "",
       password: "",
+      graduation_year: "",
+      employment_status_id: "",
+      current_company_id: "",
+      current_position: "",
+      social_media: "",
       is_active: true,
     });
     setIsFormOpen(true);
   };
 
-  const handleOpenEdit = useCallback((item: SiswaItem) => {
-    setEditingStudent(item);
-    form.reset({
-      nis: item.nis,
-      full_name: item.fullName,
-      email: item.email,
-      phone: item.phone || "",
-      major_id: item.majorId ? String(item.majorId) : "",
-      class_id: item.classId ? String(item.classId) : "",
-      password: "",
-      is_active: item.isActive,
-    });
-    setIsFormOpen(true);
-  }, [form]);
+  const handleOpenEdit = useCallback(
+    (item: SiswaItem) => {
+      setEditingStudent(item);
+
+      const resolvedClassId =
+        findMatchingClassId(item.class, options.classes) ||
+        (item.classId ? String(item.classId) : "");
+
+      const resolvedMajorId =
+        findMatchingMajorId(item.major, options.majors) ||
+        (item.majorId ? String(item.majorId) : "");
+
+      const resolvedStatusId =
+        findMatchingOptionId(item.employmentStatus, options.employment_statuses || []) ||
+        (item.employmentStatusId ? String(item.employmentStatusId) : "");
+
+      const resolvedCompanyId = options.companies?.find(
+        (comp) => comp.name.toLowerCase() === (item.currentCompany?.name || "").toLowerCase()
+      )
+        ? String(
+            options.companies.find(
+              (comp) => comp.name.toLowerCase() === (item.currentCompany?.name || "").toLowerCase()
+            )!.id
+          )
+        : item.currentCompanyId
+        ? String(item.currentCompanyId)
+        : "";
+
+      const socialMediaValue =
+        typeof item.socialMedia === "string"
+          ? item.socialMedia
+          : (item.socialMedia?.profile_url as string) || "";
+
+      form.reset({
+        nis: item.nis,
+        full_name: item.fullName || item.user?.fullName || "",
+        email: item.email || item.user?.email || "",
+        phone: item.phone || item.user?.phone || "",
+        major_id: resolvedMajorId,
+        class_id: resolvedClassId,
+        password: "",
+        graduation_year: item.graduationYear ? String(item.graduationYear) : "",
+        employment_status_id: resolvedStatusId,
+        current_company_id: resolvedCompanyId,
+        current_position: item.currentPosition || "",
+        social_media: socialMediaValue,
+        is_active: item.isActive,
+      });
+      setIsFormOpen(true);
+    },
+    [form, options]
+  );
+
+  const handleOpenDetail = useCallback(async (item: SiswaItem) => {
+    setActiveDetailStudent(item);
+    setIsDetailOpen(true);
+    try {
+      const res = await siswaApi.getStudent(item.id);
+      if (res.data?.data) {
+        setActiveDetailStudent(res.data.data);
+      }
+    } catch {
+      // Menggunakan data awal jika endpoint detail lambat merespons
+    }
+  }, []);
 
   const handleSubmitForm = form.handleSubmit(async (values) => {
-    setSubmitting(true);
     try {
-      const payload = toCreateSiswaPayload(values);
+      const payload = toSiswaPayload(values);
 
       if (editingStudent) {
         await siswaApi.updateStudent(editingStudent.id, payload);
         toast.success("Data siswa berhasil diperbarui.");
       } else {
         await siswaApi.createStudent(payload);
-        toast.success("Data siswa berhasil ditambahkan.");
+        toast.success("Data siswa baru berhasil ditambahkan.");
       }
 
       setIsFormOpen(false);
@@ -148,8 +283,6 @@ export function SiswaPage() {
         (err as { response?: { data?: { message?: string } } })?.response?.data
           ?.message || "Terjadi kesalahan saat menyimpan data siswa.";
       toast.error(msg);
-    } finally {
-      setSubmitting(false);
     }
   });
 
@@ -158,7 +291,8 @@ export function SiswaPage() {
     setDeleting(true);
     try {
       await siswaApi.deleteStudent(deleteStudent.id);
-      toast.success(`Data siswa ${deleteStudent.fullName} berhasil dihapus.`);
+      const studentName = deleteStudent.fullName || deleteStudent.user?.fullName || "Siswa";
+      toast.success(`Data siswa ${studentName} berhasil dihapus.`);
       setDeleteStudent(null);
       fetchStudents();
     } catch {
@@ -168,10 +302,38 @@ export function SiswaPage() {
     }
   };
 
-  const activeCount = useMemo(
-    () => students.filter((s) => s.isActive).length,
-    [students]
-  );
+  const handleUploadPortfolio = async (studentId: number | string, formData: FormData) => {
+    try {
+      const res = await siswaApi.uploadPortfolio(studentId, formData);
+      if (res.data?.data) {
+        setActiveDetailStudent(res.data.data);
+      }
+      toast.success("Berkas portofolio berhasil diunggah.");
+      fetchStudents();
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || "Gagal mengunggah berkas portofolio.";
+      toast.error(msg);
+      throw err;
+    }
+  };
+
+  const handleDeletePortfolio = async (
+    studentId: number | string,
+    portfolioId: number | string
+  ) => {
+    try {
+      const res = await siswaApi.deletePortfolio(studentId, portfolioId);
+      if (res.data?.data) {
+        setActiveDetailStudent(res.data.data);
+      }
+      toast.success("Berkas portofolio berhasil dihapus.");
+      fetchStudents();
+    } catch {
+      toast.error("Gagal menghapus berkas portofolio.");
+    }
+  };
 
   const handleOpenPortfolio = useCallback((item: SiswaItem) => {
     setSelectedPortfolioStudent(item);
@@ -181,20 +343,22 @@ export function SiswaPage() {
   const columns = useMemo(
     () =>
       buildSiswaColumns({
-        onViewPortfolio: handleOpenPortfolio,
+        onDetail: handleOpenDetail,
         onEdit: handleOpenEdit,
         onDelete: (item) => setDeleteStudent(item),
       }),
-    [handleOpenPortfolio, handleOpenEdit]
+    [handleOpenDetail, handleOpenEdit]
   );
-
 
   return (
     <div className="space-y-6">
+      {/* 1. Page Header Sesuai Desain Figma */}
       <PageHeader
         variant="admin"
+        badge="Master data Modul"
+        badgeIcon={<Layers className="h-3.5 w-3.5" />}
         title="Data Siswa Kelas 12 Aktif"
-        description="Kelola data siswa aktif, NIS, jurusan, kelas, dan akun akses portal karir siswa."
+        description="Temukan peluang karir terbaik dari industri mitra resmi SKARIGA."
       >
         <PageHeader.Button
           variant="primary"
@@ -205,120 +369,184 @@ export function SiswaPage() {
         </PageHeader.Button>
       </PageHeader>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard
-          label="Total Siswa Kelas 12"
-          value={students.length}
-          icon={Users}
-          color="blue"
-        />
-        <StatCard
-          label="Siswa Akun Aktif"
-          value={activeCount}
-          icon={School}
-          color="amber"
-        />
-        <StatCard
-          label="Kompetensi Keahlian"
-          value={majors.length}
-          icon={GraduationCap}
-          color="sky"
-        />
-      </div>
-
-      <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/90 shadow-xs flex flex-col md:flex-row gap-4 justify-between items-center">
-        <div className="relative w-full md:w-80">
+      {/* 2. Filter Bar Sesuai Desain Figma */}
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 px-4 py-2.5 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+        {/* Search Bar */}
+        <div className="relative w-full lg:flex-1 lg:max-w-xl min-w-0 sm:min-w-[320px]">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <Input
             placeholder="Cari nama siswa, NIS, email..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9.5 pr-4 bg-slate-50 border-slate-200 rounded-xl h-10 text-xs placeholder:text-slate-400 shadow-2xs"
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
+            className="w-full pl-9.5 pr-4 bg-slate-50/60 border-slate-200 rounded-xl h-10 text-xs placeholder:text-slate-400 shadow-2xs focus-visible:bg-white"
           />
         </div>
 
-        <div className="flex w-full md:w-auto items-center gap-3">
-          <Select value={majorFilter} onValueChange={setMajorFilter}>
-            <SelectTrigger className="w-full md:w-48 h-10 rounded-xl bg-slate-50 border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer">
-              <SelectValue placeholder="Semua Jurusan" />
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          {/* Filter 1: Semua Jurusan */}
+          <Select
+            value={majorFilter}
+            onValueChange={(val) => {
+              setMajorFilter(val);
+              setCurrentPage(1);
+            }}
+          >
+            <SelectTrigger className="w-[160px] sm:w-[185px] h-10 rounded-xl bg-white border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50/80 transition-colors shadow-2xs cursor-pointer">
+              <div className="flex items-center gap-2 truncate">
+                <GraduationCap className="h-4 w-4 text-sky-600 shrink-0" />
+                <SelectValue placeholder="Semua Jurusan" />
+              </div>
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all" className="text-xs">Semua Jurusan</SelectItem>
-              {majors.map((m) => (
-                <SelectItem key={m.id} value={String(m.id)} className="text-xs">
+            <SelectContent className="rounded-xl border-slate-200 shadow-md">
+              <SelectItem value="all" className="text-xs font-medium">Semua Jurusan</SelectItem>
+              {options.majors.map((m) => (
+                <SelectItem key={m.id} value={String(m.id)} className="text-xs font-medium">
                   {m.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <Select value={classFilter} onValueChange={setClassFilter}>
-            <SelectTrigger className="w-full md:w-40 h-10 rounded-xl bg-slate-50 border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer">
+          {/* Filter 2: Semua Kelas */}
+          <Select
+            value={classFilter}
+            onValueChange={(val) => {
+              setClassFilter(val);
+              setCurrentPage(1);
+            }}
+          >
+            <SelectTrigger className="w-[130px] sm:w-[150px] h-10 rounded-xl bg-white border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50/80 transition-colors shadow-2xs cursor-pointer">
               <SelectValue placeholder="Semua Kelas" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all" className="text-xs">Semua Kelas</SelectItem>
-              {classes.map((c) => (
-                <SelectItem key={c.id} value={String(c.id)} className="text-xs">
+            <SelectContent className="rounded-xl border-slate-200 shadow-md">
+              <SelectItem value="all" className="text-xs font-medium">Semua Kelas</SelectItem>
+              {(options.classes || []).map((c) => (
+                <SelectItem key={c.id} value={String(c.id)} className="text-xs font-medium">
                   {c.name}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
+
+          {/* Filter 3: Status Kerja : Semua */}
+          <Select
+            value={statusFilter}
+            onValueChange={(val) => {
+              setStatusFilter(val);
+              setCurrentPage(1);
+            }}
+          >
+            <SelectTrigger className="w-[170px] sm:w-[195px] h-10 rounded-xl bg-white border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50/80 transition-colors shadow-2xs cursor-pointer">
+              <div className="flex items-center gap-2 truncate">
+                <Briefcase className="h-4 w-4 text-emerald-600 shrink-0" />
+                <SelectValue placeholder="Semua Status Kerja" />
+              </div>
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border-slate-200 shadow-md">
+              <SelectItem value="all" className="text-xs font-medium">Semua Status Kerja</SelectItem>
+              {(options.employment_statuses || []).map((st) => (
+                <SelectItem key={st.id} value={String(st.id)} className="text-xs font-medium">
+                  {st.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Total Count Badge Sesuai Figma */}
+          <div className="hidden sm:inline-flex items-center justify-end px-3.5 h-10 rounded-xl border border-slate-200/80 bg-white text-xs font-medium text-slate-600 whitespace-nowrap shadow-2xs">
+            Total : <span className="font-bold text-purple-700 ml-1">{meta.total} Siswa/Siswi</span>
+          </div>
         </div>
       </div>
 
+      {/* 3. Table Sesuai Desain Figma */}
       <DataTable
         columns={columns}
         data={students}
         loading={loading}
+        showNumbering={true}
+        numberStartIndex={(meta.current_page - 1) * meta.per_page + 1}
+        pagination={{
+          currentPage: meta.current_page,
+          totalPages: meta.last_page,
+          totalItems: meta.total,
+          pageSize: meta.per_page,
+          onPageChange: (page) => setCurrentPage(page),
+          onPageSizeChange: (size) => {
+            setPerPage(size);
+            setCurrentPage(1);
+          },
+          role: "admin",
+        }}
         emptyMessage="Tidak ada data siswa yang ditemukan"
-        emptyDescription="Coba sesuaikan kata kunci pencarian atau filter jurusan/kelas"
-        emptyIcon={<Users className="h-8 w-8 text-slate-400" />}
+        emptyDescription="Ubah filter jurusan atau status kerja yang dipilih."
         getRowId={(student) => String(student.id)}
       />
 
+      {/* Modal Form Tambah / Edit */}
       <Modal
         open={isFormOpen}
         onOpenChange={setIsFormOpen}
         variant="admin"
         size="md"
-        headerIcon={editingStudent ? <Pencil className="h-5 w-5" /> : <UserPlus className="h-5 w-5" />}
+        headerIcon={
+          editingStudent ? <Pencil className="h-5 w-5" /> : <UserPlus className="h-5 w-5" />
+        }
         title={editingStudent ? "Edit Data Siswa" : "Tambah Siswa Baru"}
         description={
           editingStudent
-            ? "Perbarui informasi profil siswa, penempatan rombel kelas, dan jurusan."
-            : "Lengkapi data siswa baru untuk menerbitkan akun akses portal BKI Skariga."
+            ? "Perbarui informasi profil siswa, penempatan rombel kelas, dan status keterserapan."
+            : "Lengkapi data siswa baru untuk menerbitkan akun akses portal karir BKI Skariga."
         }
         confirmText={editingStudent ? "Perbarui Siswa" : "Simpan Siswa"}
         cancelText="Batal"
-        isLoading={submitting}
+        isLoading={form.formState.isSubmitting}
         onConfirm={handleSubmitForm}
       >
         <form onSubmit={handleSubmitForm}>
           <SiswaForm
             form={form}
-            majors={majors}
-            classes={classes}
-            isEditing={!!editingStudent}
+            majors={options.majors}
+            classes={options.classes}
+            employmentStatuses={options.employment_statuses}
+            companies={options.companies}
+            isEditing={Boolean(editingStudent)}
           />
         </form>
       </Modal>
 
-      <SiswaPortfolioModal
-        student={selectedPortfolioStudent}
-        open={isPortfolioOpen}
-        onOpenChange={setIsPortfolioOpen}
+      {/* Modal Detail & Portofolio Siswa */}
+      <SiswaDetailModal
+        isOpen={isDetailOpen}
+        student={activeDetailStudent}
+        options={options}
+        onClose={() => {
+          setIsDetailOpen(false);
+          setActiveDetailStudent(null);
+        }}
+        onUploadPortfolio={handleUploadPortfolio}
+        onDeletePortfolio={handleDeletePortfolio}
       />
 
-      <AlertDialog open={!!deleteStudent} onOpenChange={(open) => !open && setDeleteStudent(null)}>
+      {/* Dialog Konfirmasi Hapus Siswa */}
+      <AlertDialog
+        open={Boolean(deleteStudent)}
+        onOpenChange={(open) => !open && setDeleteStudent(null)}
+      >
         <AlertDialogContent className="rounded-3xl p-6 sm:p-7 border-none shadow-xl bg-white">
           <AlertDialogHeader>
             <AlertDialogTitle className="font-bold text-lg text-slate-900">
               Hapus Data Siswa
             </AlertDialogTitle>
             <AlertDialogDescription className="text-xs sm:text-sm text-slate-500 leading-relaxed mt-1">
-              Apakah Anda yakin ingin menghapus data siswa <strong className="text-slate-900 font-semibold">{deleteStudent?.fullName}</strong> ({deleteStudent?.nis})? Akun portal terkait akan langsung dinonaktifkan.
+              Apakah Anda yakin ingin menghapus data siswa{" "}
+              <strong className="text-slate-900 font-semibold">
+                {deleteStudent?.fullName || deleteStudent?.user?.fullName}
+              </strong>{" "}
+              (NIS: {deleteStudent?.nis})? Akun portal terkait akan dinonaktifkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-5 border-none bg-transparent p-0 flex-row justify-end gap-2.5">
@@ -328,7 +556,7 @@ export function SiswaPage() {
             <AlertDialogAction
               onClick={handleDelete}
               disabled={deleting}
-              className="h-10 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl px-5 cursor-pointer shadow-sm"
+              className="h-10 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl px-5 cursor-pointer shadow-sm"
             >
               {deleting ? "Menghapus..." : "Ya, Hapus Siswa"}
             </AlertDialogAction>
