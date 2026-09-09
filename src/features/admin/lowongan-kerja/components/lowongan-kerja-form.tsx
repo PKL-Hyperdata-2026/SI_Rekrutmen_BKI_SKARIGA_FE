@@ -22,7 +22,7 @@ import {
   type StandardTypeItem,
   type JobVacancy,
 } from "../types";
-import { DatePicker } from "@/components/ui/date-picker";
+import { DatePicker } from "@/components/custom/date-picker";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Send, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";

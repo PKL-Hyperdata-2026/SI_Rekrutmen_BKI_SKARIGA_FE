@@ -14,7 +14,7 @@ import { SectionCard } from "@/components/custom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DatePicker } from "@/components/ui/date-picker";
+import { DatePicker } from "@/components/custom/date-picker";
 import {
   Select,
   SelectContent,

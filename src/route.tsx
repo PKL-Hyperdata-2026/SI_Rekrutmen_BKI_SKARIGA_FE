@@ -6,6 +6,7 @@ import { ProtectedRoute } from "./features/auth/protected-route";
 import { DashboardRedirector } from "./features/auth/dashboard-redirector";
 import { studentRoute } from "./features/student/route";
 import { adminRoute } from "./features/admin/route";
+import { hrdRoute } from "./features/hrd/route";
 
 export const router = createBrowserRouter([
   {
@@ -30,17 +31,9 @@ export const router = createBrowserRouter([
         children: adminRoute,
       },
       {
+        path: "/hrd",
         element: <ProtectedRoute allowedRoles={['hrd']} />,
-        children: [
-          {
-            path: "/hrd/dashboard",
-            // element: <HRDDashboard />,
-          },
-          // {
-          //   path: "/hrd/feature",
-          //   element: <HRDFeature />,
-          // },
-        ],
+        children: hrdRoute,
       },
       {
         path: "/unauthorized",
