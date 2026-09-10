@@ -348,9 +348,9 @@ export function SiswaPortfolioModal({
                                 <span>Diunggah {formattedDate}</span>
                               </span>
                             )}
-                            <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold">
-                              <CheckCircle2 className="h-3 w-3" />
-                              <span>Format PDF</span>
+                            <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold truncate max-w-[200px]" title={item.fileName || item.originalFilename || "Berkas Dokumen"}>
+                              <CheckCircle2 className="h-3 w-3 shrink-0" />
+                              <span className="truncate">{item.fileName || item.originalFilename || "Format PDF"}</span>
                             </span>
                           </div>
                         </div>

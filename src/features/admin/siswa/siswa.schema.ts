@@ -13,6 +13,8 @@ export interface SiswaPortfolio {
   category: SiswaOptionItem | null;
   title: string;
   description: string | null;
+  fileName?: string | null;
+  originalFilename?: string | null;
   filePath: string;
   fileUrl: string | null;
   createdAt: string;

@@ -1027,7 +1027,7 @@ export function AlumniDetailModal({
                     const categoryCode = item.category?.code || "";
                     const iconConfig = getCategoryIconConfig(categoryName, categoryCode, item.title);
                     const IconComp = iconConfig.icon;
-                    const fileName = item.filePath ? item.filePath.split("/").pop() || "Dokumen" : "Dokumen";
+                    const fileName = item.fileName || item.originalFilename || (item.filePath ? item.filePath.split("/").pop() || "Dokumen" : "Dokumen");
 
                     return (
                       <div

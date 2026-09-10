@@ -15,6 +15,8 @@ export interface AlumniPortfolio {
   category: AlumniReferenceItem | null;
   title: string;
   description: string | null;
+  fileName?: string | null;
+  originalFilename?: string | null;
   filePath: string;
   fileUrl: string | null;
   createdAt: string;
