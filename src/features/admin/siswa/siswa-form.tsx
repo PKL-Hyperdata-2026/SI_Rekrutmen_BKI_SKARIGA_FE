@@ -1,25 +1,44 @@
-import { useId } from "react";
+import { useId, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { SearchableSelect } from "@/components/custom/searchable-select";
-import { resolveMajorByClass } from "./siswa.form";
-import type { SiswaFormSchemaType, SiswaOptionItem } from "./siswa.schema";
+import { AsyncSearchableSelect } from "@/components/custom/async-searchable-select";
+import { selectOptionsApi } from "@/api/select-options";
+import type { SelectQuery, AsyncSelectItem } from "@/api/select-options";
+import type { SiswaFormSchemaType } from "./siswa.schema";
+
+const fetchClasses = (query: SelectQuery) =>
+  selectOptionsApi.getStandardTypes("class", query);
+
+const fetchMajors = (query: SelectQuery) => selectOptionsApi.getMajors(query);
+
+const fetchEmploymentStatuses = (query: SelectQuery) =>
+  selectOptionsApi.getStandardTypes("employment_status", query);
+
+const fetchCompanies = (query: SelectQuery) =>
+  selectOptionsApi.getCompanies(query);
+
+function extraString(item: AsyncSelectItem, key: string): string {
+  const value = item.extra?.[key];
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return String(value);
+  return "";
+}
 
 interface SiswaFormProps {
   form: UseFormReturn<SiswaFormSchemaType>;
-  majors: SiswaOptionItem[];
-  classes: SiswaOptionItem[];
-  employmentStatuses?: SiswaOptionItem[];
-  companies?: SiswaOptionItem[];
+  classFallbackLabel?: string;
+  majorFallbackLabel?: string;
+  statusFallbackLabel?: string;
+  companyFallbackLabel?: string;
   isEditing?: boolean;
 }
 
 export function SiswaForm({
   form,
-  majors,
-  classes,
-  employmentStatuses = [],
-  companies = [],
+  classFallbackLabel,
+  majorFallbackLabel,
+  statusFallbackLabel,
+  companyFallbackLabel,
   isEditing = false,
 }: SiswaFormProps) {
   const majorSelectId = useId();
@@ -39,29 +58,18 @@ export function SiswaForm({
   const currentStatusId = watch("employment_status_id");
   const currentCompanyId = watch("current_company_id");
 
-  const handleClassChange = (selectedClassId: string) => {
-    setValue("class_id", selectedClassId, { shouldValidate: true });
-    const autoMajorId = resolveMajorByClass(selectedClassId, classes, majors);
-    if (autoMajorId) {
-      setValue("major_id", autoMajorId, { shouldValidate: true });
+  const [autoMajorLabel, setAutoMajorLabel] = useState<string | undefined>(
+    undefined
+  );
+
+  const handleClassSelect = (item: AsyncSelectItem) => {
+    const resolvedMajorId = extraString(item, "resolvedMajorId");
+    const resolvedMajorName = extraString(item, "resolvedMajorName");
+    if (resolvedMajorId) {
+      setValue("major_id", resolvedMajorId, { shouldValidate: true });
+      setAutoMajorLabel(resolvedMajorName || undefined);
     }
   };
-
-  const statusOptions = [
-    { value: "", label: "Belum Ditentukan / Belum Bekerja" },
-    ...employmentStatuses.map((s) => ({
-      value: String(s.id),
-      label: s.name,
-    })),
-  ];
-
-  const companyOptions = [
-    { value: "", label: "Tidak Ada / Belum Bekerja" },
-    ...companies.map((c) => ({
-      value: String(c.id),
-      label: c.name,
-    })),
-  ];
 
   return (
     <div className="space-y-4 py-1 max-h-[72vh] overflow-y-auto pr-1">
@@ -134,19 +142,16 @@ export function SiswaForm({
           <label htmlFor={classSelectId} className="text-xs font-bold text-slate-700">
             Kelas Siswa <span className="text-rose-500">*</span>
           </label>
-          <SearchableSelect
+          <AsyncSearchableSelect
             id={classSelectId}
-            searchable={true}
             variant="admin"
             value={currentClassId}
-            onValueChange={handleClassChange}
+            onValueChange={(val) => setValue("class_id", val, { shouldValidate: true })}
+            onOptionSelect={handleClassSelect}
             placeholder="Pilih Kelas"
             searchPlaceholder="Cari kelas..."
-            hasError={Boolean(errors.class_id)}
-            options={classes.map((c) => ({
-              value: String(c.id),
-              label: c.name,
-            }))}
+            fetchPage={fetchClasses}
+            fallbackLabel={classFallbackLabel}
           />
           {errors.class_id && (
             <p className="text-[11px] text-rose-500 font-medium">{errors.class_id.message}</p>
@@ -157,19 +162,15 @@ export function SiswaForm({
           <label htmlFor={majorSelectId} className="text-xs font-bold text-slate-700">
             Kompetensi Keahlian (Jurusan) <span className="text-rose-500">*</span>
           </label>
-          <SearchableSelect
+          <AsyncSearchableSelect
             id={majorSelectId}
-            searchable={true}
             variant="admin"
             value={currentMajorId}
             onValueChange={(val) => setValue("major_id", val, { shouldValidate: true })}
             placeholder="Pilih Jurusan"
             searchPlaceholder="Cari jurusan..."
-            hasError={Boolean(errors.major_id)}
-            options={majors.map((m) => ({
-              value: String(m.id),
-              label: m.name,
-            }))}
+            fetchPage={fetchMajors}
+            fallbackLabel={autoMajorLabel ?? majorFallbackLabel}
           />
           {errors.major_id && (
             <p className="text-[11px] text-rose-500 font-medium">{errors.major_id.message}</p>
@@ -201,14 +202,16 @@ export function SiswaForm({
           <label htmlFor={statusSelectId} className="text-xs font-bold text-slate-700">
             Status Keterserapan Kerja
           </label>
-          <SearchableSelect
+          <AsyncSearchableSelect
             id={statusSelectId}
             variant="admin"
             value={currentStatusId || ""}
             onValueChange={(val) => setValue("employment_status_id", val)}
             placeholder="Pilih Status Keterserapan"
             searchPlaceholder="Cari status..."
-            options={statusOptions}
+            fetchPage={fetchEmploymentStatuses}
+            fallbackLabel={statusFallbackLabel}
+            emptyOptionLabel="Belum Ditentukan / Belum Bekerja"
           />
         </div>
 
@@ -216,15 +219,16 @@ export function SiswaForm({
           <label htmlFor={companySelectId} className="text-xs font-bold text-slate-700">
             Perusahaan Mitra / Tempat Kerja (Opsional)
           </label>
-          <SearchableSelect
+          <AsyncSearchableSelect
             id={companySelectId}
-            searchable={true}
             variant="admin"
             value={currentCompanyId || ""}
             onValueChange={(val) => setValue("current_company_id", val)}
             placeholder="Pilih Perusahaan"
             searchPlaceholder="Cari perusahaan..."
-            options={companyOptions}
+            fetchPage={fetchCompanies}
+            fallbackLabel={companyFallbackLabel}
+            emptyOptionLabel="Tidak Ada / Belum Bekerja"
           />
         </div>
       </div>

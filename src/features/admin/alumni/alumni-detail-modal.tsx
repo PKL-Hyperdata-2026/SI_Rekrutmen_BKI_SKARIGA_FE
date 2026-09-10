@@ -39,6 +39,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SearchableSelect } from "@/components/custom/searchable-select";
+import { AsyncSearchableSelect } from "@/components/custom/async-searchable-select";
+import { selectOptionsApi } from "@/api/select-options";
+import type { AsyncSelectItem, SelectQuery } from "@/api/select-options";
 import { toast } from "@/components/custom/sonner";
 import { cn } from "@/lib/utils";
 import {
@@ -46,19 +49,24 @@ import {
   type AlumniFormSchemaType,
   type AlumniPortfolioUploadSchemaType,
   type AlumniItem,
-  type AlumniOptionsData,
-  type AlumniPortfolio,
   type AlumniReferenceItem,
+  type AlumniPortfolio,
 } from "./alumni.schema";
 import {
-  findMatchingClassId,
-  findMatchingMajorId,
-  findMatchingOptionId,
-  resolveMajorByClass,
   toUpdateAlumniPayload,
   useAlumniPortfolioUploadForm,
 } from "./alumni.form";
-import { alumniApi } from "./alumni.api";
+import { alumniApi, buildGraduationYears, getClassMajorSelectPage, suggestCompanies } from "./alumni.api";
+
+const fetchEmploymentStatuses = (query: SelectQuery) =>
+  selectOptionsApi.getStandardTypes("employment_status", query);
+
+function extraString(item: AsyncSelectItem, key: string): string {
+  const value = item.extra?.[key];
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return String(value);
+  return "";
+}
 
 export interface AlumniDetailModalProps {
   open?: boolean;
@@ -66,7 +74,7 @@ export interface AlumniDetailModalProps {
   onOpenChange?: (open: boolean) => void;
   onClose?: () => void;
   alumni: AlumniItem | null;
-  options: AlumniOptionsData;
+  portfolioTypes?: AlumniReferenceItem[];
   onUpdateAlumni?: (id: string | number, payload: Record<string, unknown>) => Promise<void> | void;
   onUploadPortfolio?: (alumniId: string | number, formData: FormData) => Promise<void> | void;
   onDeletePortfolio?: (alumniId: string | number, portfolioId: string | number) => Promise<void> | void;
@@ -142,7 +150,7 @@ export function AlumniDetailModal({
   onOpenChange,
   onClose,
   alumni,
-  options,
+  portfolioTypes,
   onUpdateAlumni,
   onUploadPortfolio,
   onDeletePortfolio,
@@ -198,27 +206,12 @@ export function AlumniDetailModal({
   useEffect(() => {
     if (!alumni) return;
 
-    const resolvedClassId =
-      findMatchingClassId(options.classes, alumni.class) ||
-      (alumni.classId ? findMatchingOptionId(options.classes, String(alumni.classId)) || String(alumni.classId) : "");
-
-    const resolvedMajorId =
-      findMatchingMajorId(options.majors, alumni.major) ||
-      (alumni.majorId ? findMatchingOptionId(options.majors, String(alumni.majorId)) || String(alumni.majorId) : "");
-
-    const resolvedStatusId =
-      findMatchingOptionId(options.employment_statuses, alumni.employmentStatus) ||
-      (alumni.employmentStatusId ? findMatchingOptionId(options.employment_statuses, String(alumni.employmentStatusId)) || String(alumni.employmentStatusId) : "");
-
-    const resolvedCompanyId = options.companies?.find(
-      (comp) => comp.name.toLowerCase() === (alumni.currentCompany?.name || "").toLowerCase()
-    )
-      ? String(
-          options.companies.find(
-            (comp) => comp.name.toLowerCase() === (alumni.currentCompany?.name || "").toLowerCase()
-          )!.id
-        )
-      : alumni.currentCompanyId
+    const resolvedClassId = alumni.classId ? String(alumni.classId) : "";
+    const resolvedMajorId = alumni.majorId ? String(alumni.majorId) : "";
+    const resolvedStatusId = alumni.employmentStatusId
+      ? String(alumni.employmentStatusId)
+      : "";
+    const resolvedCompanyId = alumni.currentCompanyId
       ? String(alumni.currentCompanyId)
       : "";
 
@@ -250,88 +243,50 @@ export function AlumniDetailModal({
       waiting_time_months: alumni.waitingTimeMonths ? String(alumni.waitingTimeMonths) : "",
       is_active: alumni.isActive ?? true,
     });
-  }, [alumni, modalOpen, options, reset]);
+  }, [alumni, modalOpen, reset]);
+
+  const [pickedLabels, setPickedLabels] = useState<Record<string, string>>({});
+  const [companySuggestions, setCompanySuggestions] = useState<AsyncSelectItem[]>([]);
+  const suggestRequestRef = useRef(0);
+  const suggestTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const rememberPickedLabel = (key: string, label: string) => {
+    setPickedLabels((prev) => (prev[key] === label ? prev : { ...prev, [key]: label }));
+  };
+
+  const referenceName = (
+    ref: string | { name?: string } | null | undefined
+  ): string | undefined => {
+    if (!ref || typeof ref === "string") return undefined;
+    return ref.name;
+  };
+
+  const classMajorFallbackLabel = useMemo(() => {
+    const className = referenceName(alumni?.class);
+    const majorName = referenceName(alumni?.major);
+    if (className) return majorName ? `${className} - ${majorName}` : className;
+    if (majorName) return `Jurusan: ${majorName}`;
+    return undefined;
+  }, [alumni]);
 
   // Options memoization for left form
-  const classMajorOptions = useMemo(() => {
-    const result: { value: string; label: string }[] = [];
-
-    if (options.classes && options.classes.length > 0) {
-      options.classes.forEach((c) => {
-        const resolvedMajorId = resolveMajorByClass(String(c.id), options.classes, options.majors);
-        const majorName = options.majors?.find((m) => String(m.id) === resolvedMajorId)?.name;
-        result.push({
-          value: `class_${c.id}`,
-          label: majorName ? `${c.name} - ${majorName}` : c.name,
-        });
-      });
-    }
-
-    (options.majors || []).forEach((m) => {
-      result.push({
-        value: `major_${m.id}`,
-        label: `Jurusan: ${m.name}`,
-      });
-    });
-
-    return result;
-  }, [options.classes, options.majors]);
-
   const currentClassMajorValue = useMemo(() => {
-    if (currentClassId) {
-      const matchedClass = options.classes?.find(
-        (c) => String(c.id) === String(currentClassId) || (c.code && c.code === currentClassId)
-      );
-      if (matchedClass) return `class_${matchedClass.id}`;
-    }
-    if (currentMajorId) {
-      const matchedMajor = options.majors?.find(
-        (m) => String(m.id) === String(currentMajorId) || (m.code && m.code === currentMajorId)
-      );
-      if (matchedMajor) return `major_${matchedMajor.id}`;
-    }
+    if (currentClassId) return `class_${currentClassId}`;
+    if (currentMajorId) return `major_${currentMajorId}`;
     return "";
-  }, [currentClassId, currentMajorId, options.classes, options.majors]);
-
-  const statusOptions = useMemo(() => {
-    if (options.employment_statuses && options.employment_statuses.length > 0) {
-      return options.employment_statuses.map((s) => ({
-        value: String(s.id),
-        label: s.name,
-      }));
-    }
-    return [
-      { value: "belum_bekerja", label: "Belum Bekerja" },
-      { value: "bekerja", label: "Bekerja (Kolektif/Mandiri)" },
-      { value: "wirausaha", label: "Wirausaha" },
-      { value: "melanjutkan_studi", label: "Melanjutkan Studi" },
-    ];
-  }, [options.employment_statuses]);
+  }, [currentClassId, currentMajorId]);
 
   const yearOptions = useMemo(() => {
-    if (options.graduation_years && options.graduation_years.length > 0) {
-      return options.graduation_years.map((yr) => ({
-        value: String(yr),
-        label: `Lulusan ${yr}`,
-      }));
-    }
-    const currentYear = new Date().getFullYear();
-    return Array.from({ length: 6 }, (_, i) => currentYear - i).map((yr) => ({
+    return buildGraduationYears().map((yr) => ({
       value: String(yr),
       label: `Lulusan ${yr}`,
     }));
-  }, [options.graduation_years]);
+  }, []);
 
   const handleClassMajorChange = (val: string) => {
     if (val.startsWith("class_")) {
       const cId = val.replace("class_", "");
       setValue("class_id", cId);
-      const resolvedMajorId = resolveMajorByClass(cId, options.classes, options.majors);
-      if (resolvedMajorId) {
-        setValue("major_id", resolvedMajorId, { shouldValidate: true });
-      } else if (options.majors && options.majors.length > 0) {
-        setValue("major_id", String(options.majors[0].id), { shouldValidate: true });
-      }
     } else if (val.startsWith("major_")) {
       const mId = val.replace("major_", "");
       setValue("major_id", mId, { shouldValidate: true });
@@ -340,19 +295,44 @@ export function AlumniDetailModal({
     clearErrors("major_id");
   };
 
+  const handleClassMajorOptionSelect = (item: AsyncSelectItem) => {
+    if (item.value.startsWith("class_")) {
+      const resolvedMajorId = extraString(item, "resolvedMajorId");
+      if (resolvedMajorId) {
+        setValue("major_id", resolvedMajorId, { shouldValidate: true });
+      }
+    }
+    rememberPickedLabel("classMajor", item.label);
+  };
+
   const { onChange: onCompanyManualRHFChange, ...companyManualRest } = register("company_name_manual");
 
   const handleCompanyManualChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onCompanyManualRHFChange(e);
     const val = e.target.value;
-    const matched = options.companies?.find(
-      (c) => c.name.toLowerCase() === val.trim().toLowerCase()
-    );
-    if (matched) {
-      setValue("current_company_id", String(matched.id));
-    } else {
-      setValue("current_company_id", "");
+
+    if (suggestTimerRef.current) {
+      clearTimeout(suggestTimerRef.current);
     }
+
+    if (val.trim().length < 2) {
+      setCompanySuggestions([]);
+      setValue("current_company_id", "");
+      return;
+    }
+
+    suggestTimerRef.current = setTimeout(() => {
+      const requestId = suggestRequestRef.current + 1;
+      suggestRequestRef.current = requestId;
+      void suggestCompanies(val).then((items) => {
+        if (suggestRequestRef.current !== requestId) return;
+        setCompanySuggestions(items);
+        const matched = items.find(
+          (c) => c.label.toLowerCase() === val.trim().toLowerCase()
+        );
+        setValue("current_company_id", matched ? matched.value : "");
+      });
+    }, 500);
   };
 
   const handleProfileSubmit = handleSubmit(async (values) => {
@@ -388,11 +368,11 @@ export function AlumniDetailModal({
   const [previewPortfolio, setPreviewPortfolio] = useState<AlumniPortfolio | null>(null);
 
   const portfolioCategories = useMemo(() => {
-    if (options.portfolio_types && options.portfolio_types.length > 0) {
-      return options.portfolio_types;
+    if (portfolioTypes && portfolioTypes.length > 0) {
+      return portfolioTypes;
     }
     return DEFAULT_PORTFOLIO_CATEGORIES;
-  }, [options.portfolio_types]);
+  }, [portfolioTypes]);
 
   const portfolioCategoryOptions = useMemo(() => {
     return portfolioCategories.map((cat) => ({
@@ -659,13 +639,14 @@ export function AlumniDetailModal({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-slate-700">Kelas & Jurusan *</label>
-                      <SearchableSelect
-                        searchable={true}
+                      <AsyncSearchableSelect
                         value={currentClassMajorValue}
                         onValueChange={handleClassMajorChange}
+                        onOptionSelect={handleClassMajorOptionSelect}
                         placeholder="Pilih Kelas atau Jurusan"
                         searchPlaceholder="Cari kelas atau jurusan..."
-                        options={classMajorOptions}
+                        fetchPage={getClassMajorSelectPage}
+                        fallbackLabel={pickedLabels.classMajor ?? classMajorFallbackLabel}
                         hasError={Boolean(errors.major_id)}
                       />
                       {errors.major_id && (
@@ -705,12 +686,14 @@ export function AlumniDetailModal({
 
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-slate-700">Status Keterserapan *</label>
-                      <SearchableSelect
-                        searchable={false}
+                      <AsyncSearchableSelect
                         value={currentStatusId}
                         onValueChange={(val) => setValue("employment_status_id", val, { shouldValidate: true })}
+                        onOptionSelect={(item) => rememberPickedLabel("status", item.label)}
                         placeholder="Pilih Status Keterserapan"
-                        options={statusOptions}
+                        searchPlaceholder="Cari status..."
+                        fetchPage={fetchEmploymentStatuses}
+                        fallbackLabel={pickedLabels.status ?? referenceName(alumni?.employmentStatus)}
                       />
                       {errors.employment_status_id && (
                         <p className="text-[11px] text-rose-500 font-medium">{errors.employment_status_id.message}</p>
@@ -741,10 +724,10 @@ export function AlumniDetailModal({
                       className="h-9.5 text-xs rounded-xl"
                       list="alumni-detail-company-suggestions"
                     />
-                    {options.companies && options.companies.length > 0 && (
+                    {companySuggestions.length > 0 && (
                       <datalist id="alumni-detail-company-suggestions">
-                        {options.companies.map((c) => (
-                          <option key={c.id} value={c.name} />
+                        {companySuggestions.map((c) => (
+                          <option key={c.value} value={c.label} />
                         ))}
                       </datalist>
                     )}

@@ -32,9 +32,6 @@ import { siswaApi } from "./siswa.api";
 import {
   useSiswaForm,
   toSiswaPayload,
-  findMatchingClassId,
-  findMatchingMajorId,
-  findMatchingOptionId,
 } from "./siswa.form";
 import { SiswaForm } from "./siswa-form";
 import { SiswaDetailModal } from "./siswa-detail-modal";
@@ -85,7 +82,7 @@ export function SiswaPage() {
   const [deleteStudent, setDeleteStudent] = useState<SiswaItem | null>(null);
   const [deleting, setDeleting] = useState<boolean>(false);
 
-  const form = useSiswaForm(editingStudent, options);
+  const form = useSiswaForm(editingStudent);
 
   const fetchStudents = useCallback(async () => {
     setLoading(true);
@@ -159,10 +156,10 @@ export function SiswaPage() {
   useEffect(() => {
     let ignore = false;
     siswaApi
-      .getStudentOptions()
-      .then((res) => {
-        if (!ignore && res.data?.data) {
-          setOptions(res.data.data);
+      .getFilterOptions()
+      .then((filterOptions) => {
+        if (!ignore) {
+          setOptions(filterOptions);
         }
       })
       .catch(() => {});
@@ -202,30 +199,6 @@ export function SiswaPage() {
     (item: SiswaItem) => {
       setEditingStudent(item);
 
-      const resolvedClassId =
-        findMatchingClassId(item.class, options.classes) ||
-        (item.classId ? String(item.classId) : "");
-
-      const resolvedMajorId =
-        findMatchingMajorId(item.major, options.majors) ||
-        (item.majorId ? String(item.majorId) : "");
-
-      const resolvedStatusId =
-        findMatchingOptionId(item.employmentStatus, options.employment_statuses || []) ||
-        (item.employmentStatusId ? String(item.employmentStatusId) : "");
-
-      const resolvedCompanyId = options.companies?.find(
-        (comp) => comp.name.toLowerCase() === (item.currentCompany?.name || "").toLowerCase()
-      )
-        ? String(
-            options.companies.find(
-              (comp) => comp.name.toLowerCase() === (item.currentCompany?.name || "").toLowerCase()
-            )!.id
-          )
-        : item.currentCompanyId
-        ? String(item.currentCompanyId)
-        : "";
-
       const socialMediaValue =
         typeof item.socialMedia === "string"
           ? item.socialMedia
@@ -236,19 +209,23 @@ export function SiswaPage() {
         full_name: item.fullName || item.user?.fullName || "",
         email: item.email || item.user?.email || "",
         phone: item.phone || item.user?.phone || "",
-        major_id: resolvedMajorId,
-        class_id: resolvedClassId,
+        major_id: item.majorId ? String(item.majorId) : "",
+        class_id: item.classId ? String(item.classId) : "",
         password: "",
         graduation_year: item.graduationYear ? String(item.graduationYear) : "",
-        employment_status_id: resolvedStatusId,
-        current_company_id: resolvedCompanyId,
+        employment_status_id: item.employmentStatusId
+          ? String(item.employmentStatusId)
+          : "",
+        current_company_id: item.currentCompanyId
+          ? String(item.currentCompanyId)
+          : "",
         current_position: item.currentPosition || "",
         social_media: socialMediaValue,
         is_active: item.isActive,
       });
       setIsFormOpen(true);
     },
-    [form, options]
+    [form]
   );
 
   const handleOpenDetail = useCallback(async (item: SiswaItem) => {
@@ -504,10 +481,10 @@ export function SiswaPage() {
         <form onSubmit={handleSubmitForm}>
           <SiswaForm
             form={form}
-            majors={options.majors}
-            classes={options.classes}
-            employmentStatuses={options.employment_statuses}
-            companies={options.companies}
+            classFallbackLabel={editingStudent?.class?.name}
+            majorFallbackLabel={editingStudent?.major?.name}
+            statusFallbackLabel={editingStudent?.employmentStatus?.name}
+            companyFallbackLabel={editingStudent?.currentCompany?.name}
             isEditing={Boolean(editingStudent)}
           />
         </form>

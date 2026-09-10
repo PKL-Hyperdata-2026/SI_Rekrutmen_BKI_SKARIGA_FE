@@ -14,3 +14,4 @@ export * from "./date-picker";
 export * from "./metric-card";
 export * from "./modal";
 export * from "./searchable-select";
+export * from "./async-searchable-select";

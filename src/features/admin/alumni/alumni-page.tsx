@@ -29,20 +29,16 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/components/custom/sonner";
-import { alumniApi } from "./alumni.api";
+import { alumniApi, type AlumniFilterOptions } from "./alumni.api";
 import {
   useAlumniForm,
   toCreateAlumniPayload,
-  findMatchingClassId,
-  findMatchingMajorId,
-  findMatchingOptionId,
 } from "./alumni.form";
 import { AlumniFormModal } from "./alumni-form";
 import { AlumniDetailModal } from "./alumni-detail-modal";
 import { buildAlumniColumns } from "./alumni-table";
 import type {
   AlumniItem,
-  AlumniOptionsData,
   AlumniPaginationMeta,
 } from "./alumni.schema";
 
@@ -53,6 +49,24 @@ const FALLBACK_EMPLOYMENT_STATUSES = [
   { id: "4", name: "Belum Bekerja" },
 ];
 
+function resolveReferenceName(
+  ref: string | { name?: string } | null | undefined
+): string | undefined {
+  if (!ref || typeof ref === "string") return undefined;
+  return ref.name;
+}
+
+function resolveClassMajorFallbackLabel(
+  alumni: AlumniItem | null
+): string | undefined {
+  if (!alumni) return undefined;
+  const className = resolveReferenceName(alumni.class);
+  const majorName = resolveReferenceName(alumni.major);
+  if (className) return majorName ? `${className} - ${majorName}` : className;
+  if (majorName) return `Jurusan: ${majorName}`;
+  return undefined;
+}
+
 export function AlumniPage() {
   const [alumniList, setAlumniList] = useState<AlumniItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -60,12 +74,10 @@ export function AlumniPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const perPage = 15;
 
-  const [options, setOptions] = useState<AlumniOptionsData>({
-    companies: [],
-    majors: [],
-    classes: [],
-    employment_statuses: [],
-    graduation_years: [],
+  const [options, setOptions] = useState<AlumniFilterOptions>({
+    statuses: [],
+    portfolioTypes: [],
+    graduationYears: [],
   });
 
   const [search, setSearch] = useState("");
@@ -94,7 +106,7 @@ export function AlumniPage() {
   const [deleteAlumni, setDeleteAlumni] = useState<AlumniItem | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  const form = useAlumniForm(editingAlumni, options);
+  const form = useAlumniForm(editingAlumni);
 
   const fetchAlumni = useCallback(async () => {
     setLoading(true);
@@ -160,10 +172,10 @@ export function AlumniPage() {
   useEffect(() => {
     let ignore = false;
     alumniApi
-      .getAlumniOptions()
-      .then((res) => {
-        if (!ignore && res.data?.data) {
-          setOptions(res.data.data);
+      .getFilterOptions()
+      .then((filterOptions) => {
+        if (!ignore) {
+          setOptions(filterOptions);
         }
       })
       .catch(() => {});
@@ -214,48 +226,6 @@ export function AlumniPage() {
     (item: AlumniItem) => {
       setEditingAlumni(item);
 
-      const resolvedClassId =
-        findMatchingClassId(options.classes, item.class) ||
-        (item.classId
-          ? findMatchingOptionId(options.classes, String(item.classId)) ||
-            String(item.classId)
-          : "");
-
-      const resolvedMajorId =
-        findMatchingMajorId(options.majors, item.major) ||
-        (item.majorId
-          ? findMatchingOptionId(options.majors, String(item.majorId)) ||
-            String(item.majorId)
-          : "");
-
-      const resolvedStatusId =
-        findMatchingOptionId(
-          options.employment_statuses,
-          item.employmentStatus,
-        ) ||
-        (item.employmentStatusId
-          ? findMatchingOptionId(
-              options.employment_statuses,
-              String(item.employmentStatusId),
-            ) || String(item.employmentStatusId)
-          : "");
-
-      const resolvedCompanyId = options.companies?.find(
-        (comp) =>
-          comp.name.toLowerCase() ===
-          (item.currentCompany?.name || "").toLowerCase(),
-      )
-        ? String(
-            options.companies.find(
-              (comp) =>
-                comp.name.toLowerCase() ===
-                (item.currentCompany?.name || "").toLowerCase(),
-            )!.id,
-          )
-        : item.currentCompanyId
-          ? String(item.currentCompanyId)
-          : "";
-
       const profileUrl =
         typeof item.socialMedia === "string"
           ? item.socialMedia
@@ -270,13 +240,17 @@ export function AlumniPage() {
         full_name: item.fullName || item.user?.fullName || "",
         phone: item.phone || item.user?.phone || "",
         email: item.email || item.user?.email || "",
-        major_id: resolvedMajorId,
-        class_id: resolvedClassId,
+        major_id: item.majorId ? String(item.majorId) : "",
+        class_id: item.classId ? String(item.classId) : "",
         graduation_year: item.graduationYear
           ? String(item.graduationYear)
           : String(new Date().getFullYear()),
-        employment_status_id: resolvedStatusId,
-        current_company_id: resolvedCompanyId,
+        employment_status_id: item.employmentStatusId
+          ? String(item.employmentStatusId)
+          : "",
+        current_company_id: item.currentCompanyId
+          ? String(item.currentCompanyId)
+          : "",
         current_position: item.currentPosition || "",
         profile_url: profileUrl,
         company_name_manual: item.currentCompany?.name || "",
@@ -288,7 +262,7 @@ export function AlumniPage() {
       });
       setIsFormOpen(true);
     },
-    [form, options],
+    [form],
   );
 
   const handleSubmitForm = form.handleSubmit(async (values) => {
@@ -391,11 +365,11 @@ export function AlumniPage() {
   };
 
   const employmentStatusOptions = useMemo(() => {
-    if (options.employment_statuses && options.employment_statuses.length > 0) {
-      return options.employment_statuses;
+    if (options.statuses && options.statuses.length > 0) {
+      return options.statuses;
     }
     return FALLBACK_EMPLOYMENT_STATUSES;
-  }, [options.employment_statuses]);
+  }, [options.statuses]);
 
   const columns = useMemo(
     () =>
@@ -475,7 +449,7 @@ export function AlumniPage() {
               <SelectItem value="all" className="text-xs font-medium">
                 Semua Angkatan
               </SelectItem>
-              {(options.graduation_years || []).map((yr) => (
+              {(options.graduationYears || []).map((yr) => (
                 <SelectItem
                   key={yr}
                   value={String(yr)}
@@ -536,7 +510,8 @@ export function AlumniPage() {
       <FormProvider {...form}>
         <AlumniFormModal
           form={form}
-          options={options}
+          classMajorFallbackLabel={resolveClassMajorFallbackLabel(editingAlumni)}
+          statusFallbackLabel={resolveReferenceName(editingAlumni?.employmentStatus)}
           isEditing={Boolean(editingAlumni)}
           isOpen={isFormOpen}
           onClose={() => setIsFormOpen(false)}
@@ -557,7 +532,7 @@ export function AlumniPage() {
           if (!open) setActiveDetailAlumni(null);
         }}
         alumni={activeDetailAlumni}
-        options={options}
+        portfolioTypes={options.portfolioTypes}
         onUpdateAlumni={handleUpdateAlumniFromDetail}
         onUploadPortfolio={handleUploadPortfolio}
         onDeletePortfolio={handleDeletePortfolio}

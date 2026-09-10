@@ -302,7 +302,10 @@ export function DudiPage() {
         onConfirm={handleSubmitForm}
       >
         <form onSubmit={handleSubmitForm}>
-          <DudiForm form={form} industries={industries} />
+          <DudiForm
+            form={form}
+            industryFallbackLabel={editingCompany?.industry?.name}
+          />
         </form>
       </Modal>
 

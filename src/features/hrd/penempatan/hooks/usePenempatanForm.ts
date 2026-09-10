@@ -4,12 +4,8 @@ import { toast } from "@/components/custom/sonner";
 import { useAppSelector } from "@/hooks/useApp";
 import {
   jobPlacementFormSchema,
-  type PenempatanCompanyOption,
-  type PenempatanStudentOption,
-  type PenempatanFormOptionsData,
   type JobPlacement,
 } from "../types/penempatan-schema";
-import { type SearchableSelectOption } from "@/components/custom/searchable-select";
 
 interface ApiErrorResponse {
   response?: {
@@ -29,8 +25,6 @@ export interface UsePenempatanFormOptions {
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   placement?: JobPlacement | null;
-  initialCompanies?: PenempatanCompanyOption[];
-  initialStudentsAlumni?: PenempatanStudentOption[];
 }
 
 export interface JobPlacementPayload {
@@ -46,13 +40,14 @@ export function usePenempatanForm({
   onOpenChange,
   onSuccess,
   placement,
-  initialCompanies,
-  initialStudentsAlumni,
 }: UsePenempatanFormOptions) {
   const authUser = useAppSelector((state) => state.auth?.user);
   const isEditMode = Boolean(placement);
 
   const [studentAlumniId, setStudentAlumniId] = useState("");
+  const [studentFallbackLabel, setStudentFallbackLabel] = useState<
+    string | undefined
+  >(undefined);
   const [companyId, setCompanyId] = useState(
     authUser?.company?.id ? String(authUser.company.id) : "",
   );
@@ -60,48 +55,18 @@ export function usePenempatanForm({
   const [acceptedDate, setAcceptedDate] = useState("");
   const [startDate, setStartDate] = useState("");
 
-  const [companies, setCompanies] = useState<PenempatanCompanyOption[]>(
-    initialCompanies || [],
-  );
-  const [studentsAlumni, setStudentsAlumni] = useState<
-    PenempatanStudentOption[]
-  >(initialStudentsAlumni || []);
-
-  const [isLoadingOptions, setIsLoadingOptions] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const resetForm = useCallback(() => {
     setStudentAlumniId("");
+    setStudentFallbackLabel(undefined);
     setCompanyId(authUser?.company?.id ? String(authUser.company.id) : "");
     setPosition("");
     setAcceptedDate("");
     setStartDate("");
     setErrors({});
   }, [authUser?.company?.id]);
-
-  const fetchOptions = useCallback(async () => {
-    setIsLoadingOptions(true);
-    try {
-      const response = await api.get<{
-        success: boolean;
-        data: PenempatanFormOptionsData;
-      }>("/hrd/job-placements/options");
-
-      const data = response.data?.data;
-      if (data) {
-        if (Array.isArray(data.companies)) {
-          setCompanies(data.companies);
-        }
-        if (Array.isArray(data.students_alumni)) {
-          setStudentsAlumni(data.students_alumni);
-        }
-      }
-    } catch {
-    } finally {
-      setIsLoadingOptions(false);
-    }
-  }, []);
 
   useEffect(() => {
     if (open) {
@@ -110,6 +75,15 @@ export function usePenempatanForm({
           String(
             placement.studentAlumniId || placement.studentAlumni?.id || "",
           ),
+        );
+        const pelamarName = placement.studentAlumni?.user?.fullName;
+        const pelamarMajor = placement.studentAlumni?.major;
+        setStudentFallbackLabel(
+          pelamarName
+            ? pelamarMajor
+              ? `${pelamarName} (${pelamarMajor})`
+              : pelamarName
+            : undefined,
         );
         setCompanyId(
           String(
@@ -125,11 +99,10 @@ export function usePenempatanForm({
       } else {
         resetForm();
       }
-      fetchOptions();
     } else {
       resetForm();
     }
-  }, [open, placement, fetchOptions, resetForm, authUser?.company?.id]);
+  }, [open, placement, resetForm, authUser?.company?.id]);
 
   const clearFieldError = useCallback((field: string) => {
     setErrors((prev) => {
@@ -141,8 +114,9 @@ export function usePenempatanForm({
   }, []);
 
   const handleStudentChange = useCallback(
-    (val: string) => {
+    (val: string, label?: string) => {
       setStudentAlumniId(val);
+      if (label !== undefined) setStudentFallbackLabel(label);
       clearFieldError("studentAlumniId");
     },
     [clearFieldError],
@@ -194,24 +168,6 @@ export function usePenempatanForm({
   const handleCancel = useCallback(() => {
     handleOpenChange(false);
   }, [handleOpenChange]);
-
-  const studentOptions: SearchableSelectOption[] = useMemo(() => {
-    return studentsAlumni.map((s) => ({
-      value: String(s.id),
-      label: s.fullName
-        ? s.majorName
-          ? `${s.fullName} (${s.majorName})`
-          : s.fullName
-        : `Pelamar #${s.id}`,
-    }));
-  }, [studentsAlumni]);
-
-  const companyOptions: SearchableSelectOption[] = useMemo(() => {
-    return companies.map((c) => ({
-      value: String(c.id),
-      label: c.name,
-    }));
-  }, [companies]);
 
   const validate = useCallback((): boolean => {
     const result = jobPlacementFormSchema.safeParse({
@@ -340,6 +296,7 @@ export function usePenempatanForm({
   return {
     studentAlumniId,
     setStudentAlumniId: handleStudentChange,
+    studentFallbackLabel,
     companyId,
     setCompanyId: handleCompanyChange,
     position,
@@ -348,11 +305,6 @@ export function usePenempatanForm({
     setAcceptedDate: handleAcceptedDateChange,
     startDate,
     setStartDate: handleStartDateChange,
-    companies,
-    studentsAlumni,
-    studentOptions,
-    companyOptions,
-    isLoadingOptions,
     isSubmitting,
     isEditMode,
     title,

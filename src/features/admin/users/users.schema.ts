@@ -17,12 +17,6 @@ export const resetPasswordSchema = z.object({
 
 export type ResetPasswordSchemaType = z.infer<typeof resetPasswordSchema>;
 
-export interface CompanyOption {
-  id: number | string;
-  name: string;
-  user_id?: number | string | null;
-}
-
 export interface UserItem {
   id: number | string;
   fullName: string;
@@ -37,7 +31,3 @@ export interface UserItem {
   } | null;
 }
 
-export interface UsersOptionsData {
-  roles?: Array<{ value: string; label: string }>;
-  companies: CompanyOption[];
-}

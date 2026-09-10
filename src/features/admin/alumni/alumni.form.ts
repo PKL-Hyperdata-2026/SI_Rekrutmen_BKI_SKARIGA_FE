@@ -7,7 +7,6 @@ import {
   type AlumniPortfolioUploadSchemaType,
   type AlumniItem,
   type AlumniReferenceItem,
-  type AlumniOptionsData,
 } from "./alumni.schema";
 
 export function findMatchingOptionId(
@@ -115,34 +114,19 @@ export function resolveMajorByClass(
   return "";
 }
 
-export function useAlumniForm(
-  alumni?: AlumniItem | null,
-  options?: AlumniOptionsData | null
-) {
+export function useAlumniForm(alumni?: AlumniItem | null) {
   const isEdit = Boolean(alumni);
   const mode: "graduate" | "manual" = alumni && !alumni.userId ? "manual" : "graduate";
 
-  const resolvedClassId =
-    findMatchingClassId(options?.classes, alumni?.class) ||
-    (alumni?.classId ? findMatchingOptionId(options?.classes, String(alumni.classId)) || String(alumni.classId) : "");
+  const resolvedClassId = alumni?.classId ? String(alumni.classId) : "";
 
-  const resolvedMajorId =
-    findMatchingMajorId(options?.majors, alumni?.major) ||
-    (alumni?.majorId ? findMatchingOptionId(options?.majors, String(alumni.majorId)) || String(alumni.majorId) : "");
+  const resolvedMajorId = alumni?.majorId ? String(alumni.majorId) : "";
 
-  const resolvedStatusId =
-    findMatchingOptionId(options?.employment_statuses, alumni?.employmentStatus) ||
-    (alumni?.employmentStatusId ? findMatchingOptionId(options?.employment_statuses, String(alumni.employmentStatusId)) || String(alumni.employmentStatusId) : "");
+  const resolvedStatusId = alumni?.employmentStatusId
+    ? String(alumni.employmentStatusId)
+    : "";
 
-  const resolvedCompanyId = options?.companies?.find(
-    (comp) => comp.name.toLowerCase() === (alumni?.currentCompany?.name || "").toLowerCase()
-  )
-    ? String(
-        options.companies.find(
-          (comp) => comp.name.toLowerCase() === (alumni?.currentCompany?.name || "").toLowerCase()
-        )!.id
-      )
-    : alumni?.currentCompanyId
+  const resolvedCompanyId = alumni?.currentCompanyId
     ? String(alumni.currentCompanyId)
     : "";
 

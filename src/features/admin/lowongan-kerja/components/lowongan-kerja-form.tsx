@@ -17,13 +17,13 @@ import {
 } from "@/components/ui/select";
 import { useLowonganKerjaForm } from "../hooks/useLowonganKerjaForm";
 import {
-  type Company,
   type MajorItem,
   type StandardTypeItem,
   type JobVacancy,
 } from "../types";
 import { DatePicker } from "@/components/custom/date-picker";
-import { SearchableSelect } from "@/components/custom/searchable-select";
+import { AsyncSearchableSelect } from "@/components/custom/async-searchable-select";
+import { selectOptionsApi } from "@/api/select-options";
 import { Send, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -32,7 +32,6 @@ export interface LowonganKerjaFormProps {
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   vacancy?: JobVacancy | null;
-  companies?: Company[];
   majors?: MajorItem[];
   targetApplicants?: StandardTypeItem[];
 }
@@ -42,16 +41,16 @@ export function LowonganKerjaForm({
   onOpenChange,
   onSuccess,
   vacancy,
-  companies: initialCompanies,
   majors: initialMajors,
   targetApplicants: initialTargetApplicants,
 }: LowonganKerjaFormProps) {
   const {
-    companies,
     majors,
     targetApplicants,
     companyId,
     setCompanyId,
+    companyFallbackLabel,
+    setCompanyFallbackLabel,
     position,
     setPosition,
     quota,
@@ -81,7 +80,6 @@ export function LowonganKerjaForm({
     onOpenChange,
     onSuccess,
     vacancy,
-    initialCompanies,
     initialMajors,
     initialTargetApplicants,
   });
@@ -130,19 +128,16 @@ export function LowonganKerjaForm({
                   *
                 </Badge>
               </Label>
-              <SearchableSelect
+              <AsyncSearchableSelect
                 value={companyId}
                 onValueChange={setCompanyId}
-                searchable
+                onOptionSelect={(item) => setCompanyFallbackLabel(item.label)}
                 placeholder="Pilih Perusahaan"
                 searchPlaceholder="Cari nama perusahaan..."
                 emptyMessage="Perusahaan tidak ditemukan"
-                options={companies.map((c) => ({
-                  value: String(c.id),
-                  label: c.name,
-                }))}
+                fetchPage={selectOptionsApi.getCompanies}
+                fallbackLabel={companyFallbackLabel}
                 hasError={Boolean(errors.companyId)}
-                isLoading={isLoadingOptions}
               />
               {errors.companyId && (
                 <FieldError className="text-[11px] font-medium text-red-500 ml-0.5">

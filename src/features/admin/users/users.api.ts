@@ -1,7 +1,6 @@
 import { api } from "@/api/axios";
 import type {
   UserItem,
-  UsersOptionsData,
   ResetPasswordSchemaType,
 } from "./users.schema";
 
@@ -23,13 +22,6 @@ export const usersApi = {
         total?: number;
       };
     }>("/admin/users", { params }),
-
-  getUserOptions: () =>
-    api.get<{
-      success: boolean;
-      message?: string;
-      data: UsersOptionsData;
-    }>("/admin/users/options"),
 
   createUser: (payload: Record<string, unknown>) =>
     api.post<{

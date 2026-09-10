@@ -1,6 +1,6 @@
 # Frontend Codebase Reference (React 19 + TypeScript + Vite)
 
-Deep, factual reference for AI agents and developers. **Last verified: 2026-09-08.**
+Deep, factual reference for AI agents and developers. **Last verified: 2026-09-10.**
 If you modify code that alters any architecture, feature modules, state slices, or routes documented here, update this file in the same change.
 Operational instructions & boundaries: [`AGENTS.md`](./AGENTS.md).
 
@@ -138,3 +138,53 @@ Routing stays at role level: `src/features/{role}/route.tsx` imports each `*-pag
 - **DataTable (`src/components/custom/data-table.tsx`):** Generic table with loading skeleton, empty state, pagination, and typed columns.
 - **GenericDummyPage (`src/components/custom/generic-dummy-page.tsx`):** Placeholder page with `variant: "student" | "admin"` for scaffolds.
 - **SearchableSelect (`src/components/custom/searchable-select.tsx`):** Accessible popover combobox with instant real-time search filter (`searchable?: boolean` default false) and full-width trigger.
+
+## 8. Async Selects (Server-Side Search + Pagination)
+
+All form dropdowns with potentially large datasets use `AsyncSearchableSelect`
+(`src/components/custom/async-searchable-select.tsx`) instead of loading full
+option lists on page open. Nothing is fetched until the select popover opens;
+typing searches server-side (debounced 300 ms); scrolling appends 20 rows/page.
+
+```text
+AsyncSearchableSelect (props: fetchPage, perPage=20, debounceMs=500, fallbackLabel, onOptionSelect, emptyOptionLabel?)
+  → usePaginatedOptions (src/hooks/use-paginated-options.ts: items, loading, loadingMore, hasMore, search, onSearchChange, onLoadMore, onOpen, resetSearch)
+      → selectOptionsApi (src/api/select-options.ts: getCompanies, getStudents, getMajors, getDepartments, getStandardTypes, getHrdStudentsAlumni)
+          → Backend index endpoints with ?for_select=1&search=&page=&per_page=20
+  → SearchableSelect (serverDriven mode: no client filter/slice, external loadingMore, selectedFallbackLabel, onOpen, onClose, onSearchChange, onLoadMore, hasMore)
+```
+
+Request efficiency rules (no per-keystroke requests):
+
+- Search input debounces 500 ms; opening the popover never searches, closing
+  calls `onClose` → `resetSearch()` (clears query, aborts in-flight, resets page).
+- Every new fetch aborts the previous one via `AbortController` (signal
+  threaded through `FetchSelectPage` into axios); stale responses are ignored
+  by request id; identical queries are skipped.
+- Successful pages are cached in-memory per URL+params with 60 s TTL
+  (`selectPageCache`, `clearSelectOptionsCache()` to invalidate manually), so
+  reopening within a minute costs zero requests.
+
+Rules:
+
+- `fetchPage` receives `{ search, page, per_page }` and resolves
+  `{ items: { value, label, extra? }[], hasMore, total }` from the Laravel
+  paginator envelope (`response.data.data` = items, `response.data.meta` = page meta).
+- `value` is always the backend-encrypted id string; never compare ids across
+  payloads (encryption uses a random IV, so the same id encrypts differently
+  per response). All matching happens inside one loaded item array.
+- Edit forms show the current value via `fallbackLabel` taken from the already
+  loaded entity relations (e.g. `user.company.name`), or via the last picked
+  item label tracked locally. No `fetchById` round-trip is needed.
+- Extra server-computed fields ride in `item.extra` (e.g. eligible-student
+  autofill fields, `resolvedMajorId`/`resolvedMajorName` for class→major
+  auto-resolution, `code`). Read them in `onOptionSelect`, never from a second list.
+- `emptyOptionLabel` prepends a static `{ value: "", label }` row for clearable
+  selects (status, company). `onOptionSelect` only fires for server items.
+- Feature-specific composition lives in the feature `{feature}.api.ts`
+  (e.g. alumni `getClassMajorSelectPage` merges class + major pages with
+  `class_`/`major_` value prefixes; alumni `suggestCompanies` feeds the manual
+  company-name datalist; siswa/alumni `getFilterOptions` loads small master
+  lists with `per_page=100` for table filter dropdowns).
+- Small static enums (roles, years) stay as inline `SearchableSelect` options;
+  years are generated locally via alumni `buildGraduationYears()`.

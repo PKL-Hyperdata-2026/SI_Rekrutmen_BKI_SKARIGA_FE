@@ -7,7 +7,6 @@ import {
   type PortfolioUploadSchemaType,
   type SiswaItem,
   type SiswaOptionItem,
-  type SiswaOptionsData,
 } from "./siswa.schema";
 
 export function findMatchingClassId(
@@ -75,31 +74,16 @@ export function resolveMajorByClass(
   return "";
 }
 
-export function useSiswaForm(
-  siswa?: SiswaItem | null,
-  options?: SiswaOptionsData | null
-) {
-  const resolvedClassId =
-    findMatchingClassId(siswa?.class, options?.classes || []) ||
-    (siswa?.classId ? String(siswa.classId) : "");
+export function useSiswaForm(siswa?: SiswaItem | null) {
+  const resolvedClassId = siswa?.classId ? String(siswa.classId) : "";
 
-  const resolvedMajorId =
-    findMatchingMajorId(siswa?.major, options?.majors || []) ||
-    (siswa?.majorId ? String(siswa.majorId) : "");
+  const resolvedMajorId = siswa?.majorId ? String(siswa.majorId) : "";
 
-  const resolvedStatusId =
-    findMatchingOptionId(siswa?.employmentStatus, options?.employment_statuses || []) ||
-    (siswa?.employmentStatusId ? String(siswa.employmentStatusId) : "");
+  const resolvedStatusId = siswa?.employmentStatusId
+    ? String(siswa.employmentStatusId)
+    : "";
 
-  const resolvedCompanyId = options?.companies?.find(
-    (comp) => comp.name.toLowerCase() === (siswa?.currentCompany?.name || "").toLowerCase()
-  )
-    ? String(
-        options.companies.find(
-          (comp) => comp.name.toLowerCase() === (siswa?.currentCompany?.name || "").toLowerCase()
-        )!.id
-      )
-    : siswa?.currentCompanyId
+  const resolvedCompanyId = siswa?.currentCompanyId
     ? String(siswa.currentCompanyId)
     : "";
 

@@ -2,20 +2,21 @@ import { useId } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { SearchableSelect } from "@/components/custom/searchable-select";
+import { AsyncSearchableSelect } from "@/components/custom/async-searchable-select";
+import { selectOptionsApi } from "@/api/select-options";
 import type {
   UsersFormSchemaType,
   ResetPasswordSchemaType,
-  CompanyOption,
   UserItem,
 } from "./users.schema";
 
 interface UserFormProps {
   form: UseFormReturn<UsersFormSchemaType>;
-  companies: CompanyOption[];
+  companyFallbackLabel?: string;
   isEditing?: boolean;
 }
 
-export function UserForm({ form, companies, isEditing = false }: UserFormProps) {
+export function UserForm({ form, companyFallbackLabel, isEditing = false }: UserFormProps) {
   const roleSelectId = useId();
   const companySelectId = useId();
 
@@ -114,17 +115,14 @@ export function UserForm({ form, companies, isEditing = false }: UserFormProps) 
           <label htmlFor={companySelectId} className="text-xs font-bold text-slate-700">
             Pilih Perusahaan DUDI Mitra
           </label>
-          <SearchableSelect
+          <AsyncSearchableSelect
             id={companySelectId}
-            searchable={true}
             value={currentCompanyId}
             onValueChange={(val) => setValue("company_id", val)}
             placeholder="Pilih Perusahaan Terdaftar"
             searchPlaceholder="Cari perusahaan..."
-            options={companies.map((c) => ({
-              value: String(c.id),
-              label: c.name,
-            }))}
+            fetchPage={selectOptionsApi.getCompanies}
+            fallbackLabel={companyFallbackLabel}
           />
           <p className="text-[11px] text-slate-400">
             Akun HRD ini akan memiliki wewenang untuk mengelola lowongan &amp; seleksi dari perusahaan yang dipilih.

@@ -2,15 +2,20 @@ import { useId } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { SearchableSelect } from "@/components/custom/searchable-select";
-import type { DudiFormSchemaType, IndustryOption } from "./dudi.schema";
+import { AsyncSearchableSelect } from "@/components/custom/async-searchable-select";
+import { selectOptionsApi } from "@/api/select-options";
+import type { SelectQuery } from "@/api/select-options";
+import type { DudiFormSchemaType } from "./dudi.schema";
+
+const fetchIndustries = (query: SelectQuery) =>
+  selectOptionsApi.getStandardTypes("company_industry", query);
 
 interface DudiFormProps {
   form: UseFormReturn<DudiFormSchemaType>;
-  industries: IndustryOption[];
+  industryFallbackLabel?: string;
 }
 
-export function DudiForm({ form, industries }: DudiFormProps) {
+export function DudiForm({ form, industryFallbackLabel }: DudiFormProps) {
   const industrySelectId = useId();
 
   const {
@@ -42,17 +47,14 @@ export function DudiForm({ form, industries }: DudiFormProps) {
           <label htmlFor={industrySelectId} className="text-xs font-bold text-slate-700">
             Bidang Industri
           </label>
-          <SearchableSelect
+          <AsyncSearchableSelect
             id={industrySelectId}
-            searchable={true}
             value={currentIndustryId}
             onValueChange={(val) => setValue("industry_id", val)}
             placeholder="Pilih Bidang Industri"
             searchPlaceholder="Cari bidang industri..."
-            options={industries.map((ind) => ({
-              value: String(ind.id),
-              label: ind.name,
-            }))}
+            fetchPage={fetchIndustries}
+            fallbackLabel={industryFallbackLabel}
           />
           {errors.industry_id && (
             <p className="text-[11px] text-rose-500 font-medium">{errors.industry_id.message}</p>

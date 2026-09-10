@@ -7,14 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/custom/date-picker";
-import { SearchableSelect } from "@/components/custom/searchable-select";
+import { AsyncSearchableSelect } from "@/components/custom/async-searchable-select";
+import { selectOptionsApi } from "@/api/select-options";
 import { Send, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePenempatanForm } from "../hooks/usePenempatanForm";
 import {
   type JobPlacement,
-  type PenempatanCompanyOption,
-  type PenempatanStudentOption,
 } from "../types/penempatan-schema";
 
 export interface PenempatanFormProps {
@@ -22,8 +21,6 @@ export interface PenempatanFormProps {
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   placement?: JobPlacement | null;
-  initialCompanies?: PenempatanCompanyOption[];
-  initialStudentsAlumni?: PenempatanStudentOption[];
 }
 
 export function PenempatanForm({
@@ -31,20 +28,17 @@ export function PenempatanForm({
   onOpenChange,
   onSuccess,
   placement,
-  initialCompanies,
-  initialStudentsAlumni,
 }: PenempatanFormProps) {
   const {
     studentAlumniId,
     setStudentAlumniId,
+    studentFallbackLabel,
     position,
     setPosition,
     acceptedDate,
     setAcceptedDate,
     startDate,
     setStartDate,
-    studentOptions,
-    isLoadingOptions,
     isSubmitting,
     title,
     description,
@@ -59,8 +53,6 @@ export function PenempatanForm({
     onOpenChange,
     onSuccess,
     placement,
-    initialCompanies,
-    initialStudentsAlumni,
   });
 
   return (
@@ -86,16 +78,16 @@ export function PenempatanForm({
               *
             </Badge>
           </Label>
-          <SearchableSelect
+          <AsyncSearchableSelect
             value={studentAlumniId}
             onValueChange={setStudentAlumniId}
-            searchable
+            onOptionSelect={(item) => setStudentAlumniId(item.value, item.label)}
             placeholder="Pilih Pelamar Kerja"
             searchPlaceholder="Cari nama pelamar kerja..."
             emptyMessage="Pelamar kerja tidak ditemukan"
-            options={studentOptions}
+            fetchPage={selectOptionsApi.getHrdStudentsAlumni}
+            fallbackLabel={studentFallbackLabel}
             hasError={hasError("studentAlumniId")}
-            isLoading={isLoadingOptions}
             className="h-10 rounded-lg border-slate-200 bg-[#F8F9FD] text-slate-800 focus:bg-white"
           />
           {errors.studentAlumniId && (

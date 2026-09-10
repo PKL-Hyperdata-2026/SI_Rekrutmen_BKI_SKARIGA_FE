@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { api } from "@/api/axios";
 import { toast } from "@/components/custom/sonner";
 import {
-  type Company,
   type MajorItem,
   type StandardTypeItem,
   type JobVacancy,
@@ -28,7 +27,6 @@ export interface UseLowonganKerjaFormProps {
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   vacancy?: JobVacancy | null;
-  initialCompanies?: Company[];
   initialMajors?: MajorItem[];
   initialTargetApplicants?: StandardTypeItem[];
 }
@@ -38,17 +36,18 @@ export function useLowonganKerjaForm({
   onOpenChange,
   onSuccess,
   vacancy,
-  initialCompanies,
   initialMajors,
   initialTargetApplicants,
 }: UseLowonganKerjaFormProps) {
-  const [companies, setCompanies] = useState<Company[]>(initialCompanies || []);
   const [majors, setMajors] = useState<MajorItem[]>(initialMajors || []);
   const [targetApplicants, setTargetApplicants] = useState<StandardTypeItem[]>(
     initialTargetApplicants || [],
   );
 
   const [companyId, setCompanyId] = useState("");
+  const [companyFallbackLabel, setCompanyFallbackLabel] = useState<
+    string | undefined
+  >(undefined);
   const [position, setPosition] = useState("");
   const [quota, setQuota] = useState("");
   const [deadline, setDeadline] = useState("");
@@ -145,7 +144,6 @@ export function useLowonganKerjaForm({
       );
       const data = res.data?.data;
       if (data) {
-        if (Array.isArray(data.companies)) setCompanies(data.companies);
         if (Array.isArray(data.majors)) setMajors(data.majors);
         if (Array.isArray(data.targetApplicants))
           setTargetApplicants(data.targetApplicants);
@@ -174,6 +172,7 @@ export function useLowonganKerjaForm({
 
   const resetForm = useCallback(() => {
     setCompanyId("");
+    setCompanyFallbackLabel(undefined);
     setPosition("");
     setQuota("");
     setDeadline("");
@@ -198,10 +197,6 @@ export function useLowonganKerjaForm({
       if (vacancy) {
         setIsLoadingData(true);
 
-        let currentCompanies =
-          initialCompanies && initialCompanies.length > 0
-            ? initialCompanies
-            : companies;
         let currentMajors =
           initialMajors && initialMajors.length > 0 ? initialMajors : majors;
         let currentTargets =
@@ -209,20 +204,13 @@ export function useLowonganKerjaForm({
             ? initialTargetApplicants
             : targetApplicants;
 
-        if (
-          currentCompanies.length === 0 ||
-          currentMajors.length === 0 ||
-          currentTargets.length === 0
-        ) {
+        if (currentMajors.length === 0 || currentTargets.length === 0) {
           const fetched = await fetchOptions();
           if (fetched) {
             if (
-              Array.isArray(fetched.companies) &&
-              fetched.companies.length > 0
+              Array.isArray(fetched.majors) &&
+              fetched.majors.length > 0
             ) {
-              currentCompanies = fetched.companies;
-            }
-            if (Array.isArray(fetched.majors) && fetched.majors.length > 0) {
               currentMajors = fetched.majors;
             }
             if (
@@ -236,20 +224,9 @@ export function useLowonganKerjaForm({
 
         if (!isMounted) return;
 
-        let resolvedCompanyId = "";
         const vacCompanyId = vacancy.companyId || vacancy.company?.id;
-        const vacCompanyName = vacancy.company?.name;
-        if (vacCompanyId || vacCompanyName) {
-          const matchedCompany = currentCompanies.find(
-            (c) =>
-              (vacCompanyId && String(c.id) === String(vacCompanyId)) ||
-              (vacCompanyName &&
-                c.name?.toLowerCase() === vacCompanyName.toLowerCase()),
-          );
-          resolvedCompanyId = matchedCompany
-            ? String(matchedCompany.id)
-            : String(vacCompanyId || "");
-        }
+        const resolvedCompanyId = vacCompanyId ? String(vacCompanyId) : "";
+        setCompanyFallbackLabel(vacancy.company?.name);
 
         let resolvedMajorId = "all";
         if (vacancy.majors && vacancy.majors.length > 0) {
@@ -317,7 +294,11 @@ export function useLowonganKerjaForm({
         }, 150);
       } else {
         setIsLoadingData(false);
-        if (!initialCompanies || initialCompanies.length === 0) {
+        setCompanyFallbackLabel(undefined);
+        if (
+          (!initialMajors || initialMajors.length === 0) ||
+          (!initialTargetApplicants || initialTargetApplicants.length === 0)
+        ) {
           fetchOptions();
         }
         resetForm();
@@ -329,7 +310,7 @@ export function useLowonganKerjaForm({
     return () => {
       isMounted = false;
     };
-  }, [open, vacancy, initialCompanies, fetchOptions, resetForm]);
+  }, [open, vacancy, initialMajors, initialTargetApplicants, fetchOptions, resetForm]);
 
   const handleOpenChange = useCallback(
     (nextOpen: boolean) => {
@@ -445,11 +426,12 @@ export function useLowonganKerjaForm({
   );
 
   return {
-    companies,
     majors,
     targetApplicants,
     companyId,
     setCompanyId: handleCompanyChange,
+    companyFallbackLabel,
+    setCompanyFallbackLabel,
     position,
     setPosition: handlePositionChange,
     quota,

@@ -2,15 +2,16 @@ import { useId } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { SearchableSelect } from "@/components/custom/searchable-select";
-import type { MajorFormSchemaType, DepartmentOption } from "./jurusan.schema";
+import { AsyncSearchableSelect } from "@/components/custom/async-searchable-select";
+import { selectOptionsApi } from "@/api/select-options";
+import type { MajorFormSchemaType } from "./jurusan.schema";
 
 interface MajorFormProps {
   form: UseFormReturn<MajorFormSchemaType>;
-  departments: DepartmentOption[];
+  departmentFallbackLabel?: string;
 }
 
-export function MajorForm({ form, departments }: MajorFormProps) {
+export function MajorForm({ form, departmentFallbackLabel }: MajorFormProps) {
   const deptSelectId = useId();
 
   const {
@@ -29,17 +30,14 @@ export function MajorForm({ form, departments }: MajorFormProps) {
         <label htmlFor={deptSelectId} className="text-xs font-bold text-slate-700">
           Departemen Induk <span className="text-rose-500">*</span>
         </label>
-        <SearchableSelect
+        <AsyncSearchableSelect
           id={deptSelectId}
-          searchable={true}
           value={currentDepartmentId}
           onValueChange={(val) => setValue("department_id", val, { shouldValidate: true })}
           placeholder="Pilih Departemen Induk"
           searchPlaceholder="Cari departemen..."
-          options={departments.map((d) => ({
-            value: String(d.id),
-            label: `${d.name} (${d.code})`,
-          }))}
+          fetchPage={selectOptionsApi.getDepartments}
+          fallbackLabel={departmentFallbackLabel}
         />
         {errors.department_id && (
           <p className="text-xs text-rose-500 font-medium">{errors.department_id.message}</p>

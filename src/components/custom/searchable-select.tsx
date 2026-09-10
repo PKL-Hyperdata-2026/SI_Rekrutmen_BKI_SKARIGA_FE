@@ -7,6 +7,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAppSelector } from "@/hooks/useApp";
 
 export type SearchableSelectVariant = "admin" | "student" | "alumni" | "hrd" | "auto";
@@ -31,6 +32,14 @@ export interface SearchableSelectProps {
   isLoading?: boolean;
   searchable?: boolean;
   pageSize?: number;
+  serverDriven?: boolean;
+  onSearchChange?: (value: string) => void;
+  onLoadMore?: () => void;
+  hasMore?: boolean;
+  externalLoadingMore?: boolean;
+  selectedFallbackLabel?: string;
+  onOpen?: () => void;
+  onClose?: () => void;
 }
 
 const roleThemeClasses: Record<string, string> = {
@@ -57,6 +66,14 @@ export function SearchableSelect({
   isLoading = false,
   searchable = false,
   pageSize = 20,
+  serverDriven = false,
+  onSearchChange,
+  onLoadMore,
+  hasMore = false,
+  externalLoadingMore = false,
+  selectedFallbackLabel,
+  onOpen,
+  onClose,
 }: SearchableSelectProps) {
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
@@ -83,34 +100,52 @@ export function SearchableSelect({
   );
 
   const filteredOptions = React.useMemo(() => {
+    if (serverDriven) return options;
     if (!searchable || !search.trim()) return options;
     const q = search.toLowerCase();
     return options.filter((opt) => opt.label.toLowerCase().includes(q));
-  }, [options, search, searchable]);
+  }, [options, search, searchable, serverDriven]);
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
     setVisibleCount(pageSize);
     setIsLoadingMore(false);
-    if (nextOpen && searchable) {
-      setSearch("");
-      setTimeout(() => inputRef.current?.focus(), 50);
+    if (nextOpen) {
+      onOpen?.();
+      if (searchable) {
+        setSearch("");
+        onSearchChange?.("");
+        setTimeout(() => inputRef.current?.focus(), 50);
+      }
+    } else {
+      onClose?.();
     }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
+    onSearchChange?.(e.target.value);
     setVisibleCount(pageSize);
     setIsLoadingMore(false);
   };
 
   const handleClearSearch = () => {
     setSearch("");
+    onSearchChange?.("");
     setVisibleCount(pageSize);
     setIsLoadingMore(false);
   };
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (serverDriven) {
+      if (externalLoadingMore || isLoading || !hasMore) return;
+      const target = e.currentTarget;
+      const reachedBottom = target.scrollHeight - target.scrollTop - target.clientHeight <= 30;
+      if (reachedBottom) {
+        onLoadMore?.();
+      }
+      return;
+    }
     if (isLoadingMore || isLoading) return;
     const target = e.currentTarget;
     const reachedBottom = target.scrollHeight - target.scrollTop - target.clientHeight <= 30;
@@ -127,8 +162,16 @@ export function SearchableSelect({
   };
 
   const visibleOptions = React.useMemo(() => {
+    if (serverDriven) return filteredOptions;
     return filteredOptions.slice(0, visibleCount);
-  }, [filteredOptions, visibleCount]);
+  }, [filteredOptions, visibleCount, serverDriven]);
+
+  const showLoadingMore = serverDriven ? externalLoadingMore : isLoadingMore;
+  const triggerLabel = selectedOption
+    ? selectedOption.label
+    : value && selectedFallbackLabel
+      ? selectedFallbackLabel
+      : placeholder;
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
@@ -152,7 +195,7 @@ export function SearchableSelect({
           )}
         >
           <span className="truncate">
-            {isLoading ? "Memuat data..." : (selectedOption ? selectedOption.label : placeholder)}
+            {isLoading ? "Memuat data..." : triggerLabel}
           </span>
           {isLoading ? (
             <Loader2 className="size-4 animate-spin text-slate-500 shrink-0" />
@@ -204,10 +247,18 @@ export function SearchableSelect({
           onScroll={handleScroll}
         >
           {isLoading ? (
-            <div className="flex items-center justify-center py-6 gap-2 text-xs text-slate-500">
-              <Loader2 className="size-3.5 animate-spin text-primary" />
-              <span>Memuat data...</span>
-            </div>
+            serverDriven ? (
+              <div className="flex flex-col gap-1 p-1" aria-label="Memuat data...">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <Skeleton key={index} className="h-8 w-full rounded-md" />
+                ))}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center py-6 gap-2 text-xs text-slate-500">
+                <Loader2 className="size-3.5 animate-spin text-primary" />
+                <span>Memuat data...</span>
+              </div>
+            )
           ) : filteredOptions.length === 0 ? (
             <div className="py-6 text-center text-xs text-slate-400">
               {emptyMessage}
@@ -222,7 +273,7 @@ export function SearchableSelect({
                     type="button"
                     onClick={() => {
                       onValueChange?.(opt.value);
-                      setOpen(false);
+                      handleOpenChange(false);
                     }}
                     className={cn(
                       "relative flex w-full cursor-pointer items-center justify-between rounded-md px-2.5 py-2 text-xs text-slate-700 transition-colors outline-hidden select-none text-left",
@@ -235,7 +286,7 @@ export function SearchableSelect({
                   </button>
                 );
               })}
-              {isLoadingMore && (
+              {showLoadingMore && (
                 <div className="flex items-center justify-center py-2.5 gap-2 text-xs text-slate-500">
                   <Loader2 className="size-3.5 animate-spin text-primary shrink-0" />
                   <span>Memuat data..</span>

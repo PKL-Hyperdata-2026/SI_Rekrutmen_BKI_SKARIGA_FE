@@ -38,14 +38,13 @@ import {
 } from "./users.form";
 import { UserForm, UserResetPasswordForm } from "./users-form";
 import { buildUserColumns, renderRoleBadge } from "./users-table";
-import type { UserItem, CompanyOption } from "./users.schema";
+import type { UserItem } from "./users.schema";
 
 export function UsersPage() {
   const currentUser = useAppSelector((state) => state.auth.user);
 
   const [users, setUsers] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [companies, setCompanies] = useState<CompanyOption[]>([]);
 
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
@@ -85,21 +84,6 @@ export function UsersPage() {
       setLoading(false);
     }
   }, [search, roleFilter, statusFilter, currentUser?.id]);
-
-  useEffect(() => {
-    let ignore = false;
-    usersApi
-      .getUserOptions()
-      .then((res) => {
-        if (!ignore && res.data?.data?.companies) {
-          setCompanies(res.data.data.companies);
-        }
-      })
-      .catch(() => {});
-    return () => {
-      ignore = true;
-    };
-  }, []);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -345,7 +329,11 @@ export function UsersPage() {
         onConfirm={handleSubmitForm}
       >
         <form onSubmit={handleSubmitForm}>
-          <UserForm form={userForm} companies={companies} isEditing={!!editingUser} />
+          <UserForm
+            form={userForm}
+            companyFallbackLabel={editingUser?.company?.name}
+            isEditing={!!editingUser}
+          />
         </form>
       </Modal>
 

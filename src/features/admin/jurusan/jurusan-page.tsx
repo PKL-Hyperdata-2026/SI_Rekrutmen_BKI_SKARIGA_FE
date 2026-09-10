@@ -95,7 +95,7 @@ export function JurusanPage() {
   const handleOpenCreate = () => {
     setEditingMajor(null);
     form.reset({
-      department_id: departmentOptions[0] ? String(departmentOptions[0].id) : "",
+      department_id: "",
       code: "",
       name: "",
       description: "",
@@ -297,7 +297,14 @@ export function JurusanPage() {
         onConfirm={handleSubmitForm}
       >
         <form onSubmit={handleSubmitForm}>
-          <MajorForm form={form} departments={departmentOptions} />
+          <MajorForm
+            form={form}
+            departmentFallbackLabel={
+              editingMajor?.department
+                ? `${editingMajor.department.name} (${editingMajor.department.code})`
+                : undefined
+            }
+          />
         </form>
       </Modal>
 

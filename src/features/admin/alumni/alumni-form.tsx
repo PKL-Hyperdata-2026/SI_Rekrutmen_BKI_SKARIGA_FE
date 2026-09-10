@@ -1,8 +1,11 @@
-import { useId, useMemo } from "react";
+import { useId, useMemo, useRef, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { GraduationCap, UserPlus, X, Send, Loader2, Lock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { SearchableSelect } from "@/components/custom/searchable-select";
+import { AsyncSearchableSelect } from "@/components/custom/async-searchable-select";
+import { selectOptionsApi } from "@/api/select-options";
+import type { AsyncSelectItem, FetchPageOptions, SelectQuery } from "@/api/select-options";
 import {
   Dialog,
   DialogContent,
@@ -10,12 +13,26 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { resolveMajorByClass } from "./alumni.form";
-import type { AlumniFormSchemaType, AlumniOptionsData } from "./alumni.schema";
+import { buildGraduationYears, getClassMajorSelectPage, suggestCompanies } from "./alumni.api";
+import type { AlumniFormSchemaType } from "./alumni.schema";
+
+const fetchEligibleStudents = (query: SelectQuery, opts?: FetchPageOptions) =>
+  selectOptionsApi.getStudents(query, true, opts);
+
+const fetchEmploymentStatuses = (query: SelectQuery, opts?: FetchPageOptions) =>
+  selectOptionsApi.getStandardTypes("employment_status", query, opts);
+
+function extraString(item: AsyncSelectItem, key: string): string {
+  const value = item.extra?.[key];
+  if (typeof value === "string") return value;
+  if (typeof value === "number") return String(value);
+  return "";
+}
 
 export interface AlumniFormProps {
   form: UseFormReturn<AlumniFormSchemaType>;
-  options: AlumniOptionsData;
+  classMajorFallbackLabel?: string;
+  statusFallbackLabel?: string;
   isEditing?: boolean;
   isOpen?: boolean;
   open?: boolean;
@@ -26,7 +43,8 @@ export interface AlumniFormProps {
 
 export function AlumniForm({
   form,
-  options,
+  classMajorFallbackLabel,
+  statusFallbackLabel,
   isEditing = false,
   isOpen,
   open,
@@ -59,82 +77,27 @@ export function AlumniForm({
   const isPending = isSubmitting || formIsSubmitting;
   const isStudentLocked = !isEditing && currentMode === "graduate" && Boolean(currentUserId);
 
-  const eligibleStudents = options.eligible_students || [];
-  const studentOptions = useMemo(() => {
-    return eligibleStudents.map((s) => ({
-      value: String(s.userId),
-      label: `${s.nis} - ${s.fullName}${s.className ? ` (${s.className})` : s.majorName ? ` (${s.majorName})` : ""}`,
-    }));
-  }, [eligibleStudents]);
+  const [pickedLabels, setPickedLabels] = useState<Record<string, string>>({});
+  const [companySuggestions, setCompanySuggestions] = useState<AsyncSelectItem[]>([]);
+  const suggestRequestRef = useRef(0);
+  const suggestTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const classMajorOptions = useMemo(() => {
-    const result: { value: string; label: string }[] = [];
-
-    if (options.classes && options.classes.length > 0) {
-      options.classes.forEach((c) => {
-        const resolvedMajorId = resolveMajorByClass(String(c.id), options.classes, options.majors);
-        const majorName = options.majors?.find((m) => String(m.id) === resolvedMajorId)?.name;
-        result.push({
-          value: `class_${c.id}`,
-          label: majorName ? `${c.name} - ${majorName}` : c.name,
-        });
-      });
-    }
-
-    (options.majors || []).forEach((m) => {
-      result.push({
-        value: `major_${m.id}`,
-        label: `Jurusan: ${m.name}`,
-      });
-    });
-
-    return result;
-  }, [options.classes, options.majors]);
+  const rememberPickedLabel = (key: string, label: string) => {
+    setPickedLabels((prev) => (prev[key] === label ? prev : { ...prev, [key]: label }));
+  };
 
   const currentClassMajorValue = useMemo(() => {
-    if (currentClassId) {
-      const matchedClass = options.classes?.find(
-        (c) => String(c.id) === String(currentClassId) || (c.code && c.code === currentClassId)
-      );
-      if (matchedClass) return `class_${matchedClass.id}`;
-    }
-    if (currentMajorId) {
-      const matchedMajor = options.majors?.find(
-        (m) => String(m.id) === String(currentMajorId) || (m.code && m.code === currentMajorId)
-      );
-      if (matchedMajor) return `major_${matchedMajor.id}`;
-    }
+    if (currentClassId) return `class_${currentClassId}`;
+    if (currentMajorId) return `major_${currentMajorId}`;
     return "";
-  }, [currentClassId, currentMajorId, options.classes, options.majors]);
-
-  const statusOptions = useMemo(() => {
-    if (options.employment_statuses && options.employment_statuses.length > 0) {
-      return options.employment_statuses.map((s) => ({
-        value: String(s.id),
-        label: s.name,
-      }));
-    }
-    return [
-      { value: "belum_bekerja", label: "Belum Bekerja" },
-      { value: "bekerja", label: "Bekerja (Kolektif/Mandiri)" },
-      { value: "wirausaha", label: "Wirausaha" },
-      { value: "melanjutkan_studi", label: "Melanjutkan Studi" },
-    ];
-  }, [options.employment_statuses]);
+  }, [currentClassId, currentMajorId]);
 
   const yearOptions = useMemo(() => {
-    if (options.graduation_years && options.graduation_years.length > 0) {
-      return options.graduation_years.map((yr) => ({
-        value: String(yr),
-        label: `Lulusan ${yr}`,
-      }));
-    }
-    const currentYear = new Date().getFullYear();
-    return Array.from({ length: 6 }, (_, i) => currentYear - i).map((yr) => ({
+    return buildGraduationYears().map((yr) => ({
       value: String(yr),
       label: `Lulusan ${yr}`,
     }));
-  }, [options.graduation_years]);
+  }, []);
 
   const handleTabChange = (newMode: "graduate" | "manual") => {
     setValue("mode", newMode);
@@ -143,21 +106,29 @@ export function AlumniForm({
     }
   };
 
-  const handleStudentSelect = (userIdVal: string) => {
-    const student = (options.eligible_students || []).find(
-      (s) => String(s.userId) === userIdVal
-    );
-    if (!student) return;
+  const handleStudentSelect = (item: AsyncSelectItem) => {
+    const className = extraString(item, "className");
+    const majorName = extraString(item, "majorName");
 
-    setValue("user_id", String(student.userId));
-    setValue("nis", student.nis, { shouldValidate: true });
-    setValue("full_name", student.fullName, { shouldValidate: true });
-    setValue("phone", student.phone || "");
-    if (student.email) {
-      setValue("email", student.email);
+    setValue("user_id", item.value);
+    setValue("nis", extraString(item, "nis"), { shouldValidate: true });
+    setValue("full_name", extraString(item, "fullName"), { shouldValidate: true });
+    setValue("phone", extraString(item, "phone") || "");
+    const email = extraString(item, "email");
+    if (email) {
+      setValue("email", email);
     }
-    setValue("major_id", String(student.majorId), { shouldValidate: true });
-    setValue("class_id", student.classId ? String(student.classId) : "");
+    setValue("major_id", extraString(item, "majorId"), { shouldValidate: true });
+    setValue("class_id", extraString(item, "classId") || "");
+    rememberPickedLabel("student", item.label);
+    rememberPickedLabel(
+      "classMajor",
+      className
+        ? `${className}${majorName ? ` - ${majorName}` : ""}`
+        : majorName
+          ? `Jurusan: ${majorName}`
+          : item.label
+    );
     clearErrors(["nis", "full_name", "major_id"]);
   };
 
@@ -165,12 +136,6 @@ export function AlumniForm({
     if (val.startsWith("class_")) {
       const cId = val.replace("class_", "");
       setValue("class_id", cId);
-      const resolvedMajorId = resolveMajorByClass(cId, options.classes, options.majors);
-      if (resolvedMajorId) {
-        setValue("major_id", resolvedMajorId, { shouldValidate: true });
-      } else if (options.majors && options.majors.length > 0) {
-        setValue("major_id", String(options.majors[0].id), { shouldValidate: true });
-      }
     } else if (val.startsWith("major_")) {
       const mId = val.replace("major_", "");
       setValue("major_id", mId, { shouldValidate: true });
@@ -179,19 +144,44 @@ export function AlumniForm({
     clearErrors("major_id");
   };
 
+  const handleClassMajorOptionSelect = (item: AsyncSelectItem) => {
+    if (item.value.startsWith("class_")) {
+      const resolvedMajorId = extraString(item, "resolvedMajorId");
+      if (resolvedMajorId) {
+        setValue("major_id", resolvedMajorId, { shouldValidate: true });
+      }
+    }
+    rememberPickedLabel("classMajor", item.label);
+  };
+
   const { onChange: onCompanyManualRHFChange, ...companyManualRest } = register("company_name_manual");
 
   const handleCompanyManualChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onCompanyManualRHFChange(e);
     const val = e.target.value;
-    const matched = options.companies?.find(
-      (c) => c.name.toLowerCase() === val.trim().toLowerCase()
-    );
-    if (matched) {
-      setValue("current_company_id", String(matched.id));
-    } else {
-      setValue("current_company_id", "");
+
+    if (suggestTimerRef.current) {
+      clearTimeout(suggestTimerRef.current);
     }
+
+    if (val.trim().length < 2) {
+      setCompanySuggestions([]);
+      setValue("current_company_id", "");
+      return;
+    }
+
+    suggestTimerRef.current = setTimeout(() => {
+      const requestId = suggestRequestRef.current + 1;
+      suggestRequestRef.current = requestId;
+      void suggestCompanies(val).then((items) => {
+        if (suggestRequestRef.current !== requestId) return;
+        setCompanySuggestions(items);
+        const matched = items.find(
+          (c) => c.label.toLowerCase() === val.trim().toLowerCase()
+        );
+        setValue("current_company_id", matched ? matched.value : "");
+      });
+    }, 500);
   };
 
   const formBody = (
@@ -287,14 +277,15 @@ export function AlumniForm({
                 </span>
               )}
             </div>
-            <SearchableSelect
+            <AsyncSearchableSelect
               id="eligible-student-select"
-              searchable={true}
               value={currentUserId ? String(currentUserId) : ""}
-              onValueChange={handleStudentSelect}
+              onValueChange={(val) => setValue("user_id", val)}
+              onOptionSelect={handleStudentSelect}
               placeholder="Pilih nama siswa atau ketik NIS..."
               searchPlaceholder="Cari berdasarkan NIS atau nama siswa..."
-              options={studentOptions}
+              fetchPage={fetchEligibleStudents}
+              fallbackLabel={pickedLabels.student}
               emptyMessage="Tidak ada siswa aktif yang ditemukan"
             />
             <p className="text-[11px] text-purple-700/80">
@@ -360,14 +351,15 @@ export function AlumniForm({
               <label htmlFor={classMajorSelectId} className="text-xs font-bold text-slate-700">
                 Kelas & Jurusan *
               </label>
-              <SearchableSelect
+              <AsyncSearchableSelect
                 id={classMajorSelectId}
-                searchable={true}
                 value={currentClassMajorValue}
                 onValueChange={handleClassMajorChange}
+                onOptionSelect={handleClassMajorOptionSelect}
                 placeholder="Pilih Kelas atau Jurusan"
                 searchPlaceholder="Cari kelas atau jurusan..."
-                options={classMajorOptions}
+                fetchPage={getClassMajorSelectPage}
+                fallbackLabel={pickedLabels.classMajor ?? classMajorFallbackLabel}
                 hasError={Boolean(errors.major_id)}
               />
               {errors.major_id && (
@@ -379,13 +371,15 @@ export function AlumniForm({
               <label htmlFor={statusSelectId} className="text-xs font-bold text-slate-700">
                 Status Keterserapan *
               </label>
-              <SearchableSelect
+              <AsyncSearchableSelect
                 id={statusSelectId}
-                searchable={false}
                 value={currentStatusId}
                 onValueChange={(val) => setValue("employment_status_id", val, { shouldValidate: true })}
+                onOptionSelect={(item) => rememberPickedLabel("status", item.label)}
                 placeholder="Pilih Status Keterserapan"
-                options={statusOptions}
+                searchPlaceholder="Cari status..."
+                fetchPage={fetchEmploymentStatuses}
+                fallbackLabel={pickedLabels.status ?? statusFallbackLabel}
               />
               {errors.employment_status_id && (
                 <p className="text-[11px] text-rose-500 font-medium">{errors.employment_status_id.message}</p>
@@ -464,10 +458,10 @@ export function AlumniForm({
                 className="h-10 rounded-xl"
                 list="alumni-company-suggestions"
               />
-              {options.companies && options.companies.length > 0 && (
+              {companySuggestions.length > 0 && (
                 <datalist id="alumni-company-suggestions">
-                  {options.companies.map((c) => (
-                    <option key={c.id} value={c.name} />
+                  {companySuggestions.map((c) => (
+                    <option key={c.value} value={c.label} />
                   ))}
                 </datalist>
               )}
