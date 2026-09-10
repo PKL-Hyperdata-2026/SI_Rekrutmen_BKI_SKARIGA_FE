@@ -1,4 +1,4 @@
-import { Modal } from "@/components/ui/modal";
+import { Modal } from "@/components/custom/modal";
 import { Form } from "@/components/ui/form";
 import { Field, FieldError } from "@/components/ui/field";
 import { CardContent, CardDescription } from "@/components/ui/card";

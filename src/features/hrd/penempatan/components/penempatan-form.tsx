@@ -1,4 +1,4 @@
-import { Modal } from "@/components/ui/modal";
+import { Modal } from "@/components/custom/modal";
 import { Form } from "@/components/ui/form";
 import { Field, FieldGroup, FieldError } from "@/components/ui/field";
 import { CardContent } from "@/components/ui/card";
@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/custom/date-picker";
-import { SearchableSelect } from "@/components/ui/searchable-select";
+import { SearchableSelect } from "@/components/custom/searchable-select";
 import { Send, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePenempatanForm } from "../hooks/usePenempatanForm";

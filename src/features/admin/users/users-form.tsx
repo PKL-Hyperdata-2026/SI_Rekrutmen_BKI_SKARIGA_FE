@@ -1,7 +1,7 @@
 import { useId } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { SearchableSelect } from "@/components/ui/searchable-select";
+import { SearchableSelect } from "@/components/custom/searchable-select";
 import type {
   UsersFormSchemaType,
   ResetPasswordSchemaType,

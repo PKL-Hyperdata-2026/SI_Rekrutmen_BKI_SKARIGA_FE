@@ -9,7 +9,7 @@ import {
   type PenempatanFormOptionsData,
   type JobPlacement,
 } from "../types/penempatan-schema";
-import { type SearchableSelectOption } from "@/components/ui/searchable-select";
+import { type SearchableSelectOption } from "@/components/custom/searchable-select";
 
 interface ApiErrorResponse {
   response?: {

@@ -2,7 +2,7 @@ import { useId, useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { GraduationCap, UserPlus, X, Send, Loader2, Lock } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { SearchableSelect } from "@/components/ui/searchable-select";
+import { SearchableSelect } from "@/components/custom/searchable-select";
 import {
   Dialog,
   DialogContent,

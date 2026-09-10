@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Modal } from "@/components/ui/modal";
+import { Modal } from "@/components/custom/modal";
 import {
   AlertDialog,
   AlertDialogAction,

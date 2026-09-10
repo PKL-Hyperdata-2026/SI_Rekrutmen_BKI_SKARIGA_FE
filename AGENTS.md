@@ -47,7 +47,7 @@ npm run preview                            # Preview production build locally
 - API response unwrapping: The backend returns `{ success: true, message: "...", data: { ... } }`. Always access payload through `response.data.data` or configure the response interceptor in `src/api/axios.ts`.
 - Feature API modules: Each feature owns a `{feature}.api.ts` that wraps endpoint calls in typed functions and returns the unwrapped payload. Feature pages/components must not call `api.get/post` inline; import the feature's `.api.ts` instead.
 - RHF and Zod form conventions: Never use `.default()` or `z.coerce` in Zod schemas. Form fields must remain strings to reflect HTML input state. Always define explicit non-undefined `defaultValues` in `useForm()`. For optional fields, allow empty string via `.optional().or(z.literal(""))` or `.refine()`, and handle number/boolean conversions only in payload builders (`toXxxPayload`).
-- Select components: Use `SearchableSelect` from `@/components/ui/searchable-select`. The `searchable` prop defaults to `false`. When a search bar is required for long lists, specify `searchable={true}` or `searchable`.
+- Select components: Use `SearchableSelect` from `@/components/custom/searchable-select`. The `searchable` prop defaults to `false`. When a search bar is required for long lists, specify `searchable={true}` or `searchable`.
 - Routing protection: Role-based navigation is managed in `src/route.tsx`. Add new routes under their respective role layout or protected route wrapper.
 
 ## Git Workflow

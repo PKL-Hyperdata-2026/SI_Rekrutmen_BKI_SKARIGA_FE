@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FormProvider } from "react-hook-form";
 import { isAxiosError } from "axios";
 import { MailCheck, Lock } from "lucide-react";
-import { Modal } from "@/components/ui/modal";
+import { Modal } from "@/components/custom/modal";
 import { useForgotPasswordForm } from "./forgot-password.form";
 import { forgotPasswordApi } from "./forgot-password.api";
 import { ForgotPasswordForm } from "./forgot-password-form";

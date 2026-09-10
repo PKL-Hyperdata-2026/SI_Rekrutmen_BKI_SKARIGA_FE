@@ -30,6 +30,7 @@ export interface SearchableSelectProps {
   variant?: SearchableSelectVariant;
   isLoading?: boolean;
   searchable?: boolean;
+  pageSize?: number;
 }
 
 const roleThemeClasses: Record<string, string> = {
@@ -55,10 +56,22 @@ export function SearchableSelect({
   variant = "auto",
   isLoading = false,
   searchable = false,
+  pageSize = 20,
 }: SearchableSelectProps) {
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
+  const [visibleCount, setVisibleCount] = React.useState(pageSize);
+  const [isLoadingMore, setIsLoadingMore] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const { user } = useAppSelector((state) => state.auth);
   const resolvedRole = variant !== "auto" ? variant : user?.role || "admin";
@@ -77,11 +90,45 @@ export function SearchableSelect({
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
+    setVisibleCount(pageSize);
+    setIsLoadingMore(false);
     if (nextOpen && searchable) {
       setSearch("");
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+    setVisibleCount(pageSize);
+    setIsLoadingMore(false);
+  };
+
+  const handleClearSearch = () => {
+    setSearch("");
+    setVisibleCount(pageSize);
+    setIsLoadingMore(false);
+  };
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    if (isLoadingMore || isLoading) return;
+    const target = e.currentTarget;
+    const reachedBottom = target.scrollHeight - target.scrollTop - target.clientHeight <= 30;
+    if (reachedBottom && visibleCount < filteredOptions.length) {
+      setIsLoadingMore(true);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        setVisibleCount((prev) => prev + pageSize);
+        setIsLoadingMore(false);
+      }, 1000);
+    }
+  };
+
+  const visibleOptions = React.useMemo(() => {
+    return filteredOptions.slice(0, visibleCount);
+  }, [filteredOptions, visibleCount]);
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
@@ -135,14 +182,14 @@ export function SearchableSelect({
                 ref={inputRef}
                 type="text"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={handleSearchChange}
                 placeholder={searchPlaceholder}
                 className="w-full bg-transparent text-xs text-slate-800 placeholder:text-slate-400 outline-none"
               />
               {search && (
                 <button
                   type="button"
-                  onClick={() => setSearch("")}
+                  onClick={handleClearSearch}
                   className="text-slate-400 hover:text-slate-600 cursor-pointer"
                 >
                   <X className="size-3" />
@@ -154,6 +201,7 @@ export function SearchableSelect({
         <div
           className="max-h-60 overflow-y-auto overscroll-contain p-1 custom-scrollbar pr-1.5"
           onWheel={(e) => e.stopPropagation()}
+          onScroll={handleScroll}
         >
           {isLoading ? (
             <div className="flex items-center justify-center py-6 gap-2 text-xs text-slate-500">
@@ -165,27 +213,35 @@ export function SearchableSelect({
               {emptyMessage}
             </div>
           ) : (
-            filteredOptions.map((opt) => {
-              const isSelected = opt.value === value;
-              return (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => {
-                    onValueChange?.(opt.value);
-                    setOpen(false);
-                  }}
-                  className={cn(
-                    "relative flex w-full cursor-pointer items-center justify-between rounded-md px-2.5 py-2 text-xs text-slate-700 transition-colors outline-hidden select-none text-left",
-                    "hover:bg-accent hover:text-accent-foreground",
-                    isSelected && "bg-accent text-accent-foreground font-normal"
-                  )}
-                >
-                  <span className="truncate pr-2">{opt.label}</span>
-                  {isSelected && <Check className="size-3.5 shrink-0 ml-2" />}
-                </button>
-              );
-            })
+            <>
+              {visibleOptions.map((opt) => {
+                const isSelected = opt.value === value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => {
+                      onValueChange?.(opt.value);
+                      setOpen(false);
+                    }}
+                    className={cn(
+                      "relative flex w-full cursor-pointer items-center justify-between rounded-md px-2.5 py-2 text-xs text-slate-700 transition-colors outline-hidden select-none text-left",
+                      "hover:bg-accent hover:text-accent-foreground",
+                      isSelected && "bg-accent text-accent-foreground font-normal"
+                    )}
+                  >
+                    <span className="truncate pr-2">{opt.label}</span>
+                    {isSelected && <Check className="size-3.5 shrink-0 ml-2" />}
+                  </button>
+                );
+              })}
+              {isLoadingMore && (
+                <div className="flex items-center justify-center py-2.5 gap-2 text-xs text-slate-500">
+                  <Loader2 className="size-3.5 animate-spin text-primary shrink-0" />
+                  <span>Memuat data..</span>
+                </div>
+              )}
+            </>
           )}
         </div>
       </PopoverContent>

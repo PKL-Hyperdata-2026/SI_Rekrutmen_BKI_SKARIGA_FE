@@ -134,7 +134,7 @@ Routing stays at role level: `src/features/{role}/route.tsx` imports each `*-pag
 ## 7. Reusable Component Conventions
 
 - **Page Header (`src/components/custom/page-header.tsx`):** Universal top banner with role theming (`admin`, `student`, `alumni`, `hrd`, `auto`).
-- **Modal Boilerplate (`src/components/ui/modal.tsx`):** Dual-mode dialog wrapper over Radix UI primitives (`src/components/ui/dialog.tsx`).
+- **Modal Boilerplate (`src/components/custom/modal.tsx`):** Dual-mode dialog wrapper over Radix UI primitives (`src/components/ui/dialog.tsx`).
 - **DataTable (`src/components/custom/data-table.tsx`):** Generic table with loading skeleton, empty state, pagination, and typed columns.
 - **GenericDummyPage (`src/components/custom/generic-dummy-page.tsx`):** Placeholder page with `variant: "student" | "admin"` for scaffolds.
-- **SearchableSelect (`src/components/ui/searchable-select.tsx`):** Accessible popover combobox with instant real-time search filter (`searchable?: boolean` default false) and full-width trigger.
+- **SearchableSelect (`src/components/custom/searchable-select.tsx`):** Accessible popover combobox with instant real-time search filter (`searchable?: boolean` default false) and full-width trigger.
