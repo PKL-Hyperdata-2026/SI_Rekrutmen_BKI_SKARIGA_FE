@@ -77,7 +77,7 @@ frontend/src/
 │   │   ├── seleksi/                   # seleksi-page.tsx
 │   │   ├── validasi-absensi/          # validasi-absensi-page.tsx
 │   │   ├── penempatan/                # penempatan-page.tsx
-│   │   ├── tracer-study/              # tracer-page.tsx
+│   │   ├── tracer-study/              # tracer-page.tsx, tracer-stats-cards.tsx, tracer-detail-modal.tsx, tracer-form-modal.tsx, tracer-table.tsx, tracer.api.ts, tracer.schema.ts
 │   │   └── laporan/                   # laporan-page.tsx
 │   └── hrd/                           # [Planned] Corporate HRD portal module
 ├── hooks/                             # Global reusable React hooks
