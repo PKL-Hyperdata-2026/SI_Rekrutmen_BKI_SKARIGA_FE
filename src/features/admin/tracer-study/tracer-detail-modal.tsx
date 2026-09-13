@@ -58,7 +58,7 @@ export function TracerDetailModal({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="p-0 max-w-md sm:max-w-lg border-0 rounded-3xl overflow-hidden shadow-2xl bg-white focus:outline-hidden">
         {/* Header Gradien Ungu Sesuai Mockup */}
-        <div className="relative bg-gradient-to-r from-[#241B75] via-[#332596] to-[#4F46E5] p-5 sm:p-6 text-white">
+        <div className="relative bg-gradient-to-r from-indigo-950 via-indigo-800 to-indigo-600 p-5 sm:p-6 text-white">
           <button
             type="button"
             onClick={onClose}
@@ -79,12 +79,12 @@ export function TracerDetailModal({
         </div>
 
         {/* Body Modal Berisi 2 Card Sesuai Mockup */}
-        <div className="p-5 sm:p-6 space-y-4 bg-[#F8FAFC]">
+        <div className="p-5 sm:p-6 space-y-4 bg-slate-50">
           {/* Card 1: Profil Alumni */}
           <div className="rounded-2xl border border-slate-200/90 bg-white p-4.5 shadow-2xs space-y-3">
             <div className="flex items-center justify-between text-xs sm:text-sm">
               <span className="text-slate-500 font-medium">Nama</span>
-              <span className="font-bold text-[#1E1B4B] text-right">
+              <span className="font-bold text-indigo-950 text-right">
                 {fullName}
               </span>
             </div>
@@ -114,7 +114,7 @@ export function TracerDetailModal({
                   <span className="text-slate-500 font-medium">
                     Perusahaan / Kampus
                   </span>
-                  <span className="font-bold text-[#1E1B4B] text-right">
+                  <span className="font-bold text-indigo-950 text-right">
                     {item.companyName || "-"}
                   </span>
                 </div>
@@ -148,7 +148,7 @@ export function TracerDetailModal({
 
                 <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-slate-500 font-medium">Gaji Awal</span>
-                  <span className="font-bold text-[#3B82F6] text-right">
+                  <span className="font-bold text-blue-500 text-right">
                     {formatCurrency(item.minimumSalary || item.maximumSalary)}
                   </span>
                 </div>
@@ -161,7 +161,7 @@ export function TracerDetailModal({
                   <span className="text-slate-500 font-medium">
                     Perusahaan / Kampus
                   </span>
-                  <span className="font-bold text-[#1E1B4B] text-right">
+                  <span className="font-bold text-indigo-950 text-right">
                     {item.universityName || "-"}
                   </span>
                 </div>
@@ -206,7 +206,7 @@ export function TracerDetailModal({
               <>
                 <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-slate-500 font-medium">Nama Usaha</span>
-                  <span className="font-bold text-[#1E1B4B] text-right">
+                  <span className="font-bold text-indigo-950 text-right">
                     {item.businessName || "-"}
                   </span>
                 </div>

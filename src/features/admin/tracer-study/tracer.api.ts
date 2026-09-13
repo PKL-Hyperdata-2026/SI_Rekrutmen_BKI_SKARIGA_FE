@@ -3,12 +3,14 @@ import type {
   AdminTracerItem,
   TracerMetrics,
   TracerFilterOptions,
+  TracerListResponse,
   SubmitAdminTracerPayload,
 } from "./tracer.schema";
 
 export const adminTracerApi = {
-  getTracerStudies: (params?: Record<string, unknown>) => {
-    return api.get("/admin/tracer-studies", { params });
+  getTracerStudies: async (params?: Record<string, unknown>): Promise<TracerListResponse> => {
+    const res = await api.get("/admin/tracer-studies", { params });
+    return res.data?.data || res.data;
   },
 
   getTracerMetrics: async (): Promise<TracerMetrics> => {
@@ -26,20 +28,23 @@ export const adminTracerApi = {
     return res.data?.data || res.data;
   },
 
-  createTracerStudy: (payload: SubmitAdminTracerPayload) => {
-    return api.post("/admin/tracer-studies", payload);
+  createTracerStudy: async (payload: SubmitAdminTracerPayload) => {
+    const res = await api.post("/admin/tracer-studies", payload);
+    return res.data?.data || res.data;
   },
 
-  updateTracerStudy: (id: string | number, payload: SubmitAdminTracerPayload) => {
-    return api.put(`/admin/tracer-studies/${id}`, payload);
+  updateTracerStudy: async (id: string | number, payload: SubmitAdminTracerPayload) => {
+    const res = await api.put(`/admin/tracer-studies/${id}`, payload);
+    return res.data?.data || res.data;
   },
 
-  deleteTracerStudy: (id: string | number) => {
-    return api.delete(`/admin/tracer-studies/${id}`);
+  deleteTracerStudy: async (id: string | number) => {
+    const res = await api.delete(`/admin/tracer-studies/${id}`);
+    return res.data?.data || res.data;
   },
 
   syncTracerStudies: async () => {
     const res = await api.post("/admin/tracer-studies/sync");
-    return res.data;
+    return res.data?.data || res.data;
   },
 };

@@ -91,6 +91,15 @@ export interface TracerPaginationMeta {
   total: number;
 }
 
+export interface TracerListResponse {
+  data: AdminTracerItem[];
+  meta?: TracerPaginationMeta;
+  current_page?: number;
+  last_page?: number;
+  per_page?: number;
+  total?: number;
+}
+
 export interface AdminTracerFormData {
   student_alumni_id: string;
   career_status: CareerStatus;

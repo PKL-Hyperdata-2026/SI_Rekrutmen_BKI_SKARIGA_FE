@@ -22,8 +22,8 @@ export function TracerStatsCards({
       iconColor: "text-purple-600",
       subLabelColor: "text-purple-600",
       valueColor: "text-purple-700",
-      activeBg: "bg-[#F3EFFF] border-purple-300 ring-2 ring-purple-400/30",
-      defaultBg: "bg-[#F3EFFF] border-purple-200/80 hover:border-purple-300",
+      activeBg: "bg-purple-50 border-purple-300 ring-2 ring-purple-400/30",
+      defaultBg: "bg-purple-50 border-purple-200/80 hover:border-purple-300",
     },
     {
       id: "bekerja",

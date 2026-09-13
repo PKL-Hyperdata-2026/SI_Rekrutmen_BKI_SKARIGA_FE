@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Loader2, User, Building2, GraduationCap, Store } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { DatePicker } from "@/components/custom";
+import { DatePicker, SearchableSelect } from "@/components/custom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -85,49 +85,52 @@ export function TracerFormModal({
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (editingItem) {
-      setStudentAlumniId(editingItem.studentAlumniId || "");
-      setCareerStatus(editingItem.careerStatus || "bekerja");
-      setCompanyName(editingItem.companyName || "");
-      setCompanySector(editingItem.companySector || "");
-      setJobTitle(editingItem.jobTitle || "");
-      setJobLocation(editingItem.jobLocation || "");
-      setMinimumSalary(formatCurrencyString(editingItem.minimumSalary));
-      setMaximumSalary(formatCurrencyString(editingItem.maximumSalary));
-      setWaitingPeriod(editingItem.waitingPeriod || "");
-      setAcceptedDate(editingItem.acceptedDate || "");
-      setStartDate(editingItem.startDate || "");
-      setBusinessName(editingItem.businessName || "");
-      setBusinessAddress(editingItem.businessAddress || "");
-      setInstagramHandle(editingItem.instagramAccount || "");
-      setAverageIncome(editingItem.averageRevenue || "");
-      setBusinessField(editingItem.businessField || "");
-      setBusinessStartDate(editingItem.businessStartDate || "");
-      setUniversityName(editingItem.universityName || "");
-      setStudyProgram(editingItem.studyProgram || "");
-      setErrors({});
-    } else {
-      setStudentAlumniId("");
-      setCareerStatus("bekerja");
-      setCompanyName("");
-      setCompanySector("");
-      setJobTitle("");
-      setJobLocation("");
-      setMinimumSalary("");
-      setMaximumSalary("");
-      setWaitingPeriod("1 Bulan");
-      setAcceptedDate("");
-      setStartDate("");
-      setBusinessName("");
-      setBusinessAddress("");
-      setInstagramHandle("");
-      setAverageIncome("");
-      setBusinessField("Kuliner");
-      setBusinessStartDate("");
-      setUniversityName("");
-      setStudyProgram("");
-      setErrors({});
-    }
+    const timer = setTimeout(() => {
+      if (editingItem) {
+        setStudentAlumniId(editingItem.studentAlumniId || "");
+        setCareerStatus(editingItem.careerStatus || "bekerja");
+        setCompanyName(editingItem.companyName || "");
+        setCompanySector(editingItem.companySector || "");
+        setJobTitle(editingItem.jobTitle || "");
+        setJobLocation(editingItem.jobLocation || "");
+        setMinimumSalary(formatCurrencyString(editingItem.minimumSalary));
+        setMaximumSalary(formatCurrencyString(editingItem.maximumSalary));
+        setWaitingPeriod(editingItem.waitingPeriod || "");
+        setAcceptedDate(editingItem.acceptedDate || "");
+        setStartDate(editingItem.startDate || "");
+        setBusinessName(editingItem.businessName || "");
+        setBusinessAddress(editingItem.businessAddress || "");
+        setInstagramHandle(editingItem.instagramAccount || "");
+        setAverageIncome(editingItem.averageRevenue || "");
+        setBusinessField(editingItem.businessField || "");
+        setBusinessStartDate(editingItem.businessStartDate || "");
+        setUniversityName(editingItem.universityName || "");
+        setStudyProgram(editingItem.studyProgram || "");
+        setErrors({});
+      } else {
+        setStudentAlumniId("");
+        setCareerStatus("bekerja");
+        setCompanyName("");
+        setCompanySector("");
+        setJobTitle("");
+        setJobLocation("");
+        setMinimumSalary("");
+        setMaximumSalary("");
+        setWaitingPeriod("1 Bulan");
+        setAcceptedDate("");
+        setStartDate("");
+        setBusinessName("");
+        setBusinessAddress("");
+        setInstagramHandle("");
+        setAverageIncome("");
+        setBusinessField("Kuliner");
+        setBusinessStartDate("");
+        setUniversityName("");
+        setStudyProgram("");
+        setErrors({});
+      }
+    }, 0);
+    return () => clearTimeout(timer);
   }, [editingItem, isOpen]);
 
   const validate = (): boolean => {
@@ -240,24 +243,16 @@ export function TracerFormModal({
               </div>
             ) : (
               <div className="space-y-1">
-                <Select value={studentAlumniId} onValueChange={setStudentAlumniId}>
-                  <SelectTrigger className="w-full h-11 rounded-xl bg-white border-slate-200 text-xs sm:text-sm font-medium">
-                    <SelectValue placeholder="-- Pilih Alumni dari database --" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-60 rounded-xl border-slate-200">
-                    {availableAlumni.length === 0 ? (
-                      <div className="p-3 text-center text-xs text-slate-500">
-                        Tidak ada alumni baru yang belum mengisi tracer study.
-                      </div>
-                    ) : (
-                      availableAlumni.map((al) => (
-                        <SelectItem key={al.id} value={al.id} className="text-xs sm:text-sm">
-                          {al.label}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
+                <SearchableSelect
+                  value={studentAlumniId}
+                  onValueChange={setStudentAlumniId}
+                  options={availableAlumni.map((al) => ({ value: al.id, label: al.label }))}
+                  placeholder="Pilih alumni"
+                  searchPlaceholder="Cari nama / NIS alumni..."
+                  emptyMessage="Tidak ada alumni baru yang belum mengisi tracer study."
+                  searchable
+                  hasError={Boolean(errors.student_alumni_id)}
+                />
                 {errors.student_alumni_id && (
                   <p className="text-xs text-rose-500 font-medium">{errors.student_alumni_id}</p>
                 )}

@@ -106,7 +106,27 @@ export function TracerPage() {
   }, []);
 
   useEffect(() => {
-    fetchMetricsAndOptions();
+    let isSubscribed = true;
+
+    const load = async () => {
+      try {
+        const [metricsData, optionsData] = await Promise.all([
+          adminTracerApi.getTracerMetrics(),
+          adminTracerApi.getTracerOptions(),
+        ]);
+        if (!isSubscribed) return;
+        setMetrics(metricsData);
+        setOptions(optionsData);
+      } catch {
+        // Ignored if error occurs in background
+      }
+    };
+
+    void load();
+
+    return () => {
+      isSubscribed = false;
+    };
   }, [fetchMetricsAndOptions]);
 
   // Load tracer study list
@@ -125,14 +145,18 @@ export function TracerPage() {
       if (majorFilter !== "all") params.major_id = majorFilter;
       if (yearFilter !== "all") params.graduation_year = yearFilter;
 
-      const res = await adminTracerApi.getTracerStudies(params);
-      const resData = res.data?.data;
+      const resData = await adminTracerApi.getTracerStudies(params);
 
       if (resData) {
         setTracerList(resData.data || []);
         if (resData.meta) {
           setMeta(resData.meta);
-        } else if (resData.current_page) {
+        } else if (
+          resData.current_page !== undefined &&
+          resData.last_page !== undefined &&
+          resData.per_page !== undefined &&
+          resData.total !== undefined
+        ) {
           setMeta({
             current_page: resData.current_page,
             last_page: resData.last_page,
@@ -149,15 +173,68 @@ export function TracerPage() {
   }, [currentPage, perPage, debouncedSearch, statusFilter, majorFilter, yearFilter, sortBy, sortDir]);
 
   useEffect(() => {
-    fetchTracerStudies();
-  }, [fetchTracerStudies]);
+    let isSubscribed = true;
+
+    const load = async () => {
+      setLoading(true);
+      try {
+        const params: Record<string, unknown> = {
+          page: currentPage,
+          per_page: perPage,
+          sort_by: sortBy,
+          sort_dir: sortDir,
+        };
+
+        if (debouncedSearch.trim()) params.search = debouncedSearch.trim();
+        if (statusFilter !== "all") params.career_status = statusFilter;
+        if (majorFilter !== "all") params.major_id = majorFilter;
+        if (yearFilter !== "all") params.graduation_year = yearFilter;
+
+        const resData = await adminTracerApi.getTracerStudies(params);
+        if (!isSubscribed) return;
+
+        if (resData) {
+          setTracerList(resData.data || []);
+          if (resData.meta) {
+            setMeta(resData.meta);
+          } else if (
+            resData.current_page !== undefined &&
+            resData.last_page !== undefined &&
+            resData.per_page !== undefined &&
+            resData.total !== undefined
+          ) {
+            setMeta({
+              current_page: resData.current_page,
+              last_page: resData.last_page,
+              per_page: resData.per_page,
+              total: resData.total,
+            });
+          }
+        }
+      } catch {
+        if (isSubscribed) {
+          toast.error("Gagal memuat data tracer study.");
+        }
+      } finally {
+        if (isSubscribed) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void load();
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [currentPage, perPage, debouncedSearch, statusFilter, majorFilter, yearFilter, sortBy, sortDir]);
 
   // Handler: Sync Profil & Penempatan
   const handleSync = async () => {
     setIsSyncing(true);
     try {
       const res = await adminTracerApi.syncTracerStudies();
-      const count = res?.data?.synced_count ?? 0;
+      const count = res?.synced_count ?? 0;
       toast.success(
         count > 0
           ? `Berhasil menyinkronkan ${count} data penempatan & profil alumni ke Tracer Study.`
