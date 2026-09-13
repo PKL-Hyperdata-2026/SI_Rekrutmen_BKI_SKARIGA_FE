@@ -135,7 +135,7 @@ export function PageHeaderStatCard({
     <div
       className={cn(
         glassSurface,
-        "rounded-xl px-5 py-3.5 flex items-center gap-5 divide-x divide-white/20",
+        "rounded-xl py-2.5 px-1 sm:px-2 flex items-center justify-center divide-x divide-white/20 text-center",
         className
       )}
       {...props}
@@ -143,14 +143,14 @@ export function PageHeaderStatCard({
       {items.map((item, index) => (
         <div
           key={index}
-          className={cn("flex flex-col items-center", index > 0 && "pl-5")}
+          className="flex flex-col items-center justify-center text-center px-3 sm:px-4 min-w-[72px] sm:min-w-[84px]"
         >
           <span className="text-xs font-medium text-white/80">
             {item.label}
           </span>
           <span
             className={cn(
-              "text-lg sm:text-xl font-bold leading-tight mt-0.5",
+              "text-lg sm:text-xl font-bold leading-tight mt-0.5 text-center",
               item.valueColor || "text-white"
             )}
           >
