@@ -7,9 +7,9 @@ React 19, TypeScript 6, Vite 8, Tailwind CSS v4, Redux Toolkit, React Router v7,
 
 ## Documentation Map
 
-- `CODEBASE.md` — deep technical reference: architecture, feature modules, state, styling, routes, API clients. **Read at session start.**
-- `../AGENTS.md` — root orchestrator & shared API contract.
-- `src/route.tsx` — routing tree and role-based route protection.
+- `CODEBASE.md`, deep technical reference: architecture, feature modules, state, styling, routes, API clients. Read at session start.
+- `../AGENTS.md`, root orchestrator & shared API contract.
+- `src/route.tsx`, routing tree and role-based route protection.
 
 ## Commands Cheatsheet
 
@@ -24,7 +24,7 @@ npm run preview                            # Preview production build locally
 ## Critical Rules (READ FIRST)
 
 1. NEVER use `any` in TypeScript. Define explicit `interface` or `type` definitions for all component props, API payloads, and state objects.
-2. ALWAYS organize feature code under `src/features/{role}/{feature}/` — one kebab-case folder per business capability (e.g. `src/features/student/e-portfolio/`, `src/features/admin/users/`, `src/features/admin/dudi/`). Role-level `route.tsx` aggregates feature pages. Cross-cutting route guards live at the auth role root (`src/features/auth/protected-route.tsx`, `dashboard-redirector.tsx`).
+2. ALWAYS organize feature code under `src/features/{role}/{feature}/`, one kebab-case folder per business capability (e.g. `src/features/student/e-portfolio/`, `src/features/admin/users/`, `src/features/admin/dudi/`, `src/features/hrd/penempatan/`). Role-level `route.tsx` aggregates feature pages. Cross-cutting route guards live at the auth role root (`src/features/auth/protected-route.tsx`, `dashboard-redirector.tsx`).
 3. File naming conventions (kebab-case, matching the feature folder):
    - Page containers: `{feature}-page.tsx` exporting a PascalCase component (`users-page.tsx` -> `UsersManagementPage`).
    - Form components: `{feature}-form.tsx`.
@@ -48,7 +48,7 @@ npm run preview                            # Preview production build locally
 - Feature API modules: Each feature owns a `{feature}.api.ts` that wraps endpoint calls in typed functions and returns the unwrapped payload. Feature pages/components must not call `api.get/post` inline; import the feature's `.api.ts` instead.
 - RHF and Zod form conventions: Never use `.default()` or `z.coerce` in Zod schemas. Form fields must remain strings to reflect HTML input state. Always define explicit non-undefined `defaultValues` in `useForm()`. For optional fields, allow empty string via `.optional().or(z.literal(""))` or `.refine()`, and handle number/boolean conversions only in payload builders (`toXxxPayload`).
 - Select components: Use `SearchableSelect` from `@/components/custom/searchable-select`. The `searchable` prop defaults to `false`. When a search bar is required for long lists, specify `searchable={true}` or `searchable`.
-- Routing protection: Role-based navigation is managed in `src/route.tsx`. Add new routes under their respective role layout or protected route wrapper.
+- Routing protection: Role-based navigation is managed in `src/route.tsx`. Roles `admin` and `superadmin` access the `/admin` portal routes. Add new routes under their respective role layout or protected route wrapper.
 
 ## Git Workflow
 
