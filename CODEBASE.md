@@ -53,6 +53,42 @@ frontend/src/
 │   └── menus.ts                         # Sidebar menus per role (STUDENT_MENUS, ADMIN_MENUS, HRD_MENUS)
 ├── features/                            # Role-based feature modules (kebab-case per feature domain)
 │   ├── auth/
+│   │   ├── protected-route.tsx        # Role-aware route guard
+│   │   ├── dashboard-redirector.tsx   # Redirects "/" to role dashboard
+│   │   ├── route.tsx                  # Auth sub-routes
+│   │   ├── login/                     # login-page.tsx, login-form.tsx, login.schema.ts, login.form.ts, login.api.ts
+│   │   ├── forgot-password/           # forgot-password-modal.tsx, forgot-password-form.tsx, forgot-password.schema.ts, forgot-password.form.ts, forgot-password.api.ts
+│   │   └── reset-password/            # reset-password-page.tsx, reset-password-form.tsx, reset-password.schema.ts, reset-password.form.ts, reset-password.api.ts
+│   ├── student/                       # Student portal feature module
+│   │   ├── route.tsx                  # Student sub-routes
+│   │   ├── dashboard/                 # dashboard-page.tsx
+│   │   ├── lowongan-kerja/            # lowongan-kerja-page.tsx
+│   │   ├── lamaran/                   # lamaran-page.tsx
+│   │   ├── absensi/                   # absensi-page.tsx
+│   │   ├── e-portfolio/               # portofolio-page.tsx, personal-academic-form.tsx, portfolio.api.ts, portfolio.schema.ts, portfolio.form.ts, modals
+│   │   └── tracer-study/              # tracer-page.tsx
+│   ├── admin/                         # Administrator portal module
+│   │   ├── route.tsx                  # Admin sub-routes
+│   │   ├── dashboard/                 # dashboard-page.tsx
+│   │   ├── users/                     # users-page.tsx, users-form.tsx, users-table.tsx, users.api.ts, users.schema.ts, users.form.ts
+│   │   ├── dudi/                      # dudi-page.tsx, dudi-form.tsx, dudi-table.tsx, dudi.api.ts, dudi.schema.ts, dudi.form.ts
+│   │   ├── siswa/                     # siswa-page.tsx, siswa-form.tsx, siswa-table.tsx, siswa.api.ts, siswa.schema.ts, siswa.form.ts
+│   │   ├── alumni/                    # alumni-page.tsx, alumni-form.tsx, alumni-detail-modal.tsx, alumni-table.tsx, alumni.api.ts, alumni.schema.ts, alumni.form.ts
+│   │   ├── lowongan-kerja/            # lowongan-kerja-page.tsx and lowongan-kerja subcomponents
+│   │   ├── seleksi/                   # seleksi-page.tsx
+│   │   ├── validasi-absensi/          # validasi-absensi-page.tsx
+│   │   ├── penempatan/                # penempatan-page.tsx
+│   │   ├── tracer-study/              # tracer-page.tsx, tracer-stats-cards.tsx, tracer-detail-modal.tsx, tracer-form-modal.tsx, tracer-table.tsx, tracer.api.ts, tracer.schema.ts
+│   │   └── laporan/                   # laporan-page.tsx
+│   └── hrd/                           # [Planned] Corporate HRD portal module
+├── hooks/                             # Global reusable React hooks
+├── layouts/                           # Master layout wrappers (auth.layout.tsx, main.layout.tsx)
+├── lib/                               # Utility functions (cn) & Echo
+├── slices/                            # Redux authSlice
+├── store/                             # Redux store index
+├── main.tsx                           # React entry point
+├── route.tsx                          # Top-level routing configuration
+└── index.css                          # Global styles, Tailwind v4 imports, CSS variables
 │   │   ├── protected-route.tsx          # Role-aware route guard (siswa, alumni, admin, superadmin, hrd)
 │   │   ├── dashboard-redirector.tsx     # Redirects "/" to respective role dashboard
 │   │   ├── route.tsx                    # Auth sub-routes
