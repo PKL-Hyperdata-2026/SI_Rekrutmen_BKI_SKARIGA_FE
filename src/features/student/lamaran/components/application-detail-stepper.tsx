@@ -70,16 +70,16 @@ export const ApplicationDetailStepper: React.FC<ApplicationDetailStepperProps> =
             }
           } else if (currentStageOrder >= 4) {
             if (status === "completed") {
-              circleBg = "bg-[#0284C7] text-white shadow-xs";
-              textColor = "text-[#0284C7] font-semibold";
+              circleBg = "bg-sky-600 text-white shadow-xs";
+              textColor = "text-sky-600 font-semibold";
             } else if (status === "active") {
-              circleBg = "bg-[#0284C7] text-white shadow-xs font-bold ring-3 ring-sky-100";
-              textColor = "text-[#0284C7] font-bold";
+              circleBg = "bg-sky-600 text-white shadow-xs font-bold ring-3 ring-sky-100";
+              textColor = "text-sky-600 font-bold";
             }
           } else {
             if (status === "completed") {
-              circleBg = "bg-[#4F46E5] text-white shadow-xs";
-              textColor = "text-[#4F46E5] font-semibold";
+              circleBg = "bg-indigo-600 text-white shadow-xs";
+              textColor = "text-indigo-600 font-semibold";
             } else if (status === "active") {
               circleBg = "bg-amber-500 text-white shadow-xs font-bold ring-3 ring-amber-100";
               textColor = "text-amber-600 font-bold";
@@ -125,8 +125,8 @@ export const ApplicationDetailStepper: React.FC<ApplicationDetailStepperProps> =
                         ? isRejected
                           ? "bg-emerald-500"
                           : currentStageOrder >= 4
-                          ? "bg-[#0284C7]"
-                          : "bg-[#4F46E5]"
+                          ? "bg-sky-600"
+                          : "bg-indigo-600"
                         : "bg-transparent"
                     )}
                   />

@@ -46,8 +46,33 @@ export function useLamaranPage() {
   }, []);
 
   useEffect(() => {
-    fetchApplications();
-  }, [fetchApplications]);
+    let isSubscribed = true;
+
+    getStudentJobApplications()
+      .then((res) => {
+        if (!isSubscribed) return;
+        const rawData = res?.data;
+        const apiData = Array.isArray(rawData)
+          ? rawData
+          : Array.isArray(rawData?.data)
+          ? rawData.data
+          : [];
+        setApplications(apiData);
+      })
+      .catch(() => {
+        if (!isSubscribed) return;
+        setApplications([]);
+      })
+      .finally(() => {
+        if (isSubscribed) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, []);
 
   const handleOpenInstruction = useCallback((app: StudentJobApplication) => {
     setSelectedApplicationForInstruction(app);
@@ -80,8 +105,8 @@ export function useLamaranPage() {
       if (dateRange?.from) {
         const dateStr = app.appliedAt || app.createdAt;
         if (dateStr) {
-          try {
-            const appDate = parseISO(dateStr);
+          const appDate = parseISO(dateStr);
+          if (!Number.isNaN(appDate.getTime())) {
             const fromDate = startOfDay(dateRange.from);
             const toDate = dateRange.to
               ? endOfDay(dateRange.to)
@@ -89,7 +114,6 @@ export function useLamaranPage() {
             if (!isWithinInterval(appDate, { start: fromDate, end: toDate })) {
               return false;
             }
-          } catch {
           }
         }
       }

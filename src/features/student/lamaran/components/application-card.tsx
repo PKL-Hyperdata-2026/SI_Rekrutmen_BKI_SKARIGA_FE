@@ -81,7 +81,7 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
               />
             </div>
           ) : (
-            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-[#0284C7] shrink-0 shadow-xs">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shrink-0 shadow-xs">
               <Building2 className="h-5 w-5 sm:h-6 sm:w-6" />
             </div>
           )}
@@ -93,24 +93,24 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
               </h3>
 
               {isAccepted ? (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#0284C7] text-white shadow-xs">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-600 text-white shadow-xs">
                   Diterima Kerja
                 </span>
               ) : isRejected ? (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#E11D48] text-white shadow-xs">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-600 text-white shadow-xs">
                   Tidak Lolos
                 </span>
               ) : (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold border border-purple-600 text-purple-600 bg-transparent">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border border-purple-600 text-purple-600 bg-transparent">
                   Dalam Proses
                 </span>
               )}
 
               <span
                 className={cn(
-                  "inline-flex items-center text-[10px] font-semibold px-2.5 py-0.5 rounded-full border",
+                  "inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full border",
                   isAccepted
-                    ? "bg-sky-50 text-[#0284C7] border-sky-200"
+                    ? "bg-sky-50 text-sky-600 border-sky-200"
                     : isRejected
                     ? "bg-rose-50 text-rose-700 border-rose-200"
                     : "bg-amber-50 text-amber-700 border-amber-200"
@@ -134,12 +134,12 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
           <button
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-[#0284C7] cursor-pointer select-none transition-colors group"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-sky-600 cursor-pointer select-none transition-colors group"
           >
             <span className="font-bold">{isExpanded ? "Tutup Detail" : "Lihat Detail"}</span>
             <ChevronDown
               className={cn(
-                "h-4 w-4 text-slate-500 group-hover:text-[#0284C7] transition-transform duration-300 ease-in-out",
+                "h-4 w-4 text-slate-500 group-hover:text-sky-600 transition-transform duration-300 ease-in-out",
                 isExpanded && "rotate-180"
               )}
             />
@@ -198,11 +198,11 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
                 };
 
                 return (
-                  <div className="rounded-2xl border border-[#0284C7] bg-sky-50/10 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="rounded-2xl border border-sky-600 bg-sky-50/10 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-start gap-2.5 min-w-0">
-                      <PartyPopper className="h-4.5 w-4.5 text-[#0284C7] shrink-0 mt-0.5" />
+                      <PartyPopper className="h-4.5 w-4.5 text-sky-600 shrink-0 mt-0.5" />
                       <div className="space-y-0.5 min-w-0">
-                        <h4 className="text-xs sm:text-sm font-bold text-[#0284C7] leading-tight">
+                        <h4 className="text-xs sm:text-sm font-bold text-sky-600 leading-tight">
                           Selamat! Kamu Resmi Diterima Bekerja
                         </h4>
                         <p className="text-[11px] text-slate-600">
@@ -213,7 +213,7 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 
                     <button
                       type="button"
-                      className="bg-[#0284C7] hover:bg-[#0369A1] text-white font-medium text-[11px] sm:text-xs px-3.5 py-1.5 rounded-full shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shrink-0 self-end sm:self-center"
+                      className="bg-sky-600 hover:bg-sky-700 text-white font-medium text-xs px-3.5 py-1.5 rounded-full shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shrink-0 self-end sm:self-center"
                       onClick={() => downloadPlacementLetter(application)}
                     >
                       <Download className="h-3.5 w-3.5" />
@@ -223,11 +223,11 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
                 );
               })()
             ) : (
-              <div className="rounded-2xl border border-[#0284C7]/80 bg-sky-50/15 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="rounded-2xl border border-sky-600/80 bg-sky-50/15 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-start gap-2.5 min-w-0">
-                  <PartyPopper className="h-4.5 w-4.5 text-[#0284C7] shrink-0 mt-0.5" />
+                  <PartyPopper className="h-4.5 w-4.5 text-sky-600 shrink-0 mt-0.5" />
                   <div className="space-y-0.5 min-w-0">
-                    <h4 className="text-xs sm:text-sm font-bold text-[#0284C7] leading-tight">
+                    <h4 className="text-xs sm:text-sm font-bold text-sky-600 leading-tight">
                       Tahap 4 : Diterima (Lolos Seleksi Penerimaan)
                     </h4>
                     <p className="text-[11px] text-slate-600">
@@ -236,17 +236,17 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
                   </div>
                 </div>
 
-                <span className="px-3 py-1.5 bg-sky-100 text-[#0284C7] font-semibold text-[11px] rounded-full shrink-0 self-end sm:self-center select-none">
+                <span className="px-3 py-1.5 bg-sky-100 text-sky-600 font-semibold text-xs rounded-full shrink-0 self-end sm:self-center select-none">
                   Menunggu Surat Penempatan
                 </span>
               </div>
             )
           ) : isRejected ? (
-            <div className="rounded-2xl border border-[#E11D48]/70 bg-rose-50/15 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="rounded-2xl border border-rose-600/70 bg-rose-50/15 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-start gap-2.5 min-w-0">
-                <AlertCircle className="h-4.5 w-4.5 text-[#E11D48] shrink-0 mt-0.5" />
+                <AlertCircle className="h-4.5 w-4.5 text-rose-600 shrink-0 mt-0.5" />
                 <div className="space-y-0.5 min-w-0">
-                  <h4 className="text-xs sm:text-sm font-bold text-[#E11D48] leading-tight">
+                  <h4 className="text-xs sm:text-sm font-bold text-rose-600 leading-tight">
                     Mohon Maaf, Kamu Belum Lolos Seleksi
                   </h4>
                   <p className="text-[11px] text-slate-600">
@@ -257,7 +257,7 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
 
               <Link
                 to="/student/lowongan"
-                className="bg-[#E11D48] hover:bg-[#BE123C] text-white font-medium text-[11px] sm:text-xs px-3.5 py-1.5 rounded-full shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shrink-0 self-end sm:self-center"
+                className="bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs px-3.5 py-1.5 rounded-full shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shrink-0 self-end sm:self-center"
               >
                 <Search className="h-3.5 w-3.5" />
                 <span>Cari Lowongan Lain</span>
@@ -284,11 +284,11 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
               }
 
               return (
-                <div className="rounded-2xl border border-[#4F46E5]/70 bg-indigo-50/15 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="rounded-2xl border border-indigo-600/70 bg-indigo-50/15 p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-start gap-2.5 min-w-0">
-                    <Info className="h-4.5 w-4.5 text-[#4F46E5] shrink-0 mt-0.5" />
+                    <Info className="h-4.5 w-4.5 text-indigo-600 shrink-0 mt-0.5" />
                     <div className="space-y-0.5 min-w-0">
-                      <h4 className="text-xs sm:text-sm font-bold text-[#4F46E5] leading-tight">
+                      <h4 className="text-xs sm:text-sm font-bold text-indigo-600 leading-tight">
                         {stageHeaderTitle}
                       </h4>
                       <p className="text-[11px] text-slate-600">
@@ -319,7 +319,7 @@ export const ApplicationCard: React.FC<ApplicationCardProps> = ({
                   {onOpenInstruction && hasTestSchedule && (
                     <button
                       type="button"
-                      className="bg-[#4F46E5] hover:bg-[#4338CA] text-white font-medium text-[11px] sm:text-xs px-3.5 py-1.5 rounded-full shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shrink-0 self-end sm:self-center"
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs px-3.5 py-1.5 rounded-full shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 transition-all shrink-0 self-end sm:self-center"
                       onClick={() => onOpenInstruction(application)}
                     >
                       <CalendarClock className="h-3.5 w-3.5" />

@@ -97,8 +97,8 @@ export const LamaranSaya = () => {
                     className={cn(
                       "text-xs font-bold rounded-xl cursor-pointer [&>span:first-child]:hidden !pr-3 !pl-3 !py-1.5 transition-all justify-start whitespace-nowrap",
                       statusFilter === "all"
-                        ? "!bg-[#0284C7] !text-white shadow-xs focus:!bg-[#0284C7] focus:!text-white"
-                        : "!text-[#0284C7] hover:!bg-sky-500/15 focus:!bg-sky-500/15 focus:!text-[#0284C7]"
+                        ? "!bg-sky-600 !text-white shadow-xs focus:!bg-sky-600 focus:!text-white"
+                        : "!text-sky-600 hover:!bg-sky-500/15 focus:!bg-sky-500/15 focus:!text-sky-600"
                     )}
                   >
                     Status Seleksi
@@ -108,8 +108,8 @@ export const LamaranSaya = () => {
                     className={cn(
                       "text-xs font-bold rounded-xl cursor-pointer [&>span:first-child]:hidden !pr-3 !pl-3 !py-1.5 transition-all justify-start whitespace-nowrap",
                       statusFilter === "accepted"
-                        ? "!bg-[#0284C7] !text-white shadow-xs focus:!bg-[#0284C7] focus:!text-white"
-                        : "!text-[#0284C7] hover:!bg-sky-500/15 focus:!bg-sky-500/15 focus:!text-[#0284C7]"
+                        ? "!bg-sky-600 !text-white shadow-xs focus:!bg-sky-600 focus:!text-white"
+                        : "!text-sky-600 hover:!bg-sky-500/15 focus:!bg-sky-500/15 focus:!text-sky-600"
                     )}
                   >
                     Diterima / Lolos
@@ -119,8 +119,8 @@ export const LamaranSaya = () => {
                     className={cn(
                       "text-xs font-bold rounded-xl cursor-pointer [&>span:first-child]:hidden !pr-3 !pl-3 !py-1.5 transition-all justify-start whitespace-nowrap",
                       statusFilter === "in_progress"
-                        ? "!bg-[#0284C7] !text-white shadow-xs focus:!bg-[#0284C7] focus:!text-white"
-                        : "!text-[#0284C7] hover:!bg-sky-500/15 focus:!bg-sky-500/15 focus:!text-[#0284C7]"
+                        ? "!bg-sky-600 !text-white shadow-xs focus:!bg-sky-600 focus:!text-white"
+                        : "!text-sky-600 hover:!bg-sky-500/15 focus:!bg-sky-500/15 focus:!text-sky-600"
                     )}
                   >
                     Sedang Diproses
@@ -130,8 +130,8 @@ export const LamaranSaya = () => {
                     className={cn(
                       "text-xs font-bold rounded-xl cursor-pointer [&>span:first-child]:hidden !pr-3 !pl-3 !py-1.5 transition-all justify-start whitespace-nowrap",
                       statusFilter === "rejected"
-                        ? "!bg-[#0284C7] !text-white shadow-xs focus:!bg-[#0284C7] focus:!text-white"
-                        : "!text-[#0284C7] hover:!bg-sky-500/15 focus:!bg-sky-500/15 focus:!text-[#0284C7]"
+                        ? "!bg-sky-600 !text-white shadow-xs focus:!bg-sky-600 focus:!text-white"
+                        : "!text-sky-600 hover:!bg-sky-500/15 focus:!bg-sky-500/15 focus:!text-sky-600"
                     )}
                   >
                     Tidak Lolos
@@ -168,7 +168,7 @@ export const LamaranSaya = () => {
         ) : filteredApplications.length === 0 ? (
           applications.length === 0 ? (
             <div className="p-10 text-center bg-white rounded-2xl border border-slate-200 shadow-xs space-y-3">
-              <div className="w-12 h-12 bg-sky-50 text-[#0284C7] rounded-full flex items-center justify-center mx-auto">
+              <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-full flex items-center justify-center mx-auto">
                 <Briefcase className="h-6 w-6" />
               </div>
               <h3 className="text-sm sm:text-base font-bold text-slate-800">
@@ -180,7 +180,7 @@ export const LamaranSaya = () => {
               <div className="pt-1">
                 <Link
                   to="/student/lowongan"
-                  className="inline-flex items-center justify-center px-4 py-2 rounded-full text-xs font-semibold text-white bg-[#0284C7] hover:bg-[#0369A1] transition-all shadow-xs active:scale-95 cursor-pointer"
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-full text-xs font-semibold text-white bg-sky-600 hover:bg-sky-700 transition-all shadow-xs active:scale-95 cursor-pointer"
                 >
                   Jelajahi Lowongan Kerja
                 </Link>
