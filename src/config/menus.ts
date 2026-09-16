@@ -45,7 +45,7 @@ export const ADMIN_MENUS: MenuItem[] = [
   { name: "Perusahaan DUDI", link: "/admin/dudi", icon: Building2 },
   { name: "Lowongan Kerja", link: "/admin/lowongan", icon: Briefcase },
   { name: "Seleksi Rekrutmen", link: "/admin/seleksi", icon: CheckSquare },
-  { name: "Validasi Absensi", link: "/admin/validasi-absensi", icon: CalendarCheck },
+  { name: "Validasi Presensi", link: "/admin/validasi-presensi", icon: CalendarCheck },
   { name: "Tracer Study", link: "/admin/tracer", icon: LineChart },
   { name: "Laporan & Cetak", link: "/admin/laporan", icon: Printer },
 ];

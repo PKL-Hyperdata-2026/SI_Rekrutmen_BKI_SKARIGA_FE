@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Checkbox as CheckboxPrimitive } from "radix-ui";
-import { Check } from "lucide-react";
+import { Check, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function Checkbox({
@@ -26,7 +26,11 @@ function Checkbox({
         data-slot="checkbox-indicator"
         className="flex items-center justify-center text-white pointer-events-none"
       >
-        <Check className="h-3.5 w-3.5 stroke-3 text-white" />
+        {checked === "indeterminate" ? (
+          <Minus className="h-3.5 w-3.5 stroke-3 text-white" />
+        ) : (
+          <Check className="h-3.5 w-3.5 stroke-3 text-white" />
+        )}
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   );

@@ -7,7 +7,7 @@ import { AlumniPage } from "./alumni/alumni-page";
 import { DudiPage } from "./dudi/dudi-page";
 import { LowonganKerjaPage } from "./lowongan-kerja/lowongan-kerja-page";
 import { SeleksiPage } from "./seleksi/seleksi-page";
-import { ValidasiAbsensiPage } from "./validasi-absensi/validasi-absensi-page";
+import { ValidasiPresensiPage } from "./validasi-presensi/pages/validasi-presensi-page";
 import { TracerPage } from "./tracer-study/tracer-study-page";
 import { LaporanPage } from "./laporan/laporan-page";
 
@@ -49,8 +49,8 @@ export const adminRoute = [
     element: <SeleksiPage />,
   },
   {
-    path: "validasi-absensi",
-    element: <ValidasiAbsensiPage />,
+    path: "validasi-presensi",
+    element: <ValidasiPresensiPage />,
   },
   {
     path: "tracer",

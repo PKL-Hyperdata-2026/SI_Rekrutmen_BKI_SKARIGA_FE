@@ -75,7 +75,7 @@ frontend/src/
 │   │   ├── alumni/                    # alumni-page.tsx, alumni-form.tsx, alumni-detail-modal.tsx, alumni-table.tsx, alumni.api.ts, alumni.schema.ts, alumni.form.ts
 │   │   ├── lowongan-kerja/            # lowongan-kerja-page.tsx and lowongan-kerja subcomponents
 │   │   ├── seleksi/                   # seleksi-page.tsx
-│   │   ├── validasi-absensi/          # validasi-absensi-page.tsx
+│   │   ├── validasi-presensi/         # pages/validasi-presensi-page.tsx, components, hooks, types
 │   │   ├── penempatan/                # penempatan-page.tsx
 │   │   ├── tracer-study/              # tracer-page.tsx, tracer-stats-cards.tsx, tracer-detail-modal.tsx, tracer-form-modal.tsx, tracer-table.tsx, tracer.api.ts, tracer.schema.ts
 │   │   └── laporan/                   # laporan-page.tsx
@@ -112,7 +112,7 @@ frontend/src/
 │   │   ├── alumni/                      # alumni-page.tsx, alumni-form.tsx, alumni-detail-modal.tsx, alumni-table.tsx, alumni.api.ts, alumni.schema.ts, alumni.form.ts
 │   │   ├── lowongan-kerja/              # lowongan-kerja-page.tsx and lowongan-kerja subcomponents
 │   │   ├── seleksi/                     # seleksi-page.tsx
-│   │   ├── validasi-absensi/            # validasi-absensi-page.tsx
+│   │   ├── validasi-presensi/           # pages/validasi-presensi-page.tsx, components, hooks, types
 │   │   ├── tracer-study/                # tracer-page.tsx
 │   │   └── laporan/                     # laporan-page.tsx
 │   └── hrd/                             # Corporate HRD portal module

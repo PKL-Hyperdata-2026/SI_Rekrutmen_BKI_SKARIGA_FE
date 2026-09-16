@@ -43,14 +43,14 @@ export function PageHeader({
   return (
     <div
       className={cn(
-        "relative overflow-hidden text-white rounded-3xl p-6 sm:p-7 shadow-md",
+        "relative overflow-hidden text-white rounded-xl sm:rounded-2xl lg:rounded-3xl p-4 sm:p-6 lg:p-7 shadow-md w-full max-w-full min-w-0",
         "bg-gradient-to-r from-sidebar-gradient-to via-sidebar-strip to-sidebar-gradient-from",
         roleThemeClasses[variant],
         className
       )}
       {...props}
     >
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between relative z-10 gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between relative z-10 gap-4 sm:gap-6 w-full max-w-full min-w-0">
         <div className="flex-1 min-w-0">
           {badge && (
             <div
@@ -63,18 +63,18 @@ export function PageHeader({
               <span>{badge}</span>
             </div>
           )}
-          <HeadingTag className="font-bold tracking-tight text-white text-lg sm:text-xl leading-snug">
+          <HeadingTag className="font-bold tracking-tight text-white text-lg sm:text-xl leading-snug break-words">
             {title}
           </HeadingTag>
           {description && (
-            <p className="text-xs sm:text-sm text-white/85 max-w-2xl mt-1.5 leading-relaxed">
+            <p className="text-xs sm:text-sm text-white/85 max-w-2xl mt-1.5 leading-relaxed break-words">
               {description}
             </p>
           )}
         </div>
 
         {children && (
-          <div className="shrink-0 flex items-center gap-3 flex-wrap">
+          <div className="w-full lg:w-auto min-w-0 lg:shrink-0 flex items-center gap-3 flex-wrap">
             {children}
           </div>
         )}
@@ -201,7 +201,6 @@ export function PageHeaderNotificationCard({
   );
 }
 
-// Sub-component exports
 PageHeader.Button = PageHeaderButton;
 PageHeader.StatCard = PageHeaderStatCard;
 PageHeader.NotificationCard = PageHeaderNotificationCard;
