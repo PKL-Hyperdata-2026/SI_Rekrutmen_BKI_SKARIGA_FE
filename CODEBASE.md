@@ -117,7 +117,7 @@ frontend/src/
 │   │   └── laporan/                     # laporan-page.tsx
 │   └── hrd/                             # Corporate HRD portal module
 │       ├── route.tsx                    # HRD sub-routes
-│       ├── lowongan/                    # pages/lowongan-page.tsx, components, hooks, api
+│       ├── lowongan/                    # lowongan-page.tsx, lowongan-form.tsx, lowongan-list.tsx, use-lowongan-page.ts, use-lowongan-list.ts, lowongan.schema.ts, lowongan.form.ts, lowongan.api.ts
 │       ├── review/                      # pages/review-page.tsx, components, hooks, api
 │       ├── jadwal/                      # pages/jadwal-page.tsx, components, hooks, api
 │       ├── hasil/                       # pages/hasil-page.tsx, components, hooks, api

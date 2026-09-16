@@ -11,8 +11,6 @@ declare module "lucide-react" {
     Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
   >;
 
-  const _icons: Record<string, LucideIcon>;
-
   export const AlertCircle: LucideIcon;
   export const AlertTriangle: LucideIcon;
   export const ArrowUpDown: LucideIcon;
@@ -67,6 +65,7 @@ declare module "lucide-react" {
   export const MailCheck: LucideIcon;
   export const MapPin: LucideIcon;
   export const Medal: LucideIcon;
+  export const Minus: LucideIcon;
   export const MoreHorizontalIcon: LucideIcon;
   export const Network: LucideIcon;
   export const PanelLeft: LucideIcon;
