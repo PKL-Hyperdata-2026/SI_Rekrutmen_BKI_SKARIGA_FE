@@ -23,6 +23,11 @@ export function LoginPage() {
     try {
       const response = await loginApi(data);
       const { user, access_token } = response;
+      if (data.remember) {
+        localStorage.setItem("remembered_email", data.email);
+      } else {
+        localStorage.removeItem("remembered_email");
+      }
       localStorage.setItem("access_token", access_token);
       dispatch(setCredentials(user));
       navigate("/");

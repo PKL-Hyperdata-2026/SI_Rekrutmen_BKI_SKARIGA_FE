@@ -4,6 +4,8 @@ export interface SiswaOptionItem {
   id: number | string;
   code?: string;
   name: string;
+  departmentId?: number | string;
+  department_id?: number | string;
 }
 
 export interface SiswaPortfolio {
@@ -60,6 +62,7 @@ export interface SiswaItem {
 }
 
 export interface SiswaOptionsData {
+  departments?: SiswaOptionItem[];
   majors: SiswaOptionItem[];
   classes: SiswaOptionItem[];
   employment_statuses?: SiswaOptionItem[];
@@ -70,6 +73,7 @@ export interface SiswaOptionsData {
 
 export interface SiswaFilterParams {
   search?: string;
+  department_id?: string;
   major_id?: string;
   class_id?: string;
   employment_status_id?: string;

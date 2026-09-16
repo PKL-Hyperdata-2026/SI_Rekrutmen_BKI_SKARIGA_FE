@@ -73,6 +73,14 @@ export function PersonalAcademicForm({
     [profileData?.graduationYear]
   );
 
+  const departmentDisplay = useMemo(
+    () =>
+      profileData?.department?.name ||
+      (profileData?.major as { department?: { name?: string } } | null)?.department?.name ||
+      "-",
+    [profileData?.department, profileData?.major]
+  );
+
   return (
     <SectionCard
       className="rounded-xl p-4 sm:p-5 shadow-xs border border-slate-100/90 flex-1 flex flex-col"
@@ -144,6 +152,32 @@ export function PersonalAcademicForm({
 
               <div>
                 <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1.5">
+                  Tahun Lulus
+                </Label>
+                <Input
+                  type="text"
+                  readOnly
+                  value={graduationYearDisplay}
+                  className="h-9 text-xs bg-slate-100/70 text-slate-700 font-medium focus-visible:ring-0 focus-visible:border-input select-text"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4.5">
+              <div>
+                <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1.5">
+                  Departemen
+                </Label>
+                <Input
+                  type="text"
+                  readOnly
+                  value={departmentDisplay}
+                  className="h-9 text-xs bg-slate-100/70 text-slate-700 font-medium focus-visible:ring-0 focus-visible:border-input select-text"
+                />
+              </div>
+
+              <div>
+                <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1.5">
                   Jurusan
                 </Label>
                 <Input
@@ -153,9 +187,7 @@ export function PersonalAcademicForm({
                   className="h-9 text-xs bg-slate-100/70 text-slate-700 font-medium focus-visible:ring-0 focus-visible:border-input select-text"
                 />
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4.5">
               <div>
                 <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1.5">
                   Kelas
@@ -164,18 +196,6 @@ export function PersonalAcademicForm({
                   type="text"
                   readOnly
                   value={classDisplay}
-                  className="h-9 text-xs bg-slate-100/70 text-slate-700 font-medium focus-visible:ring-0 focus-visible:border-input select-text"
-                />
-              </div>
-
-              <div>
-                <Label className="block text-xs font-bold text-slate-500 tracking-wider mb-1.5">
-                  Tahun Lulus
-                </Label>
-                <Input
-                  type="text"
-                  readOnly
-                  value={graduationYearDisplay}
                   className="h-9 text-xs bg-slate-100/70 text-slate-700 font-medium focus-visible:ring-0 focus-visible:border-input select-text"
                 />
               </div>

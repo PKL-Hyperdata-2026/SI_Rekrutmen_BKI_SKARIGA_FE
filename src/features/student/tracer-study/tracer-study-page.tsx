@@ -5,7 +5,6 @@ import { toast } from "@/components/custom/sonner";
 import { tracerApi } from "./tracer-study.api";
 import { type TracerStudyData, type SubmitTracerPayload } from "./tracer-study.schema";
 import { TracerStudyForm } from "./tracer-study-form";
-import { TracerStatsSidebar } from "./tracer-stats-sidebar";
 
 export function TracerStudy() {
   const [tracerData, setTracerData] = useState<TracerStudyData | null>(null);
@@ -85,19 +84,13 @@ export function TracerStudy() {
         variant="student"
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 items-start">
-        <div className="lg:col-span-2">
-          <TracerStudyForm
-            initialData={tracerData}
-            isLoading={isLoading}
-            isSaving={isSaving}
-            onSubmit={handleSubmitTracer}
-          />
-        </div>
-
-        <div className="lg:col-span-1">
-          <TracerStatsSidebar />
-        </div>
+      <div className="w-full">
+        <TracerStudyForm
+          initialData={tracerData}
+          isLoading={isLoading}
+          isSaving={isSaving}
+          onSubmit={handleSubmitTracer}
+        />
       </div>
     </div>
   );

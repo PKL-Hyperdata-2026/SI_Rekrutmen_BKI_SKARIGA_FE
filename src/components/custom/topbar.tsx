@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import {
   Search,
   Mail,
@@ -11,7 +11,9 @@ import {
   Sparkles,
   RotateCw,
   AlertCircle,
+  X,
 } from "lucide-react";
+import { getRoleMenus } from "@/config/menus";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
@@ -72,6 +74,29 @@ export function Topbar() {
   const navigate = useNavigate();
   const { toggleSidebar } = useSidebar();
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isMenuSearchOpen, setIsMenuSearchOpen] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
+  const availableMenus = useMemo(() => getRoleMenus(user?.role), [user?.role]);
+  const filteredMenus = useMemo(() => {
+    if (!searchQuery.trim()) return availableMenus;
+    const q = searchQuery.toLowerCase();
+    return availableMenus.filter((m) => m.name.toLowerCase().includes(q));
+  }, [availableMenus, searchQuery]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchContainerRef.current &&
+        !searchContainerRef.current.contains(event.target as Node)
+      ) {
+        setIsMenuSearchOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const {
     notifications,
@@ -111,13 +136,71 @@ export function Topbar() {
           >
             <PanelLeft className="h-4 w-4" strokeWidth={2} />
           </button>
-          <div className="relative w-full max-w-lg hidden md:block">
+          <div ref={searchContainerRef} className="relative w-full max-w-lg hidden md:block">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
             <Input
-              type="search"
-              placeholder="Cari posisi pekerjaan, nama perusahaan, atau kata kunci..."
-              className="w-full bg-slate-50/60 hover:bg-slate-50 focus-visible:bg-white pl-9 pr-3.5 border-slate-200 focus-visible:ring-1 focus-visible:ring-primary/40 focus-visible:border-primary rounded-lg h-8.5 text-xs placeholder:text-slate-400 shadow-none transition-all"
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setIsMenuSearchOpen(true);
+              }}
+              onFocus={() => setIsMenuSearchOpen(true)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  setIsMenuSearchOpen(false);
+                } else if (e.key === "Enter" && filteredMenus.length > 0) {
+                  e.preventDefault();
+                  navigate(filteredMenus[0].link);
+                  setSearchQuery("");
+                  setIsMenuSearchOpen(false);
+                }
+              }}
+              placeholder="Cari menu..."
+              className="w-full bg-slate-50/60 hover:bg-slate-50 focus-visible:bg-white pl-9 pr-8 border-slate-200 focus-visible:ring-1 focus-visible:ring-primary/40 focus-visible:border-primary rounded-lg h-8.5 text-xs placeholder:text-slate-400 shadow-none transition-all"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery("");
+                  setIsMenuSearchOpen(false);
+                }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded-full text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            )}
+
+            {isMenuSearchOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1.5 max-h-64 overflow-y-auto rounded-xl bg-white border border-slate-200/90 shadow-xl p-1.5 z-50">
+                {filteredMenus.length === 0 ? (
+                  <div className="py-3 px-3 text-center text-xs text-slate-400">
+                    Menu tidak ditemukan
+                  </div>
+                ) : (
+                  filteredMenus.map((m) => {
+                    const Icon = m.icon;
+                    return (
+                      <button
+                        key={m.link}
+                        type="button"
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          navigate(m.link);
+                          setSearchQuery("");
+                          setIsMenuSearchOpen(false);
+                        }}
+                        className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 hover:text-primary hover:bg-slate-50 rounded-lg transition-colors text-left cursor-pointer"
+                      >
+                        {Icon && <Icon className="h-4 w-4 text-slate-400 shrink-0" />}
+                        <span>{m.name}</span>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            )}
           </div>
         </div>
 

@@ -229,7 +229,7 @@ export const MONOCHROME_PLATFORMS: PlatformConfig[] = [
     id: "twitter",
     name: "X (Twitter)",
     baseUrl: "https://x.com/",
-    placeholder: "x.com/username",
+    placeholder: "username",
     exampleUrl: "x.com/username",
     domain: "x.com",
     icon: (
@@ -243,6 +243,27 @@ export const MONOCHROME_PLATFORMS: PlatformConfig[] = [
       >
         <path d="M4 4l11.733 16h4.267l-11.733 -16z" />
         <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />
+      </svg>
+    ),
+  },
+  {
+    id: "threads",
+    name: "Threads",
+    baseUrl: "https://threads.com/@",
+    placeholder: "username",
+    exampleUrl: "threads.com/@username",
+    domain: "threads.com",
+    icon: (
+      <svg
+        className="h-5 w-5 text-slate-900 stroke-current"
+        viewBox="0 0 24 24"
+        fill="none"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M19 12a7 7 0 1 0-7 7c2.5 0 4.5-1 5.5-2.5" />
+        <circle cx="12" cy="12" r="3" />
       </svg>
     ),
   },
@@ -264,6 +285,7 @@ const KNOWN_DOMAINS: Record<string, string> = {
   "fb.com": "Facebook",
   "medium.com": "Medium",
   "gitlab.com": "GitLab",
+  "threads.com": "Threads",
   "threads.net": "Threads",
   "pinterest.com": "Pinterest",
 };
@@ -316,6 +338,35 @@ export function validateAndParseSocialUrl(
     };
   }
 
+  const isUrlFormat =
+    /^https?:\/\//i.test(trimmed) ||
+    trimmed.includes(".com") ||
+    trimmed.includes(".net") ||
+    trimmed.includes(".in/") ||
+    trimmed.includes("youtu.be");
+
+  if (!isUrlFormat) {
+    const username = trimmed.replace(/^@+/, "").replace(/\/+$/, "").trim();
+    if (!username) {
+      return {
+        isValid: false,
+        error: `Harap masukkan username ${platformName} Anda.`,
+      };
+    }
+    if (/\s/.test(username)) {
+      return {
+        isValid: false,
+        error: "Username tidak boleh mengandung spasi.",
+      };
+    }
+
+    return {
+      isValid: true,
+      username,
+      normalizedUrl: `${platform?.baseUrl || ""}${username}`,
+    };
+  }
+
   let urlString = trimmed;
   if (!/^https?:\/\//i.test(urlString)) {
     urlString = `https://${urlString}`;
@@ -327,7 +378,7 @@ export function validateAndParseSocialUrl(
   } catch {
     return {
       isValid: false,
-      error: `Format tautan tidak valid. Harap masukkan tautan URL lengkap profil ${platformName} Anda (contoh: ${platform?.exampleUrl}).`,
+      error: `Format tautan tidak valid. Harap masukkan username atau URL lengkap ${platformName} Anda.`,
     };
   }
 
@@ -338,6 +389,8 @@ export function validateAndParseSocialUrl(
     isDomainMatched = host.includes("x.com") || host.includes("twitter.com");
   } else if (platformId === "youtube") {
     isDomainMatched = host.includes("youtube.com") || host.includes("youtu.be");
+  } else if (platformId === "threads") {
+    isDomainMatched = host.includes("threads.com") || host.includes("threads.net");
   } else if (platform?.domain) {
     isDomainMatched = host.includes(platform.domain);
   }
@@ -374,12 +427,10 @@ export function validateAndParseSocialUrl(
     platformId === "behance" ||
     platformId === "dribbble" ||
     platformId === "artstation" ||
-    platformId === "twitter"
+    platformId === "twitter" ||
+    platformId === "threads" ||
+    platformId === "tiktok"
   ) {
-    if (segments.length >= 1) {
-      username = segments[0].replace(/^@/, "");
-    }
-  } else if (platformId === "tiktok") {
     if (segments.length >= 1) {
       username = segments[0].replace(/^@/, "");
     }
@@ -395,7 +446,7 @@ export function validateAndParseSocialUrl(
   if (!username) {
     return {
       isValid: false,
-      error: `Tautan tidak lengkap. Harap masukkan tautan profil ${platformName} Anda (contoh: ${platform?.exampleUrl}).`,
+      error: `Tautan tidak lengkap. Harap masukkan username profil ${platformName} Anda (contoh: ${platform?.exampleUrl}).`,
     };
   }
 
@@ -438,6 +489,7 @@ export function cleanSocialMediaUsername(platform: string, input: string): strin
   cleaned = cleaned.replace(/^https?:\/\/(www\.)?artstation\.com\//i, "");
   cleaned = cleaned.replace(/^https?:\/\/(www\.)?youtube\.com\/(@|c\/|user\/)?/i, "");
   cleaned = cleaned.replace(/^https?:\/\/(www\.)?(x|twitter)\.com\//i, "");
+  cleaned = cleaned.replace(/^https?:\/\/(www\.)?threads\.(com|net)\/@?/i, "");
   cleaned = cleaned.replace(/^https?:\/\/[^/]+\//i, "");
 
   cleaned = cleaned.replace(/^@+/, "");
@@ -484,14 +536,11 @@ export function AddSocialMediaModal({
     const existing = socialMediaList.find(
       (i) => i.platform.toLowerCase() === platformId.toLowerCase()
     );
-    const platform = MONOCHROME_PLATFORMS.find((p) => p.id === platformId);
 
     setSelectedPlatformId(platformId);
     setInputValue(
       existing
-        ? platformId === "portfolio"
-          ? existing.username || existing.url || ""
-          : existing.url || `${platform?.baseUrl || ""}${existing.username}`
+        ? existing.username || (platformId === "portfolio" ? existing.url || "" : cleanSocialMediaUsername(platformId, existing.url || ""))
         : ""
     );
     setSubmitError("");
@@ -647,13 +696,17 @@ export function AddSocialMediaModal({
                 {selectedPlatform.name}
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">
-                Masukkan tautan URL profil resmi akun Anda.
+                {selectedPlatformId === "portfolio"
+                  ? "Masukkan tautan URL web atau CV resmi Anda."
+                  : `Cukup masukkan username ${selectedPlatform.name} Anda.`}
               </p>
             </div>
 
             <div>
               <Label className="block text-xs font-bold text-slate-700 mb-1">
-                Tautan Profil
+                {selectedPlatformId === "portfolio"
+                  ? "Tautan Portofolio / CV"
+                  : "Username Akun"}
               </Label>
               <div className="relative">
                 <Input
@@ -663,7 +716,11 @@ export function AddSocialMediaModal({
                     setInputValue(e.target.value);
                     if (submitError) setSubmitError("");
                   }}
-                  placeholder={selectedPlatform.placeholder}
+                  placeholder={
+                    selectedPlatformId === "portfolio"
+                      ? "johndoe.com"
+                      : "username akun (tanpa URL)"
+                  }
                   autoFocus
                   className={`h-9.5 pl-9 pr-3 bg-slate-50 focus-visible:bg-white text-xs rounded-xl font-medium ${
                     inputValue && !validation.isValid
@@ -685,7 +742,9 @@ export function AddSocialMediaModal({
                 <p className="text-xs text-slate-400 mt-1 truncate">
                   Contoh:{" "}
                   <code className="text-slate-600 bg-slate-100 px-1 py-0.5 rounded">
-                    {selectedPlatform.exampleUrl}
+                    {selectedPlatformId === "portfolio"
+                      ? selectedPlatform.exampleUrl
+                      : `@${selectedPlatform.placeholder} atau ${selectedPlatform.placeholder}`}
                   </code>
                 </p>
               )}
@@ -698,7 +757,7 @@ export function AddSocialMediaModal({
                     Link Terverifikasi
                   </div>
                   <div className="font-bold text-slate-900 truncate text-xs">
-                    {validation.username}
+                    {validation.normalizedUrl}
                   </div>
                 </div>
                 <span className="shrink-0 text-xs font-bold text-emerald-700 bg-white border border-emerald-300 px-2 py-0.5 rounded-full flex items-center gap-1 shadow-2xs">

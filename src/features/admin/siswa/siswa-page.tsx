@@ -7,6 +7,7 @@ import {
   Pencil,
   Search,
   Briefcase,
+  Building2,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -55,9 +56,18 @@ export function SiswaPage() {
   });
 
   const [search, setSearch] = useState<string>("");
+  const [deptFilter, setDeptFilter] = useState<string>("all");
   const [majorFilter, setMajorFilter] = useState<string>("all");
   const [classFilter, setClassFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  const filteredMajors = useMemo(() => {
+    if (deptFilter === "all") return options.majors;
+    return options.majors.filter((m) => {
+      const deptId = m.departmentId || m.department_id;
+      return deptId ? String(deptId) === String(deptFilter) : true;
+    });
+  }, [options.majors, deptFilter]);
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<number>(15);
@@ -93,6 +103,7 @@ export function SiswaPage() {
       };
 
       if (search.trim()) params.search = search.trim();
+      if (deptFilter !== "all") params.department_id = deptFilter;
       if (majorFilter !== "all") params.major_id = majorFilter;
       if (classFilter !== "all") params.class_id = classFilter;
       if (statusFilter !== "all") params.employment_status_id = statusFilter;
@@ -151,7 +162,7 @@ export function SiswaPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, perPage, search, majorFilter, classFilter, statusFilter]);
+  }, [currentPage, perPage, search, deptFilter, majorFilter, classFilter, statusFilter]);
 
   useEffect(() => {
     let ignore = false;
@@ -358,6 +369,32 @@ export function SiswaPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+          {options.departments && options.departments.length > 0 && (
+            <Select
+              value={deptFilter}
+              onValueChange={(val) => {
+                setDeptFilter(val);
+                setMajorFilter("all");
+                setCurrentPage(1);
+              }}
+            >
+              <SelectTrigger className="w-[160px] sm:w-[185px] h-10 rounded-xl bg-white border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50/80 transition-colors shadow-2xs cursor-pointer">
+                <div className="flex items-center gap-2 truncate">
+                  <Building2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <SelectValue placeholder="Semua Departemen" />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-slate-200 shadow-md">
+                <SelectItem value="all" className="text-xs font-medium">Semua Departemen</SelectItem>
+                {options.departments.map((d) => (
+                  <SelectItem key={d.id} value={String(d.id)} className="text-xs font-medium">
+                    {d.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+
           {/* Filter 1: Semua Jurusan */}
           <Select
             value={majorFilter}
@@ -374,7 +411,7 @@ export function SiswaPage() {
             </SelectTrigger>
             <SelectContent className="rounded-xl border-slate-200 shadow-md">
               <SelectItem value="all" className="text-xs font-medium">Semua Jurusan</SelectItem>
-              {options.majors.map((m) => (
+              {filteredMajors.map((m) => (
                 <SelectItem key={m.id} value={String(m.id)} className="text-xs font-medium">
                   {m.name}
                 </SelectItem>

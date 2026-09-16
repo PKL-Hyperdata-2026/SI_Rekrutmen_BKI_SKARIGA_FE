@@ -6,13 +6,21 @@ import type { LoginSchemaType } from "./login.schema";
 import { ForgotPasswordModal } from "../forgot-password/forgot-password-modal";
 
 function RememberCheckbox() {
-  const [checked, setChecked] = useState(false);
+  const { watch, setValue } = useFormContext<LoginSchemaType>();
+  const checked = watch("remember") || false;
 
   return (
     <label
+      htmlFor="remember-checkbox"
       className="flex items-center gap-2 text-[13px] text-foreground font-semibold cursor-pointer select-none"
-      onClick={() => setChecked(!checked)}
     >
+      <input
+        id="remember-checkbox"
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => setValue("remember", e.target.checked)}
+        className="sr-only"
+      />
       <div
         className={cn(
           "w-4 h-4 rounded-[3px] border-[1.5px] flex items-center justify-center transition-all",

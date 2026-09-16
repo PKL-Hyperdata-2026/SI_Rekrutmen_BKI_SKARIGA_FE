@@ -58,3 +58,13 @@ export const HRD_MENUS: MenuItem[] = [
   { name: "Input Hasil Seleksi", link: "/hrd/hasil", icon: CheckCircle },
   { name: "Penempatan (3/6/12)", link: "/hrd/penempatan", icon: MapPin },
 ];
+
+export function getRoleMenus(role?: string): MenuItem[] {
+  if (role === "siswa") return STUDENT_MENUS.filter((m) => !m.alumniOnly);
+  if (role === "alumni") return STUDENT_MENUS;
+  if (role === "superadmin") return ADMIN_MENUS;
+  if (role === "admin") return ADMIN_MENUS.filter((m) => !m.superadminOnly);
+  if (role === "hrd") return HRD_MENUS;
+  return [];
+}
+

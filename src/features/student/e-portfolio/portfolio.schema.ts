@@ -90,5 +90,6 @@ export interface StudentProfileData {
   isActive: boolean;
   class: StudentOptionItem | null;
   major: StudentOptionItem | null;
+  department?: StudentOptionItem | null;
   portfolios: PortfolioItem[];
 }

@@ -8,6 +8,7 @@ export const loginSchema = z.object({
   password: z
     .string()
     .min(1, { message: "Password tidak boleh kosong" }),
+  remember: z.boolean().optional(),
 });
 
 export type LoginSchemaType = z.infer<typeof loginSchema>;
