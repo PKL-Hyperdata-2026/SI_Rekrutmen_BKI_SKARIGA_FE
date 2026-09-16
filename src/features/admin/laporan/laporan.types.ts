@@ -43,6 +43,7 @@ export interface AbsorptionMetrics {
 export interface TracerStudyMetrics {
   avg_waiting_time?: string;
   industries_count?: number;
+  sectors_count?: number;
   regions_count?: number;
 }
 
