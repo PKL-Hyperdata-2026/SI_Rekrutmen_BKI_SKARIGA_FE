@@ -8,7 +8,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useAppSelector } from "@/hooks/useApp";
+import { useAppSelector } from "@/hooks/use-app";
 
 export type SearchableSelectVariant = "admin" | "student" | "alumni" | "hrd" | "auto";
 

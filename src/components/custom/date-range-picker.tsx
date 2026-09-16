@@ -11,7 +11,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import type { DateRange } from "react-day-picker";
-import { useAppSelector } from "@/hooks/useApp";
+import { useAppSelector } from "@/hooks/use-app";
 
 export type DateRangeValue = DateRange;
 export type DateRangePickerVariant = "admin" | "student" | "alumni" | "hrd" | "auto";

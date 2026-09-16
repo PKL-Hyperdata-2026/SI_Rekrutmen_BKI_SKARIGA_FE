@@ -1,9 +1,8 @@
 import { StudentDashboard } from "./dashboard/dashboard-page";
 import { LowonganKerjaPage } from "./lowongan-kerja/lowongan-kerja-page";
 import { LamaranSaya } from "./lamaran/lamaran-page";
-import { AbsensiRekrutmen } from "./absensi/absensi-page";
-import { EPortofolio } from "./e-portfolio/portofolio-page";
-import { TracerStudy } from "./tracer-study/tracer-page";
+import { EPortofolio } from "./e-portfolio/e-portfolio-page";
+import { TracerStudy } from "./tracer-study/tracer-study-page";
 
 export const studentRoute = [
   {
@@ -17,10 +16,6 @@ export const studentRoute = [
   {
     path: "lamaran",
     element: <LamaranSaya />,
-  },
-  {
-    path: "absensi",
-    element: <AbsensiRekrutmen />,
   },
   {
     path: "portofolio",

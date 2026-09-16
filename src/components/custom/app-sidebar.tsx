@@ -7,7 +7,7 @@ import {
   SidebarGroupContent,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useAppSelector } from "@/hooks/useApp";
+import { useAppSelector } from "@/hooks/use-app";
 import { STUDENT_MENUS, ADMIN_MENUS, HRD_MENUS } from "@/config/menus";
 import type { MenuItem } from "@/config/menus";
 import { Building2, PanelLeft } from "lucide-react";

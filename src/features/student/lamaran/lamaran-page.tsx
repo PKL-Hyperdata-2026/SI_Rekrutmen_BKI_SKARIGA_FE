@@ -10,9 +10,9 @@ import {
 } from "@/components/ui/select";
 import { Briefcase, FileQuestion } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ApplicationCard } from "./components/application-card";
-import { ApplicationScheduleModal } from "./components/application-schedule-modal";
-import { useLamaranPage } from "./hooks/useLamaranPage";
+import { LamaranCard } from "./components/lamaran-card";
+import { LamaranScheduleModal } from "./components/lamaran-schedule-modal";
+import { useLamaranPage } from "./hooks/use-lamaran-page";
 
 export const LamaranSaya = () => {
   const {
@@ -201,7 +201,7 @@ export const LamaranSaya = () => {
           )
         ) : (
           filteredApplications.map((app, index) => (
-            <ApplicationCard
+            <LamaranCard
               key={`${app.id}-${index}`}
               application={app}
               onOpenInstruction={handleOpenInstruction}
@@ -210,7 +210,7 @@ export const LamaranSaya = () => {
         )}
       </div>
 
-      <ApplicationScheduleModal
+      <LamaranScheduleModal
         open={instructionModalOpen}
         onOpenChange={setInstructionModalOpen}
         application={selectedApplicationForInstruction}

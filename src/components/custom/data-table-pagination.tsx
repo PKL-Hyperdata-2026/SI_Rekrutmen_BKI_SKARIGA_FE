@@ -19,7 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAppSelector } from "@/hooks/useApp";
+import { useAppSelector } from "@/hooks/use-app";
 
 export type RoleType = "siswa" | "admin" | "hrd" | "default";
 

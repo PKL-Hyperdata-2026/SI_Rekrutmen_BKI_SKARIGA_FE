@@ -64,7 +64,6 @@ frontend/src/
 │   │   ├── dashboard/                 # dashboard-page.tsx
 │   │   ├── lowongan-kerja/            # lowongan-kerja-page.tsx
 │   │   ├── lamaran/                   # lamaran-page.tsx
-│   │   ├── absensi/                   # absensi-page.tsx
 │   │   ├── e-portfolio/               # portofolio-page.tsx, personal-academic-form.tsx, portfolio.api.ts, portfolio.schema.ts, portfolio.form.ts, modals
 │   │   └── tracer-study/              # tracer-page.tsx
 │   ├── admin/                         # Administrator portal module
@@ -100,7 +99,6 @@ frontend/src/
 │   │   ├── dashboard/                   # dashboard-page.tsx
 │   │   ├── lowongan-kerja/              # lowongan-kerja-page.tsx
 │   │   ├── lamaran/                     # lamaran-page.tsx
-│   │   ├── absensi/                     # absensi-page.tsx
 │   │   ├── e-portfolio/                 # portofolio-page.tsx, personal-academic-form.tsx, portfolio.api.ts, portfolio.schema.ts, portfolio.form.ts, modals
 │   │   └── tracer-study/                # tracer-page.tsx
 │   ├── admin/                           # Administrator portal module (admin, superadmin)

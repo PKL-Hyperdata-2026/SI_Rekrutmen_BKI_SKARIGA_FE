@@ -1,9 +1,9 @@
 import { PageHeader } from "@/components/custom";
-import { LowonganKerjaFilter } from "./components/lowongan-kerja-filter";
-import { LowonganKerjaTable } from "./components/lowongan-kerja-table";
-import { LowonganKerjaForm } from "./components/lowongan-kerja-form";
-import { LowonganKerjaDetailForm } from "./components/lowongan-kerja-detail-form";
-import { useLowonganKerja } from "./hooks/useLowonganKerja";
+import { LowonganKerjaFilter } from "./lowongan-kerja-filter";
+import { LowonganKerjaTable } from "./lowongan-kerja-table";
+import { LowonganKerjaForm } from "./lowongan-kerja-form";
+import { LowonganKerjaDetailForm } from "./lowongan-kerja-detail-form";
+import { useLowonganKerja } from "./use-lowongan-kerja";
 import { Store } from "lucide-react";
 
 export function LowonganKerjaPage() {

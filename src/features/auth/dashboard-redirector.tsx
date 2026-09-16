@@ -1,4 +1,4 @@
-import { useAppSelector } from "@/hooks/useApp";
+import { useAppSelector } from "@/hooks/use-app";
 import { Navigate } from "react-router";
 
 export function DashboardRedirector() {

@@ -16,10 +16,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { useSidebar } from "@/components/ui/sidebar";
-import { useAppSelector, useAppDispatch } from "@/hooks/useApp";
+import { useAppSelector, useAppDispatch } from "@/hooks/use-app";
 import { useNavigate } from "react-router-dom";
 import { logout } from "@/slices/authSlice";
-import { useNotification, type NotificationItem } from "@/hooks/useNotification";
+import { useNotification, type NotificationItem } from "@/hooks/use-notification";
 import {
   Popover,
   PopoverContent,

@@ -1,5 +1,5 @@
 import { Outlet, Navigate, useLocation } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "@/hooks/useApp";
+import { useAppDispatch, useAppSelector } from "@/hooks/use-app";
 import { logout, setCredentials } from "@/slices/authSlice";
 import { useEffect, useState, useRef } from "react";
 import { api } from "@/api/axios";

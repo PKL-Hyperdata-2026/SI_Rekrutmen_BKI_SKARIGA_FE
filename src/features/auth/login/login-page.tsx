@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FormProvider } from "react-hook-form";
 import { isAxiosError } from "axios";
 import { useNavigate, useLocation } from "react-router";
-import { useAppDispatch } from "@/hooks/useApp";
+import { useAppDispatch } from "@/hooks/use-app";
 import { setCredentials } from "@/slices/authSlice";
 import { useLoginForm } from "./login.form";
 import { loginApi } from "./login.api";
