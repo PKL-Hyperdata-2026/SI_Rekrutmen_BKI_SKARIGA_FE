@@ -89,6 +89,8 @@ export function TabRekrutmen({ metrics, data, isLoading = false }: TabRekrutmenP
         loading={isLoading}
         showNumbering={true}
         role="admin"
+        className="[&_th]:py-3.5 [&_th]:px-6"
+        rowClassName="[&>td]:py-4 [&>td]:px-6"
         emptyMessage="Tidak ada data laporan rekrutmen"
         emptyDescription="Coba sesuaikan rentang waktu atau filter pelamar."
       />

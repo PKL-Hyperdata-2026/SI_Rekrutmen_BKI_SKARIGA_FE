@@ -82,6 +82,8 @@ export function TabTracerStudy({ metrics, data, isLoading = false }: TabTracerSt
         loading={isLoading}
         showNumbering={true}
         role="admin"
+        className="[&_th]:py-3.5 [&_th]:px-6"
+        rowClassName="[&>td]:py-4 [&>td]:px-6"
         emptyMessage="Tidak ada data tracer study"
         emptyDescription="Coba sesuaikan rentang waktu atau filter tahun lulus."
       />

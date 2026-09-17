@@ -96,6 +96,8 @@ export function TabKeterserapan({ metrics, data, isLoading = false }: TabKeterse
         loading={isLoading}
         showNumbering={true}
         role="admin"
+        className="[&_th]:py-3.5 [&_th]:px-6"
+        rowClassName="[&>td]:py-4 [&>td]:px-6"
         emptyMessage="Tidak ada data laporan keterserapan"
         emptyDescription="Coba sesuaikan rentang waktu atau filter jurusan."
       />
