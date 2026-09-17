@@ -62,18 +62,30 @@ export interface HrdJobVacancyItem {
     id: string;
     code: string;
     name: string;
+    metadata?: {
+      badge_color?: string;
+      icon?: string;
+    } | null;
   } | null;
   statusId?: string | null;
   status?: {
     id: string;
     code: string;
     name: string;
+    metadata?: {
+      badge_color?: string;
+      icon?: string;
+    } | null;
   } | null;
   targetApplicantId?: string | null;
   targetApplicant?: {
     id: string | number;
     code: string;
     name: string;
+    metadata?: {
+      badge_color?: string;
+      icon?: string;
+    } | null;
   } | null;
   title?: string | null;
   slug?: string;
@@ -108,13 +120,24 @@ export interface HrdJobVacancyPagination {
   to: number | null;
 }
 
+export interface GetVacanciesParams {
+  major_id?: string | number;
+  major_ids?: Array<string | number>;
+  target_applicant_id?: string | number;
+  job_type_id?: string | number;
+  is_active?: boolean;
+  status_id?: string;
+  search?: string;
+  page?: number;
+  per_page?: number;
+}
+
 export const lowonganFormSchema = z.object({
   title: z
     .string()
     .trim()
-    .max(255, { message: "Judul lowongan maksimal 255 karakter." })
-    .optional()
-    .nullable(),
+    .min(1, { message: "Judul publikasi wajib diisi." })
+    .max(255, { message: "Judul lowongan maksimal 255 karakter." }),
   position: z
     .string()
     .trim()
@@ -129,15 +152,30 @@ export const lowonganFormSchema = z.object({
   job_type_id: z.string().optional().nullable(),
   quota: z
     .union([z.string(), z.number()])
-    .refine((val) => val !== "" && !Number.isNaN(Number(val)), {
-      message: "Kuota wajib diisi berupa angka.",
+    .refine(
+      (val) => {
+        const str = String(val).trim();
+        return str !== "" && !Number.isNaN(Number(str));
+      },
+      {
+        message: "Kuota wajib diisi berupa angka.",
+      }
+    )
+    .refine((val) => Number.isInteger(Number(val)), {
+      message: "Kuota harus berupa bilangan bulat.",
     })
     .refine((val) => Number(val) >= 1, {
       message: "Kuota minimal 1 orang.",
+    })
+    .refine((val) => Number(val) <= 1000, {
+      message: "Kuota maksimal 1000 orang.",
     }),
   deadline: z
     .string()
-    .min(1, { message: "Batas pendaftaran wajib diisi." }),
+    .min(1, { message: "Batas pendaftaran wajib diisi." })
+    .regex(/^\d{4}-\d{2}-\d{2}$/, {
+      message: "Format batas pendaftaran harus YYYY-MM-DD.",
+    }),
   work_location: z
     .string()
     .trim()

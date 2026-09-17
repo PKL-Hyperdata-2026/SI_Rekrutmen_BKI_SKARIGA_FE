@@ -101,10 +101,9 @@ export function toSubmitLowonganPayload(
   values: LowonganFormValues
 ): LowonganPayload {
   const position = values.position.trim();
-  const trimmedTitle = values.title?.trim();
 
   return {
-    title: trimmedTitle || position,
+    title: values.title.trim(),
     position,
     quota: Number(values.quota),
     deadline: values.deadline,
@@ -118,20 +117,92 @@ export function toSubmitLowonganPayload(
   };
 }
 
-interface UseLowonganFormProps {
-  options: HrdJobVacancyOptions;
+export interface UseLowonganFormProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   selectedVacancy: HrdJobVacancyItem | null;
-  onClearSelection: () => void;
+  options: HrdJobVacancyOptions;
   onSuccess: () => void;
+  onClearSelection?: () => void;
+}
+
+const LOWONGAN_DRAFT_KEY = "hrd-lowongan-draft-v1";
+
+function toDraftValues(raw: unknown): LowonganFormValues | null {
+  if (!raw || typeof raw !== "object") return null;
+  const record = raw as Record<string, unknown>;
+  const asString = (value: unknown): string =>
+    typeof value === "string" ? value : "";
+  const asStringArray = (value: unknown): string[] =>
+    Array.isArray(value)
+      ? value.filter((item): item is string => typeof item === "string")
+      : [];
+  const quota =
+    typeof record.quota === "string" || typeof record.quota === "number"
+      ? record.quota
+      : "";
+  const description =
+    record.description === null || record.description === undefined
+      ? ""
+      : asString(record.description);
+  const jobTypeId =
+    typeof record.job_type_id === "string" ? record.job_type_id : "";
+  return {
+    title: asString(record.title),
+    position: asString(record.position),
+    major_ids: asStringArray(record.major_ids),
+    target_applicant_id: asString(record.target_applicant_id),
+    job_type_id: jobTypeId,
+    quota,
+    deadline: asString(record.deadline),
+    work_location: asString(record.work_location),
+    qualification: asString(record.qualification),
+    description,
+    send_notification: false,
+  };
+}
+
+export function loadLowonganDraft(): LowonganFormValues | null {
+  try {
+    const raw = localStorage.getItem(LOWONGAN_DRAFT_KEY);
+    if (!raw) return null;
+    const draft = toDraftValues(JSON.parse(raw) as unknown);
+    if (
+      !draft ||
+      (!draft.title &&
+        !draft.position &&
+        draft.major_ids.length === 0 &&
+        !draft.quota &&
+        !draft.deadline &&
+        !draft.work_location &&
+        !draft.qualification)
+    ) {
+      return null;
+    }
+    return draft;
+  } catch {
+    return null;
+  }
+}
+
+function clearLowonganDraft(): void {
+  try {
+    localStorage.removeItem(LOWONGAN_DRAFT_KEY);
+  } catch {
+    // Draft is best-effort only; ignore storage failures.
+  }
 }
 
 export function useLowonganForm({
-  options,
+  open,
+  onOpenChange,
   selectedVacancy,
-  onClearSelection,
+  options,
   onSuccess,
+  onClearSelection,
 }: UseLowonganFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCloseConfirmOpen, setIsCloseConfirmOpen] = useState(false);
 
   const form = useForm<LowonganFormValues>({
     resolver: zodResolver(lowonganFormSchema),
@@ -139,33 +210,100 @@ export function useLowonganForm({
   });
 
   const { reset } = form;
-  const prevSelectedVacancyIdRef = useRef<string | number | null | undefined>(undefined);
+
+  const prevOpenRef = useRef(false);
+  const prevSelectedVacancyIdRef = useRef<string | number | undefined>(undefined);
+  const prevOptionsLoadedRef = useRef(false);
   const optionsRef = useRef(options);
-  optionsRef.current = options;
 
   useEffect(() => {
-    const currentId = selectedVacancy?.id ?? null;
+    optionsRef.current = options;
+  }, [options]);
 
-    if (prevSelectedVacancyIdRef.current === undefined) {
-      prevSelectedVacancyIdRef.current = currentId;
-      if (selectedVacancy) {
+  useEffect(() => {
+    const wasOpen = prevOpenRef.current;
+    const prevId = prevSelectedVacancyIdRef.current;
+    const currentId = selectedVacancy?.id;
+    const optionsLoaded = optionsRef.current.majors.length > 0;
+    const wasOptionsLoaded = prevOptionsLoadedRef.current;
+
+    if (!wasOpen && open) {
+      if (!selectedVacancy) {
+        const draft = loadLowonganDraft();
+        reset(draft ?? defaultLowonganFormValues);
+      } else {
         reset(toLowonganDefaultValues(selectedVacancy, optionsRef.current));
       }
+    } else if (open && currentId !== prevId) {
+      reset(toLowonganDefaultValues(selectedVacancy, optionsRef.current));
+    } else if (open && selectedVacancy && !wasOptionsLoaded && optionsLoaded) {
+      // Options arrived after the edit modal opened; re-resolve ids to labels.
+      reset(toLowonganDefaultValues(selectedVacancy, optionsRef.current));
+    } else if (wasOpen && !open) {
+      // Every close flows through doCloseForm or the submit handler below,
+      // both of which already reset the flags. Keep this branch effect-free.
+      reset(defaultLowonganFormValues);
+    }
+
+    prevOpenRef.current = open;
+    prevSelectedVacancyIdRef.current = currentId;
+    prevOptionsLoadedRef.current = optionsLoaded;
+  }, [open, selectedVacancy, options, reset]);
+
+  // Draft snapshot is written on close, never in edit mode.
+  // Keeping values in the form on submit error already covers
+  // network failures, so no live subscription is needed.
+  const saveDraftSnapshot = useCallback(() => {
+    try {
+      const values = form.getValues();
+      localStorage.setItem(LOWONGAN_DRAFT_KEY, JSON.stringify(values));
+    } catch {
+      // Draft is best-effort only; ignore storage failures.
+    }
+  }, [form]);
+
+  const doCloseForm = useCallback(() => {
+    if (!selectedVacancy) {
+      saveDraftSnapshot();
+    }
+    onClearSelection?.();
+    onOpenChange(false);
+    reset(defaultLowonganFormValues);
+    setIsCloseConfirmOpen(false);
+  }, [selectedVacancy, saveDraftSnapshot, onClearSelection, onOpenChange, reset]);
+
+  const handleSafeClose = useCallback(() => {
+    if (form.formState.isDirty) {
+      setIsCloseConfirmOpen(true);
+      return;
+    }
+    doCloseForm();
+  }, [form.formState.isDirty, doCloseForm]);
+
+  const confirmClose = useCallback(() => {
+    doCloseForm();
+  }, [doCloseForm]);
+
+  const cancelClose = useCallback(() => {
+    setIsCloseConfirmOpen(false);
+  }, []);
+
+  const onSubmit = form.handleSubmit(async (values) => {
+    // Mirror backend deadline rules: create mode rejects past dates.
+    // Edit mode only rejects a changed deadline that lies in the past.
+    const todayStr = new Date().toLocaleDateString("en-CA");
+    const originalDeadline = selectedVacancy?.deadline
+      ? selectedVacancy.deadline.split("T")[0]
+      : "";
+    if (values.deadline < todayStr && values.deadline !== originalDeadline) {
+      form.setError("deadline", {
+        type: "validate",
+        message: "Batas pendaftaran tidak boleh di masa lalu.",
+      });
+      toast.error("Batas pendaftaran tidak boleh di masa lalu.");
       return;
     }
 
-    if (currentId !== prevSelectedVacancyIdRef.current) {
-      prevSelectedVacancyIdRef.current = currentId;
-      reset(toLowonganDefaultValues(selectedVacancy, optionsRef.current));
-    }
-  }, [selectedVacancy, reset]);
-
-  const handleReset = useCallback(() => {
-    onClearSelection();
-    reset(defaultLowonganFormValues);
-  }, [onClearSelection, reset]);
-
-  const onSubmit = form.handleSubmit(async (values) => {
     setIsSubmitting(true);
     try {
       const payload = toSubmitLowonganPayload(values);
@@ -178,11 +316,20 @@ export function useLowonganForm({
         toast.success("Lowongan kerja berhasil dipublikasikan!");
       }
 
-      handleReset();
+      clearLowonganDraft();
+      reset(defaultLowonganFormValues);
+      setIsCloseConfirmOpen(false);
+      onClearSelection?.();
+      onOpenChange(false);
       onSuccess();
     } catch (err: unknown) {
       const apiErr = err as {
-        response?: { data?: { message?: string; errors?: Record<string, string[]> } };
+        response?: {
+          data?: {
+            message?: string;
+            errors?: Record<string, string[]>;
+          };
+        };
       };
       const validationErrors = apiErr.response?.data?.errors;
       if (validationErrors) {
@@ -212,7 +359,10 @@ export function useLowonganForm({
     form,
     isSubmitting,
     isEditMode: Boolean(selectedVacancy),
-    handleReset,
+    isCloseConfirmOpen,
+    handleSafeClose,
+    confirmClose,
+    cancelClose,
     onSubmit,
   };
 }
