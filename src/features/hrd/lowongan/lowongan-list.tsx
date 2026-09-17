@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { format, parseISO } from "date-fns";
-import { id as idLocale } from "date-fns/locale";
 import {
   ClipboardList,
   Users,
@@ -14,6 +12,8 @@ import {
   RotateCcw,
   X,
   AlertTriangle,
+  LayoutGrid,
+  List as ListIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
@@ -38,8 +38,12 @@ import {
   isEffectivelyActive,
   isPastDeadline,
   isQuotaFullItem,
+  formatVacancyDeadline,
+  quotaFillRatio,
+  quotaFillClass,
 } from "./lowongan-status";
 import { LowonganStatusBadge } from "./lowongan-status-badge";
+import { LowonganCard } from "./lowongan-card";
 import type {
   HrdJobVacancyItem,
   HrdJobVacancyOptions,
@@ -71,13 +75,17 @@ export interface LowonganListProps {
   selectedVacancyId?: string | null;
 }
 
-function formatDeadline(dateStr: string | null | undefined): string {
-  if (!dateStr) return "-";
+export type LowonganViewMode = "card" | "list";
+
+const VIEW_MODE_STORAGE_KEY = "hrd-lowongan-view-mode";
+
+function loadViewMode(): LowonganViewMode {
   try {
-    const cleanStr = dateStr.split("T")[0];
-    return format(parseISO(cleanStr), "d MMM yyyy", { locale: idLocale });
+    return localStorage.getItem(VIEW_MODE_STORAGE_KEY) === "list"
+      ? "list"
+      : "card";
   } catch {
-    return dateStr;
+    return "card";
   }
 }
 
@@ -127,6 +135,17 @@ export function LowonganList({
   const [reopenDeadlineError, setReopenDeadlineError] = useState<string | null>(
     null
   );
+  const [viewMode, setViewMode] =
+    useState<LowonganViewMode>(() => loadViewMode());
+
+  const handleViewModeChange = (mode: LowonganViewMode) => {
+    setViewMode(mode);
+    try {
+      localStorage.setItem(VIEW_MODE_STORAGE_KEY, mode);
+    } catch {
+      // Preference is best-effort only; ignore storage failures.
+    }
+  };
 
   const openReopenConfirm = (item: HrdJobVacancyItem) => {
     setVacancyToReopen(item);
@@ -265,6 +284,44 @@ export function LowonganList({
                 </button>
               );
             })}
+          </div>
+
+          {/* View Mode Toggle */}
+          <div
+            role="group"
+            aria-label="Mode tampilan daftar"
+            className="inline-flex items-center p-1 bg-slate-100/90 rounded-xl gap-1 shrink-0 self-start md:self-auto"
+          >
+            <button
+              type="button"
+              aria-pressed={viewMode === "card"}
+              aria-label="Tampilan kartu"
+              title="Tampilan kartu"
+              onClick={() => handleViewModeChange("card")}
+              className={cn(
+                "h-8 w-9 inline-flex items-center justify-center rounded-lg transition-all cursor-pointer",
+                viewMode === "card"
+                  ? "bg-white text-[#8D1D96] shadow-xs"
+                  : "text-slate-500 hover:text-slate-900"
+              )}
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              aria-pressed={viewMode === "list"}
+              aria-label="Tampilan daftar"
+              title="Tampilan daftar"
+              onClick={() => handleViewModeChange("list")}
+              className={cn(
+                "h-8 w-9 inline-flex items-center justify-center rounded-lg transition-all cursor-pointer",
+                viewMode === "list"
+                  ? "bg-white text-[#8D1D96] shadow-xs"
+                  : "text-slate-500 hover:text-slate-900"
+              )}
+            >
+              <ListIcon className="h-4 w-4" />
+            </button>
           </div>
         </div>
 
@@ -420,6 +477,28 @@ export function LowonganList({
       {/* Content */}
       <div className="mt-4 flex-1 flex flex-col justify-between">
         {isLoading ? (
+          viewMode === "card" ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div
+                  key={i}
+                  className="p-5 rounded-2xl border border-slate-100 bg-slate-50/40 space-y-3"
+                >
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-5 w-16 rounded-md" />
+                    <Skeleton className="h-5 w-16 rounded-md" />
+                  </div>
+                  <Skeleton className="h-5 w-3/4 rounded-md" />
+                  <Skeleton className="h-4 w-1/2 rounded-md" />
+                  <Skeleton className="h-20 w-full rounded-xl" />
+                  <div className="flex items-center justify-between pt-2">
+                    <Skeleton className="h-8 w-28 rounded-full" />
+                    <Skeleton className="h-8 w-24 rounded-md" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
               <div
@@ -438,6 +517,7 @@ export function LowonganList({
               </div>
             ))}
           </div>
+          )
         ) : fetchError && vacancies.length === 0 ? (
           <div
             role="alert"
@@ -479,15 +559,30 @@ export function LowonganList({
                 : "Klik tombol Publikasikan Lowongan Baru di atas untuk menerbitkan posisi pekerjaan kepada siswa dan alumni."}
             </p>
           </div>
+        ) : viewMode === "card" ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5">
+            {vacancies.map((item: HrdJobVacancyItem) => (
+              <LowonganCard
+                key={item.id}
+                item={item}
+                isProcessing={processingId === item.id}
+                isCurrentlyEdited={selectedVacancyId === item.id}
+                onViewApplicants={handleViewApplicants}
+                onEdit={handleEditVacancy}
+                onClose={setVacancyToClose}
+                onReopen={openReopenConfirm}
+                onDelete={openDeleteConfirm}
+              />
+            ))}
+          </div>
         ) : (
           <div className="space-y-3.5">
             {vacancies.map((item: HrdJobVacancyItem) => {
               const isProcessing = processingId === item.id;
               const isCurrentlyEdited = selectedVacancyId === item.id;
-              const formattedDate = formatDeadline(item.deadline);
+              const formattedDate = formatVacancyDeadline(item.deadline);
               const applicants = item.applicantsCount ?? 0;
-              const quotaRatio =
-                item.quota > 0 ? Math.min(applicants / item.quota, 1) : 0;
+              const quotaRatio = quotaFillRatio(item);
 
               const isExpired = isPastDeadline(item.deadline);
               const isQuotaFull = isQuotaFullItem(item);
@@ -551,11 +646,7 @@ export function LowonganList({
                         <div
                           className={cn(
                             "h-full rounded-full transition-all duration-300",
-                            quotaRatio >= 1
-                              ? "bg-rose-500"
-                              : quotaRatio >= 0.75
-                              ? "bg-amber-500"
-                              : "bg-[#8D1D96]"
+                            quotaFillClass(quotaRatio)
                           )}
                           style={{ width: `${quotaRatio * 100}%` }}
                         />
@@ -803,7 +894,7 @@ export function LowonganList({
             )}
             {vacancyToReopen && (
               <p className="text-[11px] text-slate-500">
-                Batas saat ini: {formatDeadline(vacancyToReopen.deadline)}
+                Batas saat ini: {formatVacancyDeadline(vacancyToReopen.deadline)}
               </p>
             )}
           </div>

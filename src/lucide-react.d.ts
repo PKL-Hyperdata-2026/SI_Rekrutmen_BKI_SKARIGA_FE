@@ -57,8 +57,10 @@ declare module "lucide-react" {
   export const Languages: LucideIcon;
   export const Layers: LucideIcon;
   export const LayoutDashboard: LucideIcon;
+  export const LayoutGrid: LucideIcon;
   export const LineChart: LucideIcon;
   export const Link2: LucideIcon;
+  export const List: LucideIcon;
   export const Loader2: LucideIcon;
   export const Lock: LucideIcon;
   export const Mail: LucideIcon;

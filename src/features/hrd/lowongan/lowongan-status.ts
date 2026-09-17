@@ -1,3 +1,5 @@
+import { format, parseISO } from "date-fns";
+import { id as idLocale } from "date-fns/locale";
 import type { HrdJobVacancyItem } from "./lowongan.schema";
 
 export type LowonganEffectiveStatus =
@@ -56,4 +58,27 @@ export function getEffectiveStatus(
   if (isPastDeadline(item.deadline)) return "expired";
   if (item.isActive) return "active";
   return "closed";
+}
+
+export function formatVacancyDeadline(
+  dateStr: string | null | undefined
+): string {
+  if (!dateStr) return "-";
+  try {
+    const cleanStr = dateStr.split("T")[0];
+    return format(parseISO(cleanStr), "d MMM yyyy", { locale: idLocale });
+  } catch {
+    return dateStr;
+  }
+}
+
+export function quotaFillRatio(item: HrdJobVacancyItem): number {
+  if (item.quota <= 0) return 0;
+  return Math.min((item.applicantsCount ?? 0) / item.quota, 1);
+}
+
+export function quotaFillClass(ratio: number): string {
+  if (ratio >= 1) return "bg-rose-500";
+  if (ratio >= 0.75) return "bg-amber-500";
+  return "bg-[#8D1D96]";
 }
