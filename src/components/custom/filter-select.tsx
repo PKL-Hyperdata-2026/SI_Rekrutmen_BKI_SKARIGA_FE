@@ -14,6 +14,7 @@ export interface FilterSelectOption {
 
 export interface FilterSelectProps {
   options: FilterSelectOption[];
+  value?: string;
   defaultValue?: string;
   placeholder?: string;
   role?: "admin" | "siswa" | "hrd";
@@ -30,6 +31,7 @@ const roleThemeClasses: Record<"admin" | "siswa" | "hrd", string> = {
 
 export function FilterSelect({
   options,
+  value,
   defaultValue,
   placeholder,
   role = "admin",
@@ -39,7 +41,7 @@ export function FilterSelect({
 }: FilterSelectProps) {
   return (
     <div className={cn("inline-block", roleThemeClasses[role])}>
-      <Select defaultValue={defaultValue} onValueChange={onValueChange}>
+      <Select value={value} defaultValue={defaultValue} onValueChange={onValueChange}>
         <SelectTrigger
           isLoading={isLoading}
           className={cn(
