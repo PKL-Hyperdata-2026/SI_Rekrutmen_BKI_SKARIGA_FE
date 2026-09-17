@@ -21,11 +21,39 @@ export function useLowonganPage() {
     vacancyStatuses: [],
   });
   const [isLoadingMeta, setIsLoadingMeta] = useState(true);
+  const [metaError, setMetaError] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedVacancy, setSelectedVacancy] =
     useState<HrdJobVacancyItem | null>(null);
 
   const abortControllerRef = useRef<AbortController | null>(null);
+
+  const applyMetaResults = useCallback(
+    (
+      statsRes: PromiseSettledResult<HrdJobVacancyStatistics>,
+      optionsRes: PromiseSettledResult<HrdJobVacancyOptions>
+    ) => {
+      let failed = false;
+
+      if (statsRes.status === "fulfilled") {
+        setStatistics(statsRes.value);
+      } else {
+        console.error("Failed to load vacancy statistics:", statsRes.reason);
+        failed = true;
+      }
+
+      if (optionsRes.status === "fulfilled") {
+        setOptions(optionsRes.value);
+      } else {
+        console.error("Failed to load vacancy options:", optionsRes.reason);
+        toast.error("Gagal memuat opsi pilihan lowongan kerja.");
+        failed = true;
+      }
+
+      setMetaError(failed ? "Gagal memuat ringkasan lowongan." : null);
+    },
+    []
+  );
 
   useEffect(() => {
     let ignore = false;
@@ -40,19 +68,7 @@ export function useLowonganPage() {
         ]);
 
         if (ignore || controller.signal.aborted) return;
-
-        if (statsRes.status === "fulfilled") {
-          setStatistics(statsRes.value);
-        } else {
-          console.error("Failed to load vacancy statistics:", statsRes.reason);
-        }
-
-        if (optionsRes.status === "fulfilled") {
-          setOptions(optionsRes.value);
-        } else {
-          console.error("Failed to load vacancy options:", optionsRes.reason);
-          toast.error("Gagal memuat opsi pilihan lowongan kerja.");
-        }
+        applyMetaResults(statsRes, optionsRes);
       } finally {
         if (!ignore && abortControllerRef.current === controller) {
           setIsLoadingMeta(false);
@@ -66,7 +82,7 @@ export function useLowonganPage() {
       ignore = true;
       controller.abort();
     };
-  }, []);
+  }, [applyMetaResults]);
 
   const fetchMeta = useCallback(async () => {
     abortControllerRef.current?.abort();
@@ -81,25 +97,13 @@ export function useLowonganPage() {
       ]);
 
       if (controller.signal.aborted) return;
-
-      if (statsRes.status === "fulfilled") {
-        setStatistics(statsRes.value);
-      } else {
-        console.error("Failed to load vacancy statistics:", statsRes.reason);
-      }
-
-      if (optionsRes.status === "fulfilled") {
-        setOptions(optionsRes.value);
-      } else {
-        console.error("Failed to load vacancy options:", optionsRes.reason);
-        toast.error("Gagal memuat opsi pilihan lowongan kerja.");
-      }
+      applyMetaResults(statsRes, optionsRes);
     } finally {
       if (abortControllerRef.current === controller) {
         setIsLoadingMeta(false);
       }
     }
-  }, []);
+  }, [applyMetaResults]);
 
   const handleOpenCreate = useCallback(() => {
     setSelectedVacancy(null);
@@ -178,6 +182,7 @@ export function useLowonganPage() {
     statistics,
     options,
     isLoadingMeta,
+    metaError,
     fetchMeta,
     form,
     list,

@@ -3,43 +3,70 @@ import type {
   HrdJobVacancyPagination,
   HrdJobVacancyStatistics,
   HrdJobVacancyOptions,
+  HrdJobVacancyItem,
   LowonganPayload,
+  GetVacanciesParams,
 } from "./lowongan.schema";
+
+export interface HrdJobVacancyMutationResponse {
+  success: boolean;
+  message: string;
+  data?: unknown;
+}
+
+type AbortSignalOption = { signal?: AbortSignal } | AbortSignal;
+
+function resolveSignal(option?: AbortSignalOption): AbortSignal | undefined {
+  if (option instanceof AbortSignal) return option;
+  return option?.signal;
+}
+
+function toVacancyPagination(payload: unknown): HrdJobVacancyPagination {
+  const record = (payload ?? {}) as {
+    meta?: Record<string, unknown>;
+    data?: unknown;
+    current_page?: unknown;
+    last_page?: unknown;
+    per_page?: unknown;
+    total?: unknown;
+    from?: number | null;
+    to?: number | null;
+  };
+  const meta = record.meta;
+  const data = Array.isArray(record.data)
+    ? record.data
+    : Array.isArray(payload)
+      ? payload
+      : [];
+  return {
+    data: data as HrdJobVacancyItem[],
+    current_page: Number(meta?.current_page ?? record.current_page ?? 1),
+    last_page: Number(meta?.last_page ?? record.last_page ?? 1),
+    per_page: Number(meta?.per_page ?? record.per_page ?? 10),
+    total: Number(meta?.total ?? record.total ?? data.length),
+    from: (meta?.from as number | null) ?? record.from ?? null,
+    to: (meta?.to as number | null) ?? record.to ?? null,
+  };
+}
 
 export const hrdLowonganApi = {
   async getVacancies(
-    params: {
-      search?: string;
-      page?: number;
-      per_page?: number;
-      status_id?: string;
-      is_active?: boolean;
-    } = {},
-    options?: {
-      signal?: AbortSignal;
-    }
+    params: GetVacanciesParams = {},
+    options?: AbortSignalOption
   ): Promise<HrdJobVacancyPagination> {
     const response = await api.get("/hrd/job-vacancies", {
       params,
-      signal: options?.signal,
+      signal: resolveSignal(options),
     });
-    const payload = response.data?.data;
-    if (payload && Array.isArray(payload.data)) {
-      return payload as HrdJobVacancyPagination;
-    }
-    return {
-      data: Array.isArray(payload) ? payload : [],
-      current_page: 1,
-      last_page: 1,
-      per_page: 10,
-      total: Array.isArray(payload) ? payload.length : 0,
-      from: null,
-      to: null,
-    };
+    return toVacancyPagination(response.data?.data);
   },
 
-  async getStatistics(): Promise<HrdJobVacancyStatistics> {
-    const response = await api.get("/hrd/job-vacancies/statistics");
+  async getStatistics(
+    options?: AbortSignalOption
+  ): Promise<HrdJobVacancyStatistics> {
+    const response = await api.get("/hrd/job-vacancies/statistics", {
+      signal: resolveSignal(options),
+    });
     const payload = response.data?.data || {};
     return {
       active: Number(payload.activeCount ?? payload.active ?? 0),
@@ -49,8 +76,12 @@ export const hrdLowonganApi = {
     };
   },
 
-  async getOptions(): Promise<HrdJobVacancyOptions> {
-    const response = await api.get("/hrd/job-vacancies/options");
+  async getOptions(
+    options?: AbortSignalOption
+  ): Promise<HrdJobVacancyOptions> {
+    const response = await api.get("/hrd/job-vacancies/options", {
+      signal: resolveSignal(options),
+    });
     const payload = response.data?.data || {};
     return {
       majors: Array.isArray(payload.majors) ? payload.majors : [],
@@ -64,25 +95,46 @@ export const hrdLowonganApi = {
     };
   },
 
-  async createVacancy(data: LowonganPayload) {
-    const response = await api.post("/hrd/job-vacancies", data);
+  async createVacancy(
+    data: LowonganPayload
+  ): Promise<HrdJobVacancyMutationResponse> {
+    const response = await api.post<HrdJobVacancyMutationResponse>(
+      "/hrd/job-vacancies",
+      data
+    );
     return response.data;
   },
 
-  async updateVacancy(id: string | number, data: Partial<LowonganPayload>) {
-    const response = await api.put(`/hrd/job-vacancies/${id}`, data);
+  async updateVacancy(
+    id: string | number,
+    data: Partial<LowonganPayload>
+  ): Promise<HrdJobVacancyMutationResponse> {
+    const encodedId = encodeURIComponent(String(id));
+    const response = await api.put<HrdJobVacancyMutationResponse>(
+      `/hrd/job-vacancies/${encodedId}`,
+      data
+    );
     return response.data;
   },
 
-  async deleteVacancy(id: string | number) {
-    const response = await api.delete(`/hrd/job-vacancies/${id}`);
+  async deleteVacancy(
+    id: string | number
+  ): Promise<HrdJobVacancyMutationResponse> {
+    const encodedId = encodeURIComponent(String(id));
+    const response = await api.delete<HrdJobVacancyMutationResponse>(
+      `/hrd/job-vacancies/${encodedId}`
+    );
     return response.data;
   },
 
-  async toggleActive(id: string | number, isActive?: boolean) {
-    const response = await api.patch(
-      `/hrd/job-vacancies/${id}/toggle-active`,
-      isActive !== undefined ? { is_active: isActive } : {}
+  async toggleActive(
+    id: string | number,
+    isActive: boolean
+  ): Promise<HrdJobVacancyMutationResponse> {
+    const encodedId = encodeURIComponent(String(id));
+    const response = await api.patch<HrdJobVacancyMutationResponse>(
+      `/hrd/job-vacancies/${encodedId}/toggle-active`,
+      { is_active: isActive }
     );
     return response.data;
   },
