@@ -120,12 +120,23 @@ export interface HrdJobVacancyPagination {
   to: number | null;
 }
 
+export type VacancyEffectiveStatusFilter =
+  | ""
+  | "active"
+  | "closed"
+  | "quota_full"
+  | "expiring";
+
+export type VacancySortOption = "newest" | "deadline" | "quota";
+
 export interface GetVacanciesParams {
   major_id?: string | number;
   major_ids?: Array<string | number>;
   target_applicant_id?: string | number;
   job_type_id?: string | number;
   is_active?: boolean;
+  effective_status?: VacancyEffectiveStatusFilter;
+  sort?: VacancySortOption;
   status_id?: string;
   search?: string;
   page?: number;

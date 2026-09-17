@@ -5,23 +5,14 @@ import { toast } from "@/components/custom/sonner";
 import type {
   HrdJobVacancyItem,
   HrdJobVacancyPagination,
+  VacancyEffectiveStatusFilter,
+  VacancySortOption,
 } from "./lowongan.schema";
 import { hrdLowonganApi } from "./lowongan.api";
-import {
-  isEffectivelyActive,
-  isExpiringSoon,
-  isPastDeadline,
-  isQuotaFullItem,
-} from "./lowongan-status";
+import { isPastDeadline } from "./lowongan-status";
 
-export type LowonganStatusFilter =
-  | ""
-  | "active"
-  | "closed"
-  | "quota_full"
-  | "expiring";
-
-export type LowonganSortOption = "newest" | "deadline" | "quota";
+export type LowonganStatusFilter = VacancyEffectiveStatusFilter;
+export type LowonganSortOption = VacancySortOption;
 
 export interface UseLowonganListProps {
   onVacancyUpdated: () => void;
@@ -30,32 +21,6 @@ export interface UseLowonganListProps {
 
 export function buildReviewLink(id: string | number): string {
   return `/hrd/review?vacancy_id=${encodeURIComponent(String(id))}`;
-}
-
-function applyClientSort(
-  items: HrdJobVacancyItem[],
-  sort: LowonganSortOption
-): HrdJobVacancyItem[] {
-  if (sort === "deadline") {
-    const byDeadlineAsc = (a: HrdJobVacancyItem, b: HrdJobVacancyItem) => {
-      const aKey = a.deadline ? a.deadline.split("T")[0] : "9999-12-31";
-      const bKey = b.deadline ? b.deadline.split("T")[0] : "9999-12-31";
-      return aKey < bKey ? -1 : aKey > bKey ? 1 : 0;
-    };
-    // Deadline terdekat yang masih berlaku dulu, yang sudah lewat di bawah.
-    return [
-      ...items.filter((item) => !isPastDeadline(item.deadline)).sort(byDeadlineAsc),
-      ...items.filter((item) => isPastDeadline(item.deadline)).sort(byDeadlineAsc),
-    ];
-  }
-  if (sort === "quota") {
-    const ratio = (item: HrdJobVacancyItem) => {
-      if (item.quota <= 0) return 0;
-      return Math.min((item.applicantsCount ?? 0) / item.quota, 1);
-    };
-    return [...items].sort((a, b) => ratio(b) - ratio(a));
-  }
-  return items;
 }
 
 function isAbortError(err: unknown): boolean {
@@ -159,7 +124,8 @@ export function useLowonganList({
           page: number;
           per_page: number;
           search?: string;
-          is_active?: boolean;
+          effective_status?: LowonganStatusFilter;
+          sort?: LowonganSortOption;
           major_id?: string;
           target_applicant_id?: string;
           job_type_id?: string;
@@ -172,19 +138,12 @@ export function useLowonganList({
           queryParams.search = searchQuery.trim();
         }
 
-        // Backend only knows the raw is_active flag. Effective status
-        // (active vs expired vs quota full) is narrowed client-side below.
-        if (
-          status === "active" ||
-          status === "quota_full" ||
-          status === "expiring"
-        ) {
-          queryParams.is_active = true;
-        } else if (status === "closed") {
-          // Ditutup = semua yang tidak efektif-aktif (tutup manual +
-          // batas lewat + kuota penuh). Item kedaluwarsa masih berflag
-          // is_active true di backend, jadi ambil semua lalu saring.
+        // Effective status and sort run server-side. The backend covers
+        // the whole dataset, so no client-side narrowing is needed.
+        if (status) {
+          queryParams.effective_status = status;
         }
+        queryParams.sort = sortOpt;
 
         if (major) {
           queryParams.major_id = major;
@@ -203,22 +162,7 @@ export function useLowonganList({
         });
 
         if (!controller.signal.aborted) {
-          let items = res.data;
-          if (status === "active") {
-            items = items.filter(isEffectivelyActive);
-          } else if (status === "closed") {
-            items = items.filter((item) => !isEffectivelyActive(item));
-          } else if (status === "quota_full") {
-            items = items.filter(isQuotaFullItem);
-          } else if (status === "expiring") {
-            items = items.filter(
-              (item) =>
-                isEffectivelyActive(item) && isExpiringSoon(item.deadline)
-            );
-          }
-          // Backend has no guaranteed sort contract, so sort client-side.
-          items = applyClientSort(items, sortOpt);
-          setVacanciesData({ ...res, data: items });
+          setVacanciesData(res);
           lastFetchedParamsRef.current = {
             page,
             search: searchQuery,

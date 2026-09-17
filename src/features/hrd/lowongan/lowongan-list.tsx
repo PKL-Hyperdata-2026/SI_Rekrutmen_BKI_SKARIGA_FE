@@ -371,23 +371,11 @@ export function LowonganList({
 
           {/* Total Count */}
           <span className="ml-auto text-xs text-slate-500 font-medium">
-            {!hasActiveFilter ? (
-              <>
-                Total{" "}
-                <span className="font-bold text-slate-800">
-                  {pagination?.total ?? 0}
-                </span>{" "}
-                lowongan
-              </>
-            ) : (
-              <>
-                Menampilkan{" "}
-                <span className="font-bold text-slate-800">
-                  {vacancies.length}
-                </span>{" "}
-                hasil
-              </>
-            )}
+            Total{" "}
+            <span className="font-bold text-slate-800">
+              {pagination?.total ?? 0}
+            </span>{" "}
+            lowongan
           </span>
 
           {/* Reset Filter Button */}
