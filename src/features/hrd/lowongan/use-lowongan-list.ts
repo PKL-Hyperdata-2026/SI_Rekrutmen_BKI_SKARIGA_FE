@@ -15,16 +15,19 @@ interface UseLowonganListProps {
   onEditVacancy: (item: HrdJobVacancyItem) => void;
 }
 
-function isPastDeadline(deadline: string | null | undefined): boolean {
-  if (!deadline) return false;
+export function isPastDeadline(
+  deadlineStr: string | null | undefined
+): boolean {
+  if (!deadlineStr) return false;
   try {
-    const cleanStr = deadline.split("T")[0];
+    const cleanStr = deadlineStr.split("T")[0];
     const todayStr = new Date().toLocaleDateString("en-CA");
     return cleanStr < todayStr;
   } catch {
     return false;
   }
 }
+
 
 function isAbortError(err: unknown): boolean {
   if (axios.isCancel(err)) return true;
