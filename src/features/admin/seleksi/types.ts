@@ -38,10 +38,6 @@ export interface SelectionAttendance {
   attendanceStatus?: SelectionAttendanceStatus | null;
   attendanceLabel?: string | null;
   attendedAt?: string | null;
-  qrCodeToken?: string | null;
-  latitude?: number | null;
-  longitude?: number | null;
-  photoSelfiePath?: string | null;
 }
 
 export interface SelectionStageInfo {
