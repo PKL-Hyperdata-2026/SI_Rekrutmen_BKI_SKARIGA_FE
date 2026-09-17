@@ -179,13 +179,13 @@ export function PageHeaderNotificationCard({
     <div
       className={cn(
         glassSurface,
-        "rounded-xl px-5 py-3.5 flex items-center gap-3.5 text-left select-none",
+        "rounded-xl px-4 py-2 sm:px-4.5 sm:py-2.5 flex items-center gap-3 sm:gap-3.5 text-left select-none",
         className
       )}
       {...props}
     >
       {icon && (
-        <div className="shrink-0 flex items-center justify-center text-white">
+        <div className="shrink-0 flex items-center justify-center text-white [&_svg]:size-5">
           {icon}
         </div>
       )}
@@ -193,7 +193,7 @@ export function PageHeaderNotificationCard({
         <h4 className="text-xs sm:text-sm font-bold text-white leading-tight">
           {title}
         </h4>
-        <p className="text-xs text-white/80 leading-snug mt-0.5">
+        <p className="text-xs text-white/85 leading-tight mt-0.5">
           {description}
         </p>
       </div>

@@ -15,6 +15,7 @@ declare module "lucide-react" {
 
   export const AlertCircle: LucideIcon;
   export const AlertTriangle: LucideIcon;
+  export const ArrowRight: LucideIcon;
   export const ArrowUpDown: LucideIcon;
   export const Award: LucideIcon;
   export const BadgeCheck: LucideIcon;
@@ -40,6 +41,7 @@ declare module "lucide-react" {
   export const ChevronUpIcon: LucideIcon;
   export const ClipboardCheck: LucideIcon;
   export const ClipboardList: LucideIcon;
+  export const Clock: LucideIcon;
   export const Clock3: LucideIcon;
   export const Download: LucideIcon;
   export const ExternalLink: LucideIcon;
@@ -67,6 +69,7 @@ declare module "lucide-react" {
   export const MailCheck: LucideIcon;
   export const MapPin: LucideIcon;
   export const Medal: LucideIcon;
+  export const Minus: LucideIcon;
   export const MoreHorizontalIcon: LucideIcon;
   export const Network: LucideIcon;
   export const PanelLeft: LucideIcon;

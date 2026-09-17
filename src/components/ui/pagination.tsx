@@ -61,7 +61,7 @@ function PaginationLink({
           variant: isActive ? "default" : "ghost",
           size,
         }),
-        "rounded-xl transition-all cursor-pointer select-none",
+        "rounded-lg transition-all cursor-pointer select-none",
         className
       )}
       {...props}
