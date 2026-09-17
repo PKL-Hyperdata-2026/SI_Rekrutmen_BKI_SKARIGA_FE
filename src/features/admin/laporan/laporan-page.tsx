@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { toast } from '@/components/custom/sonner';
 import { useAppSelector } from '@/hooks/use-app';
 import { LaporanHeader } from './components/laporan-header';
 import { LaporanFilterBar } from './components/laporan-filter-bar';
@@ -84,7 +85,7 @@ export function LaporanPage() {
 
   // Fetch Report Data based on active tab.
   const fetchActiveTabReport = useCallback(
-    async (tab: ReportTabType = activeTab, snapshot: Partial<ReportFilterState> = filters) => {
+    async (tab: ReportTabType, snapshot: Partial<ReportFilterState>) => {
       try {
         if (tab === 'rekrutmen') {
           const res = await reportApi.getRecruitment(snapshot);
@@ -101,15 +102,45 @@ export function LaporanPage() {
         }
       } catch (err: unknown) {
         console.error(err);
+        toast.error('Gagal memuat data laporan.');
       } finally {
         setIsLoading(false);
       }
     },
-    [activeTab, filters],
+    [],
   );
 
   useEffect(() => {
-    void fetchActiveTabReport(activeTab, filters);
+    let isSubscribed = true;
+
+    const load = async () => {
+      try {
+        if (activeTab === 'rekrutmen') {
+          const res = await reportApi.getRecruitment(filters);
+          if (isSubscribed) setRekrutmenData({ metrics: res.metrics ?? {}, data: res.data ?? [] });
+        } else if (activeTab === 'absensi') {
+          const res = await reportApi.getAttendance(filters);
+          if (isSubscribed) setAbsensiData({ metrics: res.metrics ?? {}, data: res.data ?? [] });
+        } else if (activeTab === 'keterserapan') {
+          const res = await reportApi.getAbsorption(filters);
+          if (isSubscribed) setKeterserapanData({ metrics: res.metrics ?? {}, data: res.data ?? [] });
+        } else if (activeTab === 'tracer-study') {
+          const res = await reportApi.getTracerStudy(filters);
+          if (isSubscribed) setTracerData({ metrics: res.metrics ?? {}, data: res.data ?? [] });
+        }
+      } catch (err: unknown) {
+        console.error(err);
+        if (isSubscribed) toast.error('Gagal memuat data laporan.');
+      } finally {
+        if (isSubscribed) setIsLoading(false);
+      }
+    };
+
+    void load();
+
+    return () => {
+      isSubscribed = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 

@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import type {
   AbsorptionMetrics,
   AbsorptionRow,
@@ -51,15 +52,31 @@ export function LaporanPrintDocument({
     'tracer-study': 'LAPORAN TRACER STUDY, RETENSI KERJA, DAN SEBARAN ALUMNI',
   };
 
+  const formatIndoDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    try {
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        if (!isNaN(d.getTime())) {
+          return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+      }
+      return dateStr;
+    } catch {
+      return dateStr;
+    }
+  };
+
   const getPeriodeString = () => {
     if (filters.startDate && filters.endDate) {
-      return `${filters.startDate} s/d ${filters.endDate}`;
+      return `${formatIndoDate(filters.startDate)} s/d ${formatIndoDate(filters.endDate)}`;
     }
     if (filters.startDate) {
-      return `Mulai ${filters.startDate}`;
+      return `Mulai ${formatIndoDate(filters.startDate)}`;
     }
     if (filters.endDate) {
-      return `Sampai dengan ${filters.endDate}`;
+      return `Sampai dengan ${formatIndoDate(filters.endDate)}`;
     }
     return 'Semua Periode / Tahun Berjalan';
   };
@@ -84,7 +101,15 @@ export function LaporanPrintDocument({
     return 'Semua Data';
   };
 
-  const docNumber = `BKK-SKARIGA/LAP/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(Math.floor(Math.random() * 900) + 100)}`;
+  const docNumber = useMemo(() => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    const h = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    return `BKK-SKARIGA/LAP/${y}/${m}/${d}${h}${min}`;
+  }, []);
 
   return (
     <div className="hidden print:block font-serif text-black bg-white p-0 m-0">

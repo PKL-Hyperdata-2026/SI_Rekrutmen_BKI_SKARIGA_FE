@@ -10,7 +10,7 @@ export function LaporanHeader({ onPrint }: LaporanHeaderProps) {
     <div className="print:hidden">
       <PageHeader
         variant="admin"
-        badge="Master data Modul"
+        badge="Master Data Modul"
         badgeIcon={<Sparkles className="h-3.5 w-3.5" />}
         title="Laporan Rekrutmen & Tracer Study"
         description="Temukan peluang karir terbaik dari industri mitra resmi SKARIGA."
@@ -21,9 +21,9 @@ export function LaporanHeader({ onPrint }: LaporanHeaderProps) {
           onClick={onPrint}
           className="cursor-pointer font-semibold shadow-sm"
         >
-          Import PDF
+          Cetak Laporan / PDF
         </PageHeader.Button>
       </PageHeader>
     </div>
   );
-}
+}

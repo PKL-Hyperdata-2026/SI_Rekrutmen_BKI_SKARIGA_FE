@@ -1,3 +1,4 @@
+import { DataTable, type DataTableColumn } from "@/components/custom";
 import { LaporanStatCard } from "./laporan-stat-card";
 import type { RecruitmentMetrics, RecruitmentRow } from "../laporan.types";
 
@@ -6,6 +7,56 @@ interface TabRekrutmenProps {
   data: RecruitmentRow[];
   isLoading?: boolean;
 }
+
+const columns: DataTableColumn<RecruitmentRow>[] = [
+  {
+    header: "PERUSAHAAN",
+    accessorKey: "company_name",
+    align: "left",
+    cell: (row) => <span className="font-bold text-slate-900">{row.company_name}</span>,
+  },
+  {
+    header: "POSISI / JABATAN",
+    accessorKey: "job_title",
+    align: "left",
+    cell: (row) => <span className="text-slate-600 font-normal">{row.job_title}</span>,
+  },
+  {
+    header: "TOTAL PELAMAR",
+    accessorKey: "total_applicants",
+    align: "center",
+    headerClassName: "text-center",
+    cell: (row) => <span className="font-bold text-slate-900">{row.total_applicants}</span>,
+  },
+  {
+    header: "LOLOS ADMIN",
+    accessorKey: "passed_admin",
+    align: "center",
+    headerClassName: "text-center",
+    cell: (row) => <span className="font-bold text-primary">{row.passed_admin}</span>,
+  },
+  {
+    header: "LOLOS TES/INTERVIEW",
+    accessorKey: "passed_interview",
+    align: "center",
+    headerClassName: "text-center",
+    cell: (row) => <span className="font-bold text-amber-600">{row.passed_interview}</span>,
+  },
+  {
+    header: "DITERIMA",
+    accessorKey: "accepted",
+    align: "center",
+    headerClassName: "text-center",
+    cell: (row) => <span className="font-bold text-emerald-600">{row.accepted}</span>,
+  },
+  {
+    header: "KELULUSAN (%)",
+    accessorKey: "pass_rate_percentage",
+    align: "right",
+    headerClassName: "text-right",
+    cell: (row) => <span className="font-bold text-emerald-600">{row.pass_rate_percentage}%</span>,
+  },
+];
 
 export function TabRekrutmen({ metrics, data, isLoading = false }: TabRekrutmenProps) {
   return (
@@ -31,54 +82,16 @@ export function TabRekrutmen({ metrics, data, isLoading = false }: TabRekrutmenP
         />
       </div>
 
-      {/* Data Table */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-xs">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50/50 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-              <tr>
-                <th className="px-6 py-4 text-center w-14">NO</th>
-                <th className="px-6 py-4">PERUSAHAAN</th>
-                <th className="px-6 py-4">POSISI / JABATAN</th>
-                <th className="px-6 py-4 text-center">TOTAL PELAMAR</th>
-                <th className="px-6 py-4 text-center">LOLOS ADMIN</th>
-                <th className="px-6 py-4 text-center">LOLOS TES/INTERVIEW</th>
-                <th className="px-6 py-4 text-center">DITERIMA</th>
-                <th className="px-6 py-4 text-right">KELULUSAN (%)</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
-              {isLoading ? (
-                <tr>
-                  <td colSpan={8} className="px-6 py-10 text-center text-xs text-slate-400">
-                    Memuat data laporan rekrutmen...
-                  </td>
-                </tr>
-              ) : data.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="px-6 py-10 text-center">
-                    <p className="text-xs font-semibold text-slate-600">Tidak ada data laporan rekrutmen</p>
-                    <p className="mt-1 text-[11px] text-slate-400">Coba sesuaikan rentang waktu atau filter pelamar.</p>
-                  </td>
-                </tr>
-              ) : (
-                data.map((row) => (
-                  <tr key={row.no} className="hover:bg-slate-50/40 transition-colors">
-                    <td className="px-6 py-4 text-center font-bold text-slate-800">{row.no}</td>
-                    <td className="px-6 py-4 font-bold text-slate-900">{row.company_name}</td>
-                    <td className="px-6 py-4 text-slate-600 font-normal">{row.job_title}</td>
-                    <td className="px-6 py-4 text-center font-bold text-slate-900">{row.total_applicants}</td>
-                    <td className="px-6 py-4 text-center font-bold text-primary">{row.passed_admin}</td>
-                    <td className="px-6 py-4 text-center font-bold text-amber-600">{row.passed_interview}</td>
-                    <td className="px-6 py-4 text-center font-bold text-emerald-600">{row.accepted}</td>
-                    <td className="px-6 py-4 text-right font-bold text-emerald-600">{row.pass_rate_percentage}%</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      {/* Standard DataTable */}
+      <DataTable
+        columns={columns}
+        data={data}
+        loading={isLoading}
+        showNumbering={true}
+        role="admin"
+        emptyMessage="Tidak ada data laporan rekrutmen"
+        emptyDescription="Coba sesuaikan rentang waktu atau filter pelamar."
+      />
     </div>
   );
 }
