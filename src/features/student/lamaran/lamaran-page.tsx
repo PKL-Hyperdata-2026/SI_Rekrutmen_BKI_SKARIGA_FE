@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { PageHeader, DateRangePicker } from "@/components/custom";
+import { DataTablePagination } from "@/components/custom/data-table-pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,
@@ -8,19 +9,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Briefcase, FileQuestion } from "lucide-react";
+import { Briefcase, FileQuestion, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { LamaranCard } from "./components/lamaran-card";
-import { LamaranScheduleModal } from "./components/lamaran-schedule-modal";
-import { useLamaranPage } from "./hooks/use-lamaran-page";
+import { LamaranCard } from "./lamaran-card";
+import { LamaranScheduleModal } from "./lamaran-schedule-modal";
+import { useLamaranPage } from "./use-lamaran-page";
 
-export const LamaranSaya = () => {
+export const LamaranPage = () => {
   const {
     applications,
     filteredApplications,
     loading,
+    search,
+    setSearch,
     statusFilter,
     setStatusFilter,
+    currentPage,
+    pageSize,
+    totalPages,
+    totalItems,
+    setCurrentPage,
     dateRange,
     setDateRange,
     instructionModalOpen,
@@ -64,6 +72,17 @@ export const LamaranSaya = () => {
           />
 
           <div className="flex flex-wrap items-center justify-end gap-2 w-full sm:w-auto">
+            <div className="relative w-full sm:w-56 flex items-center">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-white/80 pointer-events-none z-10" />
+              <input
+                type="text"
+                placeholder="Cari lowongan / industri..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-9 pr-3 h-8 text-xs text-white placeholder:text-white/70 bg-white/15 hover:bg-white/25 border border-white/35 backdrop-blur-[6px] rounded-full outline-none focus:border-white/70 shadow-[0_2px_8px_rgba(0,0,0,0.15)] transition-all"
+              />
+            </div>
+
             <DateRangePicker
               value={dateRange}
               onChange={setDateRange}
@@ -77,8 +96,8 @@ export const LamaranSaya = () => {
                 value={statusFilter}
                 onValueChange={(val) => setStatusFilter(val)}
               >
-                <SelectTrigger className="w-auto min-w-[140px] max-w-fit !text-white !bg-white/15 hover:!bg-white/25 !border !border-white/35 !backdrop-blur-[6px] !rounded-full !px-3.5 !py-1 !h-7.5 !text-xs font-semibold shadow-[0_2px_8px_rgba(0,0,0,0.15)] transition-all cursor-pointer !gap-2.5 [&_svg]:!text-white [&_svg]:!opacity-95 [&_svg]:!size-3.5 justify-between">
-                  <SelectValue placeholder="Status Seleksi">
+                <SelectTrigger className="w-auto min-w-[140px] max-w-fit !text-white !bg-white/15 hover:!bg-white/25 !border !border-white/35 !backdrop-blur-[6px] !rounded-full !px-3.5 !py-1 !h-8 !text-xs font-semibold shadow-[0_2px_8px_rgba(0,0,0,0.15)] transition-all cursor-pointer !gap-2.5 [&_svg]:!text-white [&_svg]:!opacity-95 [&_svg]:!size-3.5 justify-between">
+                  <SelectValue placeholder="Semua Status">
                     {statusFilter === "all"
                       ? "Status Seleksi"
                       : statusFilter === "accepted"
@@ -166,7 +185,7 @@ export const LamaranSaya = () => {
             ))}
           </div>
         ) : filteredApplications.length === 0 ? (
-          applications.length === 0 ? (
+          applications.length === 0 && !search && statusFilter === "all" ? (
             <div className="p-10 text-center bg-white rounded-2xl border border-slate-200 shadow-xs space-y-3">
               <div className="w-12 h-12 bg-sky-50 text-sky-600 rounded-full flex items-center justify-center mx-auto">
                 <Briefcase className="h-6 w-6" />
@@ -195,7 +214,7 @@ export const LamaranSaya = () => {
                 Tidak Ada Lamaran Ditemukan
               </h3>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Tidak ada lamaran yang sesuai dengan status filter saat ini.
+                Tidak ada lamaran yang sesuai dengan kriteria pencarian atau status filter saat ini.
               </p>
             </div>
           )
@@ -208,6 +227,19 @@ export const LamaranSaya = () => {
             />
           ))
         )}
+
+        {totalItems > 0 && (
+          <DataTablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+            role="siswa"
+            showPageSizeSelector={false}
+            className="rounded-2xl border border-slate-200 shadow-xs overflow-hidden mt-2"
+          />
+        )}
       </div>
 
       <LamaranScheduleModal
@@ -219,5 +251,5 @@ export const LamaranSaya = () => {
   );
 };
 
-export const LamaranPage = LamaranSaya;
-export default LamaranSaya;
+export const LamaranSaya = LamaranPage;
+export default LamaranPage;
