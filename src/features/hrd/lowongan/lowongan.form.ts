@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "@/components/custom/sonner";
@@ -12,9 +12,11 @@ import {
 import { hrdLowonganApi } from "./lowongan.api";
 
 export const defaultLowonganFormValues: LowonganFormValues = {
+  title: "",
   position: "",
-  major_id: "",
+  major_ids: [],
   target_applicant_id: "",
+  job_type_id: "",
   quota: "",
   deadline: "",
   work_location: "",
@@ -31,21 +33,22 @@ export function toLowonganDefaultValues(
     return defaultLowonganFormValues;
   }
 
-  // Resolve major_id
-  let resolvedMajorId = "";
+  // Resolve major_ids
+  let resolvedMajorIds: string[] = [];
   if (vacancy.majors && vacancy.majors.length > 0 && options?.majors) {
-    const firstMajor = vacancy.majors[0];
-    const match = options.majors.find(
-      (m) =>
-        String(m.id) === String(firstMajor.id) ||
-        (firstMajor.code &&
-          m.code.toLowerCase() === firstMajor.code.toLowerCase()) ||
-        (firstMajor.name &&
-          m.name.toLowerCase() === firstMajor.name.toLowerCase())
-    );
-    resolvedMajorId = match ? String(match.id) : String(firstMajor.id);
+    resolvedMajorIds = vacancy.majors
+      .map((vm) => {
+        const match = options.majors.find(
+          (m) =>
+            Boolean(vm.code && m.code && m.code.toLowerCase() === vm.code.toLowerCase()) ||
+            Boolean(vm.name && m.name && m.name.toLowerCase() === vm.name.toLowerCase()) ||
+            Boolean(vm.id && m.id && String(m.id) === String(vm.id))
+        );
+        return match ? String(match.id) : String(vm.id);
+      })
+      .filter(Boolean);
   } else if (vacancy.majorIds && vacancy.majorIds.length > 0) {
-    resolvedMajorId = String(vacancy.majorIds[0]);
+    resolvedMajorIds = vacancy.majorIds.map(String);
   }
 
   // Resolve target_applicant_id
@@ -55,20 +58,37 @@ export function toLowonganDefaultValues(
   if ((target || targetId) && options?.targetApplicants) {
     const match = options.targetApplicants.find(
       (t) =>
-        (targetId && String(t.id) === String(targetId)) ||
-        (target?.code &&
-          t.code.toLowerCase() === target.code.toLowerCase()) ||
-        (target?.name &&
-          t.name.toLowerCase() === target.name.toLowerCase())
+        Boolean(target?.code && t?.code && t.code.toLowerCase() === target.code.toLowerCase()) ||
+        Boolean(target?.name && t?.name && t.name.toLowerCase() === target.name.toLowerCase()) ||
+        Boolean(targetId && t?.id && String(t.id) === String(targetId))
     );
     resolvedTargetId = match ? String(match.id) : String(targetId || "");
   }
 
+  // Resolve job_type_id
+  let resolvedJobTypeId = "";
+  const jobType = vacancy.jobType;
+  const jobTypeId = vacancy.jobTypeId || jobType?.id;
+  if ((jobType || jobTypeId) && options?.jobTypes) {
+    const match = options.jobTypes.find(
+      (jt) =>
+        Boolean(jobType?.code && jt?.code && jt.code.toLowerCase() === jobType.code.toLowerCase()) ||
+        Boolean(jobType?.name && jt?.name && jt.name.toLowerCase() === jobType.name.toLowerCase()) ||
+        Boolean(jobTypeId && jt?.id && String(jt.id) === String(jobTypeId))
+    );
+    resolvedJobTypeId = match ? String(match.id) : String(jobTypeId || "");
+  }
+
   return {
+    title: vacancy.title || "",
     position: vacancy.position || "",
-    major_id: resolvedMajorId,
+    major_ids: resolvedMajorIds,
     target_applicant_id: resolvedTargetId,
-    quota: vacancy.quota !== undefined && vacancy.quota !== null ? String(vacancy.quota) : "",
+    job_type_id: resolvedJobTypeId,
+    quota:
+      vacancy.quota !== undefined && vacancy.quota !== null
+        ? String(vacancy.quota)
+        : "",
     deadline: vacancy.deadline ? vacancy.deadline.split("T")[0] : "",
     work_location: vacancy.workLocation || "",
     qualification: vacancy.qualification || "",
@@ -80,12 +100,17 @@ export function toLowonganDefaultValues(
 export function toSubmitLowonganPayload(
   values: LowonganFormValues
 ): LowonganPayload {
+  const position = values.position.trim();
+  const trimmedTitle = values.title?.trim();
+
   return {
-    position: values.position.trim(),
+    title: trimmedTitle || position,
+    position,
     quota: Number(values.quota),
     deadline: values.deadline,
-    major_ids: [values.major_id],
+    major_ids: values.major_ids,
     target_applicant_id: values.target_applicant_id,
+    job_type_id: values.job_type_id ? values.job_type_id : null,
     work_location: values.work_location.trim(),
     qualification: values.qualification.trim(),
     description: values.description?.trim() || null,
@@ -113,33 +138,44 @@ export function useLowonganForm({
     defaultValues: defaultLowonganFormValues,
   });
 
-  const isEditMode = Boolean(selectedVacancy?.id);
+  const { reset } = form;
+  const prevSelectedVacancyIdRef = useRef<string | number | null | undefined>(undefined);
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
 
-  // Sync selected vacancy into form fields
   useEffect(() => {
-    if (selectedVacancy) {
-      form.reset(toLowonganDefaultValues(selectedVacancy, options));
-    } else {
-      form.reset(defaultLowonganFormValues);
+    const currentId = selectedVacancy?.id ?? null;
+
+    if (prevSelectedVacancyIdRef.current === undefined) {
+      prevSelectedVacancyIdRef.current = currentId;
+      if (selectedVacancy) {
+        reset(toLowonganDefaultValues(selectedVacancy, optionsRef.current));
+      }
+      return;
     }
-  }, [selectedVacancy, options, form]);
+
+    if (currentId !== prevSelectedVacancyIdRef.current) {
+      prevSelectedVacancyIdRef.current = currentId;
+      reset(toLowonganDefaultValues(selectedVacancy, optionsRef.current));
+    }
+  }, [selectedVacancy, reset]);
 
   const handleReset = useCallback(() => {
-    form.reset(defaultLowonganFormValues);
     onClearSelection();
-  }, [form, onClearSelection]);
+    reset(defaultLowonganFormValues);
+  }, [onClearSelection, reset]);
 
-  const onSubmit = async (values: LowonganFormValues) => {
+  const onSubmit = form.handleSubmit(async (values) => {
     setIsSubmitting(true);
     try {
       const payload = toSubmitLowonganPayload(values);
 
-      if (isEditMode && selectedVacancy?.id) {
+      if (selectedVacancy) {
         await hrdLowonganApi.updateVacancy(selectedVacancy.id, payload);
-        toast.success("Lowongan kerja berhasil diperbarui.");
+        toast.success("Lowongan kerja berhasil diperbarui!");
       } else {
         await hrdLowonganApi.createVacancy(payload);
-        toast.success("Lowongan kerja berhasil dipublikasikan.");
+        toast.success("Lowongan kerja berhasil dipublikasikan!");
       }
 
       handleReset();
@@ -148,35 +184,35 @@ export function useLowonganForm({
       const apiErr = err as {
         response?: { data?: { message?: string; errors?: Record<string, string[]> } };
       };
-      if (apiErr.response?.data?.errors) {
-        const errors = apiErr.response.data.errors;
-        if (errors.position?.[0]) form.setError("position", { message: errors.position[0] });
-        if (errors.quota?.[0]) form.setError("quota", { message: errors.quota[0] });
-        if (errors.deadline?.[0]) form.setError("deadline", { message: errors.deadline[0] });
-        if (errors.major_ids?.[0]) form.setError("major_id", { message: errors.major_ids[0] });
-        if (errors.target_applicant_id?.[0]) {
-          form.setError("target_applicant_id", { message: errors.target_applicant_id[0] });
-        }
-        if (errors.work_location?.[0]) form.setError("work_location", { message: errors.work_location[0] });
-        if (errors.qualification?.[0]) form.setError("qualification", { message: errors.qualification[0] });
-      } else {
-        toast.error(
-          apiErr.response?.data?.message ||
-            (isEditMode
-              ? "Gagal memperbarui lowongan kerja."
-              : "Gagal mempublikasikan lowongan kerja.")
-        );
+      const validationErrors = apiErr.response?.data?.errors;
+      if (validationErrors) {
+        Object.entries(validationErrors).forEach(([field, msgs]) => {
+          if (msgs && msgs.length > 0) {
+            const formField =
+              field.startsWith("major_ids.") || field === "major_ids"
+                ? "major_ids"
+                : (field as keyof LowonganFormValues);
+            form.setError(formField, {
+              type: "server",
+              message: msgs[0],
+            });
+          }
+        });
       }
+      toast.error(
+        apiErr.response?.data?.message ||
+          "Gagal menyimpan lowongan kerja. Silakan periksa kembali formulir."
+      );
     } finally {
       setIsSubmitting(false);
     }
-  };
+  });
 
   return {
     form,
     isSubmitting,
-    isEditMode,
+    isEditMode: Boolean(selectedVacancy),
     handleReset,
-    onSubmit: form.handleSubmit(onSubmit),
+    onSubmit,
   };
 }

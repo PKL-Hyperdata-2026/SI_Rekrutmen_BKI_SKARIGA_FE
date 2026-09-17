@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { toast } from "@/components/custom/sonner";
 import type {
   HrdJobVacancyItem,
   HrdJobVacancyOptions,
@@ -23,7 +24,17 @@ export function useLowonganPage() {
   const [selectedVacancy, setSelectedVacancy] =
     useState<HrdJobVacancyItem | null>(null);
 
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   const fetchMeta = useCallback(async () => {
+    if (!isMountedRef.current) return;
     setIsLoadingMeta(true);
     try {
       const [statsRes, optionsRes] = await Promise.allSettled([
@@ -31,49 +42,30 @@ export function useLowonganPage() {
         hrdLowonganApi.getOptions(),
       ]);
 
+      if (!isMountedRef.current) return;
+
       if (statsRes.status === "fulfilled") {
         setStatistics(statsRes.value);
+      } else {
+        console.error("Failed to load vacancy statistics:", statsRes.reason);
       }
+
       if (optionsRes.status === "fulfilled") {
         setOptions(optionsRes.value);
+      } else {
+        console.error("Failed to load vacancy options:", optionsRes.reason);
+        toast.error("Gagal memuat opsi pilihan lowongan kerja.");
       }
     } finally {
-      setIsLoadingMeta(false);
+      if (isMountedRef.current) {
+        setIsLoadingMeta(false);
+      }
     }
   }, []);
 
   useEffect(() => {
-    let isMounted = true;
-
-    async function load() {
-      setIsLoadingMeta(true);
-      try {
-        const [statsRes, optionsRes] = await Promise.allSettled([
-          hrdLowonganApi.getStatistics(),
-          hrdLowonganApi.getOptions(),
-        ]);
-
-        if (isMounted) {
-          if (statsRes.status === "fulfilled") {
-            setStatistics(statsRes.value);
-          }
-          if (optionsRes.status === "fulfilled") {
-            setOptions(optionsRes.value);
-          }
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoadingMeta(false);
-        }
-      }
-    }
-
-    void load();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    void fetchMeta();
+  }, [fetchMeta]);
 
   const handleEditVacancy = useCallback((item: HrdJobVacancyItem) => {
     setSelectedVacancy(item);
