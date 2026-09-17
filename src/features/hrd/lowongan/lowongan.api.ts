@@ -7,12 +7,22 @@ import type {
 } from "./lowongan.schema";
 
 export const hrdLowonganApi = {
-  async getVacancies(params: {
-    search?: string;
-    page?: number;
-    per_page?: number;
-  } = {}): Promise<HrdJobVacancyPagination> {
-    const response = await api.get("/hrd/job-vacancies", { params });
+  async getVacancies(
+    params: {
+      search?: string;
+      page?: number;
+      per_page?: number;
+      status_id?: string;
+      is_active?: boolean;
+    } = {},
+    options?: {
+      signal?: AbortSignal;
+    }
+  ): Promise<HrdJobVacancyPagination> {
+    const response = await api.get("/hrd/job-vacancies", {
+      params,
+      signal: options?.signal,
+    });
     const payload = response.data?.data;
     if (payload && Array.isArray(payload.data)) {
       return payload as HrdJobVacancyPagination;
@@ -32,8 +42,10 @@ export const hrdLowonganApi = {
     const response = await api.get("/hrd/job-vacancies/statistics");
     const payload = response.data?.data || {};
     return {
-      active: Number(payload.active ?? 0),
-      draft_closed: Number(payload.draft_closed ?? 0),
+      active: Number(payload.activeCount ?? payload.active ?? 0),
+      draft_closed: Number(
+        payload.draftOrClosedCount ?? payload.draft_closed ?? 0
+      ),
     };
   },
 
@@ -67,10 +79,11 @@ export const hrdLowonganApi = {
     return response.data;
   },
 
-  async toggleActive(id: string | number, isActive: boolean) {
-    const response = await api.patch(`/hrd/job-vacancies/${id}/status`, {
-      is_active: isActive,
-    });
+  async toggleActive(id: string | number, isActive?: boolean) {
+    const response = await api.patch(
+      `/hrd/job-vacancies/${id}/toggle-active`,
+      isActive !== undefined ? { is_active: isActive } : {}
+    );
     return response.data;
   },
 };

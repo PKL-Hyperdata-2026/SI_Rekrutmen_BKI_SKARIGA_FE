@@ -109,17 +109,24 @@ export interface HrdJobVacancyPagination {
 }
 
 export const lowonganFormSchema = z.object({
+  title: z
+    .string()
+    .trim()
+    .max(255, { message: "Judul lowongan maksimal 255 karakter." })
+    .optional()
+    .nullable(),
   position: z
     .string()
     .trim()
     .min(1, { message: "Posisi pekerjaan wajib diisi." })
     .max(255, { message: "Posisi pekerjaan maksimal 255 karakter." }),
-  major_id: z
-    .string()
-    .min(1, { message: "Kategori jurusan wajib dipilih." }),
+  major_ids: z
+    .array(z.string())
+    .min(1, { message: "Pilih minimal satu jurusan." }),
   target_applicant_id: z
     .string()
     .min(1, { message: "Target pelamar wajib dipilih." }),
+  job_type_id: z.string().optional().nullable(),
   quota: z
     .union([z.string(), z.number()])
     .refine((val) => val !== "" && !Number.isNaN(Number(val)), {
@@ -147,11 +154,13 @@ export const lowonganFormSchema = z.object({
 export type LowonganFormValues = z.infer<typeof lowonganFormSchema>;
 
 export interface LowonganPayload {
+  title?: string | null;
   position: string;
   quota: number;
   deadline: string;
   major_ids: Array<string | number>;
   target_applicant_id: string | number;
+  job_type_id?: string | number | null;
   work_location: string;
   qualification: string;
   description?: string | null;
