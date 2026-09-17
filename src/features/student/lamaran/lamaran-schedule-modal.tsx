@@ -1,8 +1,8 @@
 import React from "react";
 import { Modal } from "@/components/custom/modal";
 import { Building2, ExternalLink } from "lucide-react";
-import type { StudentJobApplication } from "../lamaran.schema";
-import { useLamaranScheduleModal } from "../hooks/use-lamaran-schedule-modal";
+import type { StudentJobApplication } from "./lamaran.schema";
+import { useLamaranScheduleModal } from "./use-lamaran-schedule-modal";
 
 export interface LamaranScheduleModalProps {
   open: boolean;

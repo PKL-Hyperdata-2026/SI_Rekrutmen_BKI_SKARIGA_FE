@@ -1,5 +1,5 @@
 import { useMemo, useCallback } from "react";
-import type { StudentJobApplication } from "../lamaran.schema";
+import type { StudentJobApplication } from "./lamaran.schema";
 
 export interface UseLamaranScheduleModalProps {
   open: boolean;

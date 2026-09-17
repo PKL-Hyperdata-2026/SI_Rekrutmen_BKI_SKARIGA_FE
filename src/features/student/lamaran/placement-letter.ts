@@ -1,5 +1,5 @@
 import { toast } from "@/components/custom/sonner";
-import type { StudentJobApplication } from "../lamaran.schema";
+import type { StudentJobApplication } from "./lamaran.schema";
 
 export function downloadPlacementLetter(
   application: StudentJobApplication

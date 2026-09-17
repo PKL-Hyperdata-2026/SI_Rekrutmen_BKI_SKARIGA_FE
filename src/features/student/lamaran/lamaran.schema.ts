@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const jobVacancyInfoSchema = z.object({
-  id: z.number(),
+  id: z.union([z.string(), z.number()]),
   title: z.string(),
   position: z.string().nullable().optional(),
   companyName: z.string().nullable().optional(),
@@ -12,14 +12,14 @@ export const jobVacancyInfoSchema = z.object({
 export type JobVacancyInfo = z.infer<typeof jobVacancyInfoSchema>;
 
 export const standardStatusSchema = z.object({
-  id: z.number(),
+  id: z.union([z.string(), z.number()]),
   name: z.string(),
   code: z.string(),
 });
 export type StandardStatus = z.infer<typeof standardStatusSchema>;
 
 export const stageInfoSchema = z.object({
-  id: z.number(),
+  id: z.union([z.string(), z.number()]),
   name: z.string(),
   order: z.number().optional(),
   agendaName: z.string().nullable().optional(),
@@ -30,7 +30,7 @@ export const stageInfoSchema = z.object({
 export type StageInfo = z.infer<typeof stageInfoSchema>;
 
 export const stageHistorySchema = z.object({
-  id: z.number(),
+  id: z.union([z.string(), z.number()]),
   stage: stageInfoSchema.nullable().optional(),
   status: standardStatusSchema.nullable().optional(),
   assessorName: z.string().nullable().optional(),
@@ -41,7 +41,7 @@ export const stageHistorySchema = z.object({
 export type StageHistory = z.infer<typeof stageHistorySchema>;
 
 export const placementInfoSchema = z.object({
-  id: z.number().optional(),
+  id: z.union([z.string(), z.number()]).optional(),
   acceptedDate: z.string().nullable().optional(),
   startDate: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
@@ -49,15 +49,15 @@ export const placementInfoSchema = z.object({
 export type PlacementInfo = z.infer<typeof placementInfoSchema>;
 
 export const selectionResultInfoSchema = z.object({
-  id: z.number().optional(),
+  id: z.union([z.string(), z.number()]).optional(),
   decision: z.string().nullable().optional(),
   letterUrl: z.string().nullable().optional(),
 });
 export type SelectionResultInfo = z.infer<typeof selectionResultInfoSchema>;
 
 export const studentJobApplicationSchema = z.object({
-  id: z.number(),
-  jobVacancyId: z.number().optional(),
+  id: z.union([z.string(), z.number()]),
+  jobVacancyId: z.union([z.string(), z.number()]).optional(),
   vacancy: jobVacancyInfoSchema.optional(),
   status: standardStatusSchema.optional(),
   currentStage: stageInfoSchema.nullable().optional(),
@@ -71,33 +71,40 @@ export const studentJobApplicationSchema = z.object({
 export type StudentJobApplication = z.infer<typeof studentJobApplicationSchema>;
 
 export interface StudentJobApplicationFilters {
-  status_id?: number;
+  search?: string;
+  status_id?: number | string;
+  status_code?: string;
   page?: number;
   per_page?: number;
+  start_date?: string;
+  end_date?: string;
 }
 
 export interface PaginationMeta {
+  current_page: number;
+  last_page: number;
+  per_page: number;
+  total: number;
+  from: number | null;
+  to: number | null;
+}
+
+export interface StudentJobApplicationPaginatedData {
+  data: StudentJobApplication[];
   current_page?: number;
   last_page?: number;
   per_page?: number;
   total?: number;
   from?: number | null;
   to?: number | null;
+  links?: Record<string, unknown>;
+  meta?: PaginationMeta;
 }
 
 export interface StudentJobApplicationListResponse {
   success: boolean;
   message: string;
-  data:
-    | {
-        data: StudentJobApplication[];
-        meta?: PaginationMeta;
-        links?: Record<string, string | null>;
-        current_page?: number;
-        last_page?: number;
-        total?: number;
-      }
-    | StudentJobApplication[];
+  data: StudentJobApplicationPaginatedData | StudentJobApplication[];
 }
 
 export interface StudentJobApplicationDetailResponse {

@@ -13,8 +13,8 @@ import {
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { LamaranDetailStepper } from "./lamaran-detail-stepper";
-import type { StudentJobApplication } from "../lamaran.schema";
-import { downloadPlacementLetter } from "../utils/placement-letter";
+import type { StudentJobApplication } from "./lamaran.schema";
+import { downloadPlacementLetter } from "./placement-letter";
 
 export interface LamaranCardProps {
   application: StudentJobApplication;

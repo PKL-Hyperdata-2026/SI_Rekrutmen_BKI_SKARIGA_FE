@@ -16,7 +16,7 @@ export const getStudentJobApplications = async (
 };
 
 export const getStudentJobApplicationDetail = async (
-  id: number
+  id: number | string
 ): Promise<StudentJobApplicationDetailResponse> => {
   const response = await api.get<StudentJobApplicationDetailResponse>(
     `/my-applications/${id}`
