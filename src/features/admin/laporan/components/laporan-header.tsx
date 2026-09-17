@@ -2,7 +2,7 @@ import { Sparkles, Printer } from "lucide-react";
 import { PageHeader } from "@/components/custom";
 
 interface LaporanHeaderProps {
-  onPrint: () => void;
+  onPrint?: () => void;
 }
 
 export function LaporanHeader({ onPrint }: LaporanHeaderProps) {

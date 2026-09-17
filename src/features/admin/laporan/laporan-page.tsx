@@ -101,6 +101,12 @@ export function LaporanPage() {
           setTracerData({ metrics: res.metrics ?? {}, data: res.data ?? [] });
         }
       } catch (err: unknown) {
+        if (err && typeof err === 'object' && ('code' in err || 'name' in err)) {
+          const e = err as { code?: string; name?: string };
+          if (e.code === 'ERR_CANCELED' || e.name === 'CanceledError' || e.name === 'AbortError') {
+            return;
+          }
+        }
         console.error(err);
         toast.error('Gagal memuat data laporan.');
       } finally {
@@ -129,8 +135,15 @@ export function LaporanPage() {
           if (isSubscribed) setTracerData({ metrics: res.metrics ?? {}, data: res.data ?? [] });
         }
       } catch (err: unknown) {
+        if (!isSubscribed) return;
+        if (err && typeof err === 'object' && ('code' in err || 'name' in err)) {
+          const e = err as { code?: string; name?: string };
+          if (e.code === 'ERR_CANCELED' || e.name === 'CanceledError' || e.name === 'AbortError') {
+            return;
+          }
+        }
         console.error(err);
-        if (isSubscribed) toast.error('Gagal memuat data laporan.');
+        toast.error('Gagal memuat data laporan.');
       } finally {
         if (isSubscribed) setIsLoading(false);
       }
@@ -144,7 +157,12 @@ export function LaporanPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
+  // FITUR CETAK DIARSIPKAN SEMENTARA
+  // Untuk mengaktifkan kembali, ubah nilai isPrintEnabled menjadi true
+  const isPrintEnabled = false;
+
   const handlePrintPDF = () => {
+    if (!isPrintEnabled) return;
     window.print();
   };
 
@@ -168,17 +186,19 @@ export function LaporanPage() {
 
   return (
     <div className="space-y-6 pb-12 print:p-0 print:m-0 print:space-y-0">
-      {/* 1. TAMPILAN RESMI CETAK (Hanya Muncul Saat Print / PDF) */}
-      <LaporanPrintDocument
-        activeTab={activeTab}
-        filters={filters}
-        options={options}
-        rekrutmenData={rekrutmenData}
-        absensiData={absensiData}
-        keterserapanData={keterserapanData}
-        tracerData={tracerData}
-        adminName={user?.name || 'Administrator BKK SKARIGA'}
-      />
+      {/* 1. TAMPILAN RESMI CETAK (Diarsipkan: Aktifkan kembali saat PRD Cetak disetujui) */}
+      {isPrintEnabled && (
+        <LaporanPrintDocument
+          activeTab={activeTab}
+          filters={filters}
+          options={options}
+          rekrutmenData={rekrutmenData}
+          absensiData={absensiData}
+          keterserapanData={keterserapanData}
+          tracerData={tracerData}
+          adminName={user?.name || 'Administrator BKK SKARIGA'}
+        />
+      )}
 
       {/* 2. TAMPILAN DASHBOARD INTERAKTIF WEB (Disembunyikan Saat Print) */}
       <div className="space-y-6 print:hidden">

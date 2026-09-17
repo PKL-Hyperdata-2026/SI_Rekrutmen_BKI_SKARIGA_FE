@@ -441,13 +441,16 @@ textarea.custom-scrollbar::-webkit-scrollbar-thumb:hover {
     display: block !important;
   }
 
-  /* Sembunyikan scrollbar, sidebar, header, dan elemen web saat print */
+  /* Sembunyikan scrollbar, sidebar, header, toast notifikasi, dan elemen web saat print */
   [data-slot="scroll-area-scrollbar"],
   [data-slot="scroll-area-thumb"],
   [data-slot="sidebar"],
   aside,
   header,
   nav,
+  [data-sonner-toaster],
+  [data-sonner-toast],
+  .toaster,
   .print\:hidden {
     display: none !important;
   }
