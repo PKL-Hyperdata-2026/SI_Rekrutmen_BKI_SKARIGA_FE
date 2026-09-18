@@ -11,10 +11,42 @@ export interface CekStatusModalProps {
   item: RecruitmentSelectionItem | null;
 }
 
+function resolveAttendanceLabelForModal(item: RecruitmentSelectionItem | null): string {
+  if (!item) return "-";
+  const histories = item.stageHistories ?? [];
+  if (histories.length === 0) return "Belum Absensi";
+  const currentStageId = item.currentStage?.id != null ? String(item.currentStage.id) : null;
+  let target = histories.find((h) =>
+    currentStageId && h.selectionStage?.id != null ? String(h.selectionStage.id) === currentStageId : false
+  );
+  if (!target) {
+    const sorted = [...histories].sort((a, b) => {
+      const ca = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const cb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return cb - ca;
+    });
+    target = sorted[0] ?? histories[0];
+  }
+  const raw = target?.attendance?.attendanceLabel ?? target?.attendance?.attendanceStatus?.name ?? null;
+  const normalized = (raw ?? "").trim().toLowerCase();
+  if (normalized === "hadir" || normalized === "present") return "Hadir";
+  if (
+    normalized === "tidak hadir" ||
+    normalized === "tidak_hadir" ||
+    normalized === "absent" ||
+    normalized.includes("tidak hadir")
+  )
+    return "Tidak Hadir";
+  return raw && raw.trim() !== "" && raw !== "Belum Presensi" ? raw : "Belum Absensi";
+}
+
 export function CekStatusModal({ open, onOpenChange, item }: CekStatusModalProps) {
   const companyName = item?.jobVacancy?.companyName ?? "-";
   const quota = item?.jobVacancy?.quota != null ? String(item.jobVacancy.quota) : "-";
   const qualification = item?.jobVacancy?.qualification ?? item?.jobVacancy?.description ?? "-";
+  const namaPelamar = item?.student?.name ?? item?.studentAlumni?.user?.fullName ?? "-";
+  const jurusan = item?.student?.majorName ?? item?.studentAlumni?.major?.name ?? "-";
+  const statusKehadiran = resolveAttendanceLabelForModal(item);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -41,6 +73,48 @@ export function CekStatusModal({ open, onOpenChange, item }: CekStatusModalProps
 
         {/* Body view-only */}
         <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-5">
+          {/* Nama Lengkap Pelamar */}
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="cek-nama" className="text-xs font-semibold text-slate-700">
+              Nama Lengkap Pelamar <span className="text-rose-500">*</span>
+            </Label>
+            <Input
+              id="cek-nama"
+              value={namaPelamar}
+              readOnly
+              disabled
+              className="h-10 rounded-xl border-slate-200 bg-slate-50 text-slate-900 text-sm font-medium disabled:opacity-100 disabled:cursor-not-allowed disabled:bg-slate-50"
+            />
+          </div>
+
+          {/* Jurusan */}
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="cek-jurusan" className="text-xs font-semibold text-slate-700">
+              Jurusan <span className="text-rose-500">*</span>
+            </Label>
+            <Input
+              id="cek-jurusan"
+              value={jurusan}
+              readOnly
+              disabled
+              className="h-10 rounded-xl border-slate-200 bg-slate-50 text-slate-900 text-sm font-medium disabled:opacity-100 disabled:cursor-not-allowed disabled:bg-slate-50"
+            />
+          </div>
+
+          {/* Status Kehadiran */}
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="cek-kehadiran" className="text-xs font-semibold text-slate-700">
+              Status Kehadiran <span className="text-rose-500">*</span>
+            </Label>
+            <Input
+              id="cek-kehadiran"
+              value={statusKehadiran}
+              readOnly
+              disabled
+              className="h-10 rounded-xl border-slate-200 bg-slate-50 text-slate-900 text-sm font-medium disabled:opacity-100 disabled:cursor-not-allowed disabled:bg-slate-50"
+            />
+          </div>
+
           {/* Nama Perusahaan Mitra */}
           <div className="flex flex-col gap-2">
             <Label htmlFor="cek-company" className="text-xs font-semibold text-slate-700">

@@ -5,7 +5,6 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
 } from "@/components/ui/select";
 import type {
   SelectionJobVacancyOption,
@@ -85,13 +84,12 @@ export function SeleksiFilter({
             isLoading={isLoadingOptions}
             className="w-[220px] sm:w-[240px] h-10 rounded-xl bg-white border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50/80 transition-colors shadow-none cursor-pointer"
           >
-            <div className="flex items-center gap-2 truncate min-w-0">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
               <Building2 className="h-4 w-4 text-[#7B4DFF] shrink-0" />
               <span className="truncate text-xs font-semibold text-slate-700" title={selectedVacancyLabel}>
                 {selectedVacancyLabel}
               </span>
             </div>
-            <SelectValue className="hidden" />
           </SelectTrigger>
           <SelectContent className="rounded-xl border-slate-200 shadow-md max-h-72">
             {vacancyOptions.map((opt) => (
@@ -112,13 +110,12 @@ export function SeleksiFilter({
             isLoading={isLoadingOptions}
             className="w-[210px] sm:w-[230px] h-10 rounded-xl bg-white border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50/80 transition-colors shadow-none cursor-pointer"
           >
-            <div className="flex items-center gap-2 truncate min-w-0">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
               <Layers className="h-4 w-4 text-[#7B4DFF] shrink-0" />
               <span className="truncate text-xs font-semibold text-slate-700" title={tahapanLabel}>
                 {tahapanLabel}
               </span>
             </div>
-            <SelectValue className="hidden" />
           </SelectTrigger>
           <SelectContent className="rounded-xl border-slate-200 shadow-md max-h-72">
             {stageOptions.map((opt) => (
@@ -136,13 +133,12 @@ export function SeleksiFilter({
         {/* Filter 3: Kehadiran */}
         <Select value={selectedAttendance} onValueChange={onAttendanceChange}>
           <SelectTrigger className="w-[200px] sm:w-[220px] h-10 rounded-xl bg-white border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50/80 transition-colors shadow-none cursor-pointer">
-            <div className="flex items-center gap-2 truncate min-w-0">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
               <CalendarCheck className="h-4 w-4 text-[#7B4DFF] shrink-0" />
               <span className="truncate text-xs font-semibold text-slate-700" title={kehadiranLabel}>
                 {kehadiranLabel}
               </span>
             </div>
-            <SelectValue className="hidden" />
           </SelectTrigger>
           <SelectContent className="rounded-xl border-slate-200 shadow-md">
             {ATTENDANCE_OPTIONS.map((opt) => (

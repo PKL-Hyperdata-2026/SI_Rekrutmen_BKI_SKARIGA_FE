@@ -23,22 +23,6 @@ export interface SeleksiTableProps {
   onUpdateStatus?: (item: RecruitmentSelectionItem) => void;
 }
 
-function formatTimeWIB(iso?: string | null): string {
-  if (!iso) return "-";
-  try {
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return "-";
-    return new Intl.DateTimeFormat("id-ID", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-      timeZone: "Asia/Jakarta",
-    }).format(d);
-  } catch {
-    return "-";
-  }
-}
-
 function resolveAttendanceBadge(attendanceLabel?: string | null): {
   label: string;
   className: string;
@@ -69,25 +53,6 @@ function resolveAttendanceBadge(attendanceLabel?: string | null): {
   };
 }
 
-function resolveStageBadge(name?: string | null, code?: string | null): {
-  label: string;
-  className: string;
-} {
-  const lower = `${name ?? ""} ${code ?? ""}`.toLowerCase();
-  if (lower.includes("diterima") || lower.includes("lolos final") || lower.includes("accepted") || lower.includes("penempatan")) {
-    return { label: name ?? code ?? "Diterima", className: "bg-emerald-50 text-emerald-700 border-emerald-200" };
-  }
-  if (lower.includes("tidak lolos") || lower.includes("gagal") || lower.includes("rejected") || lower.includes("ditolak")) {
-    return { label: name ?? "Tidak Lolos", className: "bg-rose-50 text-rose-700 border-rose-200" };
-  }
-  if (lower.includes("interview") || lower.includes("wawancara") || lower.includes("psikotes") || lower.includes("psychotest") || lower.includes("tes") || lower.includes("test") || lower.includes("administrasi")) {
-    // Biru untuk tahap tes/interview
-    return { label: name ?? code ?? "-", className: "bg-sky-50 text-sky-700 border-sky-200" };
-  }
-  if (!name && !code) return { label: "-", className: "bg-slate-50 text-slate-600 border-slate-200" };
-  return { label: name ?? code ?? "-", className: "bg-white text-slate-700 border-slate-200" };
-}
-
 function resolveAttendanceForItem(
   item: RecruitmentSelectionItem
 ): { label: string | null; attendedAt: string | null } {
@@ -113,12 +78,6 @@ function resolveAttendanceForItem(
     label: target.attendance?.attendanceLabel ?? target.attendance?.attendanceStatus?.name ?? null,
     attendedAt: target.attendance?.attendedAt ?? null,
   };
-}
-
-function getStatusLabel(item: RecruitmentSelectionItem): string {
-  const gradYear = item.studentAlumni?.graduationYear;
-  if (gradYear) return `Status: Alumni`;
-  return "Status: Siswa kls 12";
 }
 
 export function SeleksiTable({
@@ -170,7 +129,7 @@ export function SeleksiTable({
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <div className="font-bold text-slate-900 text-sm leading-snug truncate max-w-[180px]">{alumniName}</div>
+                <div className="font-bold text-slate-900 text-sm leading-snug whitespace-normal break-words">{alumniName}</div>
                 <div className="text-xs text-slate-500 mt-0.5 font-medium">NIS: {nis}</div>
               </div>
             </div>
@@ -178,18 +137,16 @@ export function SeleksiTable({
         },
       },
       {
-        header: "JURUSAN & STATUS",
+        header: "JURUSAN",
         align: "left",
         cell: (row) => {
           const majorName =
             row.student?.majorName ??
             row.studentAlumni?.major?.name ??
             "-";
-          const statusText = getStatusLabel(row);
           return (
-            <div className="flex flex-col gap-0.5 min-w-0">
-              <span className="text-sm font-bold text-slate-900 truncate max-w-[180px]">{majorName}</span>
-              <span className="text-xs text-slate-500 font-medium truncate">{statusText}</span>
+            <div className="flex flex-col min-w-0">
+              <span className="text-sm font-bold text-slate-900">{majorName}</span>
             </div>
           );
         },
@@ -200,34 +157,11 @@ export function SeleksiTable({
         headerClassName: "text-center",
         className: "text-center",
         cell: (row) => {
-          const { label, attendedAt } = resolveAttendanceForItem(row);
+          const { label } = resolveAttendanceForItem(row);
           const badge = resolveAttendanceBadge(label);
-          const time = formatTimeWIB(attendedAt);
-          const pukulText = attendedAt && badge.label === "Hadir" ? `Pukul: ${time} WIB` : "Pukul: -";
           return (
-            <div className="flex flex-col items-center gap-1.5">
+            <div className="flex flex-col items-center">
               <Badge variant="outline" className={`rounded-full px-3 py-1 text-xs font-semibold border ${badge.className}`}>
-                {badge.label}
-              </Badge>
-              <span className="text-[11px] text-slate-500 font-medium">{pukulText}</span>
-            </div>
-          );
-        },
-      },
-      {
-        header: "TAHAP SELEKSI SAAT INI",
-        align: "center",
-        headerClassName: "text-center",
-        className: "text-center",
-        cell: (row) => {
-          const stageName = row.currentStage?.name ?? row.stageHistories?.[0]?.selectionStage?.name ?? "-";
-          // Use status or stage name to determine badge style
-          const badgeSource = row.currentStage?.name ?? stageName;
-          const statusCode = row.status?.code ?? undefined;
-          const badge = resolveStageBadge(badgeSource, statusCode);
-          return (
-            <div className="flex flex-col items-center gap-1">
-              <Badge variant="outline" className={`rounded-full px-3 py-1 text-xs font-semibold border bg-white ${badge.className}`}>
                 {badge.label}
               </Badge>
             </div>
@@ -245,7 +179,7 @@ export function SeleksiTable({
               type="button"
               size="sm"
               onClick={() => handleCekStatus?.(row)}
-              className="h-8 rounded-full px-5 bg-[#351c75] hover:bg-[#2A1B7B] text-white text-xs font-semibold shadow-sm border-0 cursor-pointer"
+              className="h-8 rounded-xl px-5 bg-[#351c75] hover:bg-[#2A1B7B] text-white text-xs font-semibold shadow-sm border-0 cursor-pointer"
             >
               Cek Status
             </Button>
@@ -276,14 +210,8 @@ export function SeleksiTable({
             const initial = name.charAt(0).toUpperCase();
             const nis = row.student?.nis ?? row.studentAlumni?.nis ?? "-";
             const majorName = row.student?.majorName ?? row.studentAlumni?.major?.name ?? "-";
-            const statusText = getStatusLabel(row);
-            const stageName = row.currentStage?.name ?? row.stageHistories?.[0]?.selectionStage?.name ?? "-";
-            const statusCode = row.status?.code ?? undefined;
-            const stageBadge = resolveStageBadge(stageName, statusCode);
-            const { label, attendedAt } = resolveAttendanceForItem(row);
+            const { label } = resolveAttendanceForItem(row);
             const attendanceBadge = resolveAttendanceBadge(label);
-            const time = formatTimeWIB(attendedAt);
-            const pukulText = attendedAt && attendanceBadge.label === "Hadir" ? `Pukul: ${time} WIB` : "Pukul: -";
 
             return (
               <Card
@@ -302,7 +230,7 @@ export function SeleksiTable({
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
-                    <div className="font-bold text-slate-900 text-sm truncate">{name}</div>
+                    <div className="font-bold text-slate-900 text-sm whitespace-normal break-words">{name}</div>
                     <div className="text-xs text-slate-500">NIS: {nis}</div>
                   </div>
                   <Badge variant="outline" className="text-xs font-bold text-slate-400 border-none bg-transparent p-0 shadow-none">
@@ -312,34 +240,26 @@ export function SeleksiTable({
 
                 <CardContent className="grid grid-cols-2 gap-2 text-xs pt-2.5 border-t border-slate-100 p-0">
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Jurusan & Status</span>
-                    <span className="text-sm font-bold text-slate-900 truncate">{majorName}</span>
-                    <span className="text-xs text-slate-500">{statusText}</span>
+                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Jurusan</span>
+                    <span className="text-sm font-bold text-slate-900">{majorName}</span>
                   </div>
                   <div className="flex flex-col gap-1 items-start">
                     <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Absensi</span>
                     <Badge variant="outline" className={`rounded-full px-3 py-1 text-xs font-semibold border ${attendanceBadge.className}`}>
                       {attendanceBadge.label}
                     </Badge>
-                    <span className="text-[11px] text-slate-500">{pukulText}</span>
                   </div>
                 </CardContent>
 
-                <CardContent className="flex flex-col gap-1 pt-2.5 border-t border-slate-100 p-0">
-                  <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Tahap Saat Ini</span>
-                  <div className="flex items-center justify-between gap-2">
-                    <Badge variant="outline" className={`rounded-full px-3 py-1 text-xs font-semibold border bg-white ${stageBadge.className}`}>
-                      {stageBadge.label}
-                    </Badge>
-                    <Button
-                      type="button"
-                      size="sm"
-                      onClick={() => handleCekStatus?.(row)}
-                      className="h-8 rounded-full px-5 bg-[#351c75] hover:bg-[#2A1B7B] text-white text-xs font-semibold shadow-sm border-0 cursor-pointer"
-                    >
-                      Cek Status
-                    </Button>
-                  </div>
+                <CardContent className="flex pt-2.5 border-t border-slate-100 p-0">
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => handleCekStatus?.(row)}
+                    className="w-full h-9 rounded-xl bg-[#351c75] hover:bg-[#2A1B7B] text-white text-xs font-semibold shadow-sm border-0 cursor-pointer"
+                  >
+                    Cek Status
+                  </Button>
                 </CardContent>
               </Card>
             );
