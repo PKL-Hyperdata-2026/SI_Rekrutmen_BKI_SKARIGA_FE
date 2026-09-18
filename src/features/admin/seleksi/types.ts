@@ -90,6 +90,13 @@ export interface SelectionJobVacancy {
   title: string;
   position?: string | null;
   companyName?: string | null;
+  quota?: number | null;
+  qualification?: string | null;
+  description?: string | null;
+  workLocation?: string | null;
+  deadline?: string | null;
+  minSalary?: number | null;
+  maxSalary?: number | null;
 }
 
 export interface SelectionStudentUser {
@@ -145,10 +152,27 @@ export interface SelectionPaginationMeta {
   to?: number | null;
 }
 
+export interface SelectionSummaryRaw {
+  total_applicants: number;
+  total_passed_admin: number;
+  total_accepted: number;
+}
+
+export interface SelectionApplicantsPaginated {
+  data: RecruitmentSelectionItem[];
+  links?: Record<string, unknown> | null;
+  meta: SelectionPaginationMeta;
+}
+
+export interface SelectionListData {
+  summary: SelectionSummaryRaw;
+  applicants: SelectionApplicantsPaginated;
+}
+
 export interface SelectionListEnvelope {
   success: boolean;
   message?: string;
-  data: {
+  data: SelectionListData | {
     data: RecruitmentSelectionItem[];
     meta?: SelectionPaginationMeta;
     current_page?: number;

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { api } from "@/api/axios";
 import type {
   RecruitmentSelectionItem,
@@ -11,22 +11,20 @@ import type {
 
 type AttendanceFilterValue = "all" | "hadir" | "tidak_hadir" | "belum_absensi";
 
+// Backend actual payload: data: { summary: {total_applicants, total_passed_admin, total_accepted}, applicants: {data:[], meta:{...}} }
 function normalizeSelectionsPayload(
   envelope: SelectionListEnvelope
-): { rows: RecruitmentSelectionItem[]; meta: SelectionPaginationMeta | null } {
-  const raw = envelope.data as unknown as Record<string, unknown> | unknown[];
+): { rows: RecruitmentSelectionItem[]; meta: SelectionPaginationMeta | null; summary: SelectionSummaryStats | null } {
+  const raw = envelope.data as unknown;
 
+  // Case 1: raw is array (legacy direct array pagination)
   if (Array.isArray(raw)) {
+    const metaEnvelope = (envelope as unknown as Record<string, unknown>).meta as SelectionPaginationMeta | undefined;
     const total = (envelope as unknown as Record<string, unknown>).total as number | undefined;
     const currentPage = (envelope as unknown as Record<string, unknown>).current_page as number | undefined;
     const lastPage = (envelope as unknown as Record<string, unknown>).last_page as number | undefined;
     const perPage = (envelope as unknown as Record<string, unknown>).per_page as number | undefined;
-    const metaEnvelope = (envelope as unknown as Record<string, unknown>).meta as SelectionPaginationMeta | undefined;
-
-    if (metaEnvelope) {
-      return { rows: raw as RecruitmentSelectionItem[], meta: metaEnvelope };
-    }
-
+    if (metaEnvelope) return { rows: raw as RecruitmentSelectionItem[], meta: metaEnvelope, summary: null };
     if (currentPage !== undefined || lastPage !== undefined || total !== undefined) {
       return {
         rows: raw as RecruitmentSelectionItem[],
@@ -36,37 +34,106 @@ function normalizeSelectionsPayload(
           per_page: perPage ?? raw.length,
           total: total ?? raw.length,
         },
+        summary: null,
+      };
+    }
+    return { rows: raw as RecruitmentSelectionItem[], meta: null, summary: null };
+  }
+
+  if (raw && typeof raw === "object") {
+    const obj = raw as Record<string, unknown>;
+
+    // 1) Preferred new backend structure: data.applicants.data & data.applicants.meta & data.summary
+    if (obj.applicants && typeof obj.applicants === "object") {
+      const applicants = obj.applicants as Record<string, unknown>;
+      const nestedData = applicants.data as unknown;
+      if (Array.isArray(nestedData)) {
+        const rows = nestedData as RecruitmentSelectionItem[];
+        const meta =
+          (applicants.meta as SelectionPaginationMeta | undefined) ??
+          ((applicants.current_page !== undefined || applicants.last_page !== undefined || applicants.total !== undefined)
+            ? {
+                current_page: (applicants.current_page as number) ?? 1,
+                last_page: (applicants.last_page as number) ?? 1,
+                per_page: (applicants.per_page as number) ?? rows.length,
+                total: (applicants.total as number) ?? rows.length,
+                from: (applicants.from as number | null) ?? null,
+                to: (applicants.to as number | null) ?? null,
+              }
+            : null) ??
+          ((envelope as unknown as Record<string, unknown>).meta as SelectionPaginationMeta | undefined) ??
+          null;
+
+        const summaryRaw = obj.summary as Record<string, unknown> | undefined;
+        const summary: SelectionSummaryStats | null = summaryRaw
+          ? {
+              totalPelamar: Number(summaryRaw.total_applicants ?? summaryRaw.totalPelamar ?? summaryRaw.total ?? 0),
+              administrasiLolos: Number(summaryRaw.total_passed_admin ?? summaryRaw.administrasiLolos ?? 0),
+              finalDiterima: Number(summaryRaw.total_accepted ?? summaryRaw.finalDiterima ?? 0),
+            }
+          : null;
+
+        return { rows, meta, summary };
+      }
+    }
+
+    // 2) Legacy shape: data: { data: [], meta: {} }  (paginated without summary wrapper)
+    if (Array.isArray((obj as { data?: unknown }).data)) {
+      const nested = obj as {
+        data: RecruitmentSelectionItem[];
+        meta?: SelectionPaginationMeta;
+        current_page?: number;
+        last_page?: number;
+        total?: number;
+        per_page?: number;
+        from?: number | null;
+        to?: number | null;
+        summary?: Record<string, unknown>;
+      };
+      const metaFromNested =
+        nested.meta ??
+        (nested.current_page !== undefined || nested.last_page !== undefined || nested.total !== undefined
+          ? {
+              current_page: nested.current_page ?? 1,
+              last_page: nested.last_page ?? 1,
+              per_page: nested.per_page ?? nested.data.length,
+              total: nested.total ?? nested.data.length,
+              from: nested.from ?? null,
+              to: nested.to ?? null,
+            }
+          : undefined);
+      const rootMeta = (envelope as unknown as { meta?: SelectionPaginationMeta }).meta;
+      const summaryRaw = (nested as unknown as Record<string, unknown>).summary as Record<string, unknown> | undefined;
+      const summary: SelectionSummaryStats | null = summaryRaw
+        ? {
+            totalPelamar: Number(summaryRaw.total_applicants ?? 0),
+            administrasiLolos: Number(summaryRaw.total_passed_admin ?? 0),
+            finalDiterima: Number(summaryRaw.total_accepted ?? 0),
+          }
+        : null;
+      return {
+        rows: nested.data,
+        meta: metaFromNested ?? rootMeta ?? null,
+        summary,
       };
     }
 
-    return { rows: raw as RecruitmentSelectionItem[], meta: null };
+    // 3) Check if object itself contains summary but no applicants wrapper (defensive)
+    if (obj.summary && typeof obj.summary === "object") {
+      const summaryRaw = obj.summary as Record<string, unknown>;
+      const summary: SelectionSummaryStats = {
+        totalPelamar: Number(summaryRaw.total_applicants ?? 0),
+        administrasiLolos: Number(summaryRaw.total_passed_admin ?? 0),
+        finalDiterima: Number(summaryRaw.total_accepted ?? 0),
+      };
+      return { rows: [], meta: null, summary };
+    }
   }
 
-  if (raw && typeof raw === "object" && Array.isArray((raw as { data?: unknown }).data)) {
-    const nested = raw as { data: RecruitmentSelectionItem[]; meta?: SelectionPaginationMeta; current_page?: number; last_page?: number; total?: number; per_page?: number; from?: number | null; to?: number | null };
-    const metaFromNested =
-      nested.meta ??
-      (nested.current_page !== undefined || nested.last_page !== undefined || nested.total !== undefined
-        ? {
-            current_page: nested.current_page ?? 1,
-            last_page: nested.last_page ?? 1,
-            per_page: nested.per_page ?? nested.data.length,
-            total: nested.total ?? nested.data.length,
-            from: nested.from ?? null,
-            to: nested.to ?? null,
-          }
-        : undefined);
-    const rootMeta = (envelope as unknown as { meta?: SelectionPaginationMeta }).meta;
-    return {
-      rows: nested.data,
-      meta: metaFromNested ?? rootMeta ?? null,
-    };
-  }
-
-  return { rows: [], meta: null };
+  return { rows: [], meta: null, summary: null };
 }
 
-function computeStats(
+function computeStatsFallback(
   rows: RecruitmentSelectionItem[],
   totalItems: number
 ): SelectionSummaryStats {
@@ -164,6 +231,11 @@ export function useSeleksi(): UseSeleksiReturn {
   const [perPage, setPerPage] = useState<number>(10);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [totalItems, setTotalItems] = useState<number>(0);
+  const [stats, setStats] = useState<SelectionSummaryStats>({
+    totalPelamar: 0,
+    administrasiLolos: 0,
+    finalDiterima: 0,
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -207,8 +279,26 @@ export function useSeleksi(): UseSeleksiReturn {
             meta?: unknown;
           } | Array<unknown>;
         }>("/admin/standard-types", {
-          params: { category: "selection_stage", page: 1, per_page: 100 },
+          params: { category: "stage_type", page: 1, per_page: 100 },
         })
+        .catch(() =>
+          api.get<{
+            success?: boolean;
+            message?: string;
+            data?: {
+              data?: Array<{
+                id: string | number;
+                name?: string;
+                code?: string;
+                sequence_order?: number;
+                sequenceOrder?: number;
+              }>;
+              meta?: unknown;
+            } | Array<unknown>;
+          }>("/admin/standard-types", {
+            params: { category: "selection_stage", page: 1, per_page: 100 },
+          })
+        )
         .catch(() =>
           api.get<{
             success?: boolean;
@@ -303,7 +393,11 @@ export function useSeleksi(): UseSeleksiReturn {
       };
       if (selectedVacancyId !== "all") params.job_vacancy_id = selectedVacancyId;
       if (selectedStageId !== "all") params.stage_id = selectedStageId;
-      if (selectedAttendance !== "all") params.attendance_status = selectedAttendance;
+      if (selectedAttendance !== "all") {
+        // UI pakai "belum_absensi" tapi backend expects "belum" (validasi in: hadir,tidak_hadir,belum)
+        const attendanceParam = selectedAttendance === "belum_absensi" ? "belum" : selectedAttendance;
+        params.attendance_status = attendanceParam;
+      }
       if (debouncedSearch) params.search = debouncedSearch;
 
       const res = await api.get<SelectionListEnvelope>("/admin/recruitment-selections", {
@@ -311,16 +405,28 @@ export function useSeleksi(): UseSeleksiReturn {
       });
 
       const envelope = res.data;
-      const { rows, meta } = normalizeSelectionsPayload(envelope);
+      const { rows, meta, summary } = normalizeSelectionsPayload(envelope);
 
       setSelections(rows);
 
+      // Pagination meta dari data.applicants.meta (sesuai payload backend)
       if (meta) {
         setTotalItems(meta.total);
         setTotalPages(meta.last_page || Math.ceil(meta.total / perPage) || 1);
       } else {
-        setTotalItems(rows.length);
-        setTotalPages(Math.ceil(rows.length / perPage) || 1);
+        // fallback: jika meta kosong, gunakan summary.totalPelamar sebagai total
+        const fallbackTotal = summary?.totalPelamar ?? rows.length;
+        setTotalItems(fallbackTotal);
+        setTotalPages(Math.ceil(fallbackTotal / perPage) || 1);
+      }
+
+      // Summary cards dari data.summary (jangan hitung manual dari rows karena paginated)
+      if (summary) {
+        setStats(summary);
+      } else {
+        // fallback legacy: hitung dari rows bila backend tidak kirim summary
+        const fallbackTotal = meta?.total ?? rows.length;
+        setStats(computeStatsFallback(rows, fallbackTotal));
       }
     } catch (err: unknown) {
       const message =
@@ -330,6 +436,7 @@ export function useSeleksi(): UseSeleksiReturn {
       setSelections([]);
       setTotalItems(0);
       setTotalPages(1);
+      setStats({ totalPelamar: 0, administrasiLolos: 0, finalDiterima: 0 });
     } finally {
       setLoading(false);
     }
@@ -360,11 +467,6 @@ export function useSeleksi(): UseSeleksiReturn {
     setPerPage(size);
     setCurrentPage(1);
   }, []);
-
-  const stats: SelectionSummaryStats = useMemo(
-    () => computeStats(selections, totalItems),
-    [selections, totalItems]
-  );
 
   return {
     selections,
