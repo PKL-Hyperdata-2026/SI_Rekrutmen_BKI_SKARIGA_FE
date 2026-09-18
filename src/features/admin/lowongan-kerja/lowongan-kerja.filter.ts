@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { type FilterSelectOption } from "@/components/custom/filter-select";
 import { type JobVacancy } from "./lowongan-kerja.schema";
 import { lowonganKerjaApi } from "./lowongan-kerja.api";
@@ -42,12 +42,53 @@ export function useLowonganKerjaFilter() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
 
-  const fetchOptions = useCallback(async () => {
-    setIsLoadingOptions(true);
+  const fetchVacancies = useCallback(async () => {
+    setLoading(true);
     try {
-      const data = await lowonganKerjaApi.getOptions();
+      const params: Record<string, string | number> = {
+        page: currentPage,
+        per_page: pageSize,
+      };
+      if (selectedStatus !== "all") params.status_id = selectedStatus;
+      if (selectedMajor !== "all") params.major_id = selectedMajor;
+      if (selectedTarget !== "all") params.target_applicant_id = selectedTarget;
 
-      if (data) {
+      const rawData = await lowonganKerjaApi.getVacancies(params);
+      const rows: JobVacancy[] = Array.isArray(rawData?.data)
+        ? rawData.data
+        : Array.isArray(rawData)
+          ? rawData
+          : [];
+
+      setVacancies(rows);
+
+      const meta = rawData?.meta || rawData;
+      if (meta && typeof meta.total === "number") {
+        setTotalItems(meta.total);
+        setTotalPages(meta.last_page || Math.ceil(meta.total / pageSize) || 1);
+      } else {
+        setTotalItems(rows.length);
+        setTotalPages(Math.ceil(rows.length / pageSize) || 1);
+      }
+    } catch (err: unknown) {
+      setVacancies([]);
+      setTotalItems(0);
+      setTotalPages(1);
+      void err;
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedStatus, selectedMajor, selectedTarget, currentPage, pageSize]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadOptions() {
+      setIsLoadingOptions(true);
+      try {
+        const data = await lowonganKerjaApi.getOptions();
+        if (!isMounted || !data) return;
+
         if (Array.isArray(data.vacancyStatuses)) {
           setStatusOptions([
             { value: "all", label: "Semua Status Lowongan" },
@@ -77,57 +118,74 @@ export function useLowonganKerjaFilter() {
             })),
           ]);
         }
+      } catch (err: unknown) {
+        void err;
+      } finally {
+        if (isMounted) {
+          setIsLoadingOptions(false);
+        }
       }
-    } catch {
-    } finally {
-      setIsLoadingOptions(false);
     }
+
+    loadOptions();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const fetchVacancies = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params: Record<string, string | number> = {
-        page: currentPage,
-        per_page: pageSize,
-      };
-      if (selectedStatus !== "all") params.status_id = selectedStatus;
-      if (selectedMajor !== "all") params.major_id = selectedMajor;
-      if (selectedTarget !== "all") params.target_applicant_id = selectedTarget;
+  useEffect(() => {
+    let isMounted = true;
 
-      const rawData = await lowonganKerjaApi.getVacancies(params);
-      const rows: JobVacancy[] = Array.isArray(rawData?.data)
-        ? rawData.data
-        : Array.isArray(rawData)
-          ? rawData
-          : [];
+    async function loadVacancies() {
+      setLoading(true);
+      try {
+        const params: Record<string, string | number> = {
+          page: currentPage,
+          per_page: pageSize,
+        };
+        if (selectedStatus !== "all") params.status_id = selectedStatus;
+        if (selectedMajor !== "all") params.major_id = selectedMajor;
+        if (selectedTarget !== "all") params.target_applicant_id = selectedTarget;
 
-      setVacancies(rows);
+        const rawData = await lowonganKerjaApi.getVacancies(params);
+        if (!isMounted) return;
 
-      const meta = rawData?.meta || rawData;
-      if (meta && typeof meta.total === "number") {
-        setTotalItems(meta.total);
-        setTotalPages(meta.last_page || Math.ceil(meta.total / pageSize) || 1);
-      } else {
-        setTotalItems(rows.length);
-        setTotalPages(Math.ceil(rows.length / pageSize) || 1);
+        const rows: JobVacancy[] = Array.isArray(rawData?.data)
+          ? rawData.data
+          : Array.isArray(rawData)
+            ? rawData
+            : [];
+
+        setVacancies(rows);
+
+        const meta = rawData?.meta || rawData;
+        if (meta && typeof meta.total === "number") {
+          setTotalItems(meta.total);
+          setTotalPages(meta.last_page || Math.ceil(meta.total / pageSize) || 1);
+        } else {
+          setTotalItems(rows.length);
+          setTotalPages(Math.ceil(rows.length / pageSize) || 1);
+        }
+      } catch (err: unknown) {
+        if (!isMounted) return;
+        setVacancies([]);
+        setTotalItems(0);
+        setTotalPages(1);
+        void err;
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-    } catch {
-      setVacancies([]);
-      setTotalItems(0);
-      setTotalPages(1);
-    } finally {
-      setLoading(false);
     }
+
+    loadVacancies();
+
+    return () => {
+      isMounted = false;
+    };
   }, [selectedStatus, selectedMajor, selectedTarget, currentPage, pageSize]);
-
-  useEffect(() => {
-    fetchOptions();
-  }, [fetchOptions]);
-
-  useEffect(() => {
-    fetchVacancies();
-  }, [fetchVacancies]);
 
   const handleStatusChange = useCallback((val: string) => {
     setSelectedStatus(val);
@@ -149,20 +207,6 @@ export function useLowonganKerjaFilter() {
     setCurrentPage(1);
   }, []);
 
-  const totalCompaniesCount = useMemo(() => {
-    const uniqueCompanyKeys = new Set<string | number>();
-    for (const v of vacancies) {
-      const key =
-        v.companyId ??
-        v.company?.id ??
-        (v.company?.name ? v.company.name.trim().toLowerCase() : undefined);
-      if (key !== undefined && key !== null && key !== "") {
-        uniqueCompanyKeys.add(key);
-      }
-    }
-    return uniqueCompanyKeys.size;
-  }, [vacancies]);
-
   return {
     selectedStatus,
     selectedMajor,
@@ -174,7 +218,6 @@ export function useLowonganKerjaFilter() {
     majorOptions,
     targetOptions,
     vacancies,
-    totalCompaniesCount,
     loading,
     isLoadingOptions,
     currentPage,

@@ -45,10 +45,10 @@ export function LowonganKerjaFilter({
         className,
       )}
     >
-      <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap items-center gap-2.5 sm:gap-3 p-0">
+      <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-center gap-2.5 sm:gap-3 p-0 w-full">
         <Badge
           variant="outline"
-          className="relative flex items-center h-10 w-full lg:w-auto rounded-lg border-primary/30 bg-primary/5 hover:border-primary/50 transition-colors shadow-2xs cursor-pointer p-0 font-normal text-foreground [&>div]:w-full [&>div]:h-full shrink-0"
+          className="relative flex items-center h-10 w-full rounded-lg border-primary/30 bg-primary/5 hover:border-primary/50 transition-colors shadow-2xs cursor-pointer p-0 font-normal text-foreground [&>div]:w-full [&>div]:h-full"
         >
           <Building2 className="size-4 text-primary shrink-0 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
           <FilterSelect
@@ -63,7 +63,7 @@ export function LowonganKerjaFilter({
 
         <Badge
           variant="outline"
-          className="relative flex items-center h-10 w-full lg:w-auto rounded-lg border-primary/30 bg-primary/5 hover:border-primary/50 transition-colors shadow-2xs cursor-pointer p-0 font-normal text-foreground [&>div]:w-full [&>div]:h-full shrink-0"
+          className="relative flex items-center h-10 w-full rounded-lg border-primary/30 bg-primary/5 hover:border-primary/50 transition-colors shadow-2xs cursor-pointer p-0 font-normal text-foreground [&>div]:w-full [&>div]:h-full"
         >
           <GraduationCap className="size-4 text-primary shrink-0 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
           <FilterSelect
@@ -78,7 +78,7 @@ export function LowonganKerjaFilter({
 
         <Badge
           variant="outline"
-          className="relative flex items-center h-10 w-full lg:w-auto rounded-lg border-primary/30 bg-primary/5 hover:border-primary/50 transition-colors shadow-2xs cursor-pointer p-0 font-normal text-foreground [&>div]:w-full [&>div]:h-full shrink-0"
+          className="relative flex items-center h-10 w-full rounded-lg border-primary/30 bg-primary/5 hover:border-primary/50 transition-colors shadow-2xs cursor-pointer p-0 font-normal text-foreground [&>div]:w-full [&>div]:h-full"
         >
           <Users className="size-4 text-primary shrink-0 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
           <FilterSelect
@@ -93,7 +93,7 @@ export function LowonganKerjaFilter({
 
         <Badge
           variant="outline"
-          className="h-10 px-4 w-full sm:w-auto justify-between sm:justify-start rounded-lg border-primary/30 bg-primary/5 text-xs sm:text-[13px] shadow-2xs font-normal text-foreground select-none shrink-0 flex items-center gap-1.5"
+          className="h-10 px-4 w-full justify-start rounded-lg border-primary/30 bg-primary/5 text-xs sm:text-[13px] shadow-2xs font-normal text-foreground select-none flex items-center gap-1.5"
         >
           <Badge
             variant="outline"

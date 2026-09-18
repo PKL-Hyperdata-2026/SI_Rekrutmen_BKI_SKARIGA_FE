@@ -6,6 +6,7 @@ import { SiswaPage } from "./siswa/siswa-page";
 import { AlumniPage } from "./alumni/alumni-page";
 import { DudiPage } from "./dudi/dudi-page";
 import { LowonganKerjaPage } from "./lowongan-kerja/lowongan-kerja-page";
+import { LowonganKerjaForm } from "./lowongan-kerja/lowongan-kerja-form";
 import { SeleksiPage } from "./seleksi/seleksi-page";
 import { ValidasiPresensiPage } from "./validasi-presensi/pages/validasi-presensi-page";
 import { TracerPage } from "./tracer-study/tracer-study-page";
@@ -43,6 +44,14 @@ export const adminRoute = [
   {
     path: "lowongan",
     element: <LowonganKerjaPage />,
+  },
+  {
+    path: "lowongan/create",
+    element: <LowonganKerjaForm />,
+  },
+  {
+    path: "lowongan/:id/edit",
+    element: <LowonganKerjaForm />,
   },
   {
     path: "seleksi",

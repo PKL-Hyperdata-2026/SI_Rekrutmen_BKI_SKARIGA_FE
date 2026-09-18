@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { type JobVacancy } from "./lowongan-kerja.schema";
 import { lowonganKerjaApi } from "./lowongan-kerja.api";
 
-export interface UseLowonganKerjaDetailFormProps {
+export interface UseLowonganKerjaDetailProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   vacancy: JobVacancy | null;
@@ -48,37 +48,41 @@ function parseQualificationLines(text?: string): string[] {
     .filter((line) => line.length > 0);
 }
 
-export function useLowonganKerjaDetailForm({
+export function useLowonganKerjaDetail({
   open,
   onOpenChange,
   vacancy,
-}: UseLowonganKerjaDetailFormProps) {
-  const [activeVacancy, setActiveVacancy] = useState<JobVacancy | null>(
-    vacancy,
-  );
+}: UseLowonganKerjaDetailProps) {
+  const [activeVacancy, setActiveVacancy] = useState<JobVacancy | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchDetail = useCallback(async (id: number | string) => {
-    setIsLoading(true);
-    try {
-      const data = await lowonganKerjaApi.getVacancyDetail(id);
-      if (data) {
-        setActiveVacancy(data);
-      }
-    } catch {
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    if (open && vacancy?.id) {
-      setActiveVacancy(vacancy);
-      fetchDetail(vacancy.id);
-    } else if (!open) {
-      setIsLoading(false);
+    let isMounted = true;
+
+    async function loadDetail(id: number | string) {
+      setIsLoading(true);
+      try {
+        const data = await lowonganKerjaApi.getVacancyDetail(id);
+        if (isMounted && data) {
+          setActiveVacancy(data);
+        }
+      } catch (err: unknown) {
+        void err;
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
     }
-  }, [open, vacancy, fetchDetail]);
+
+    if (open && vacancy?.id) {
+      loadDetail(vacancy.id);
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [open, vacancy?.id]);
 
   const handleOpenChange = useCallback(
     (nextOpen: boolean) => {
@@ -88,7 +92,7 @@ export function useLowonganKerjaDetailForm({
   );
 
   const detail = useMemo(() => {
-    const current = activeVacancy ?? vacancy;
+    const current = open ? (activeVacancy ?? vacancy) : null;
     if (!current) {
       return {
         companyName: "-",
@@ -98,6 +102,8 @@ export function useLowonganKerjaDetailForm({
         major: "-",
         target: "-",
         workLocation: "-",
+        description: "",
+        qualification: "",
         qualificationLines: [],
       };
     }
@@ -118,11 +124,16 @@ export function useLowonganKerjaDetailForm({
         current.targetApplicant?.name,
       ),
       workLocation: current.workLocation ?? "-",
-      qualificationLines: parseQualificationLines(
-        current.qualification || current.description,
+      description: current.description ?? "",
+      qualification: current.qualification ?? "",
+      qualificationLines: parseQualificationLines(current.qualification),
+      isHtmlQualification: Boolean(
+        current.qualification &&
+          current.qualification.includes("<") &&
+          current.qualification.includes(">"),
       ),
     };
-  }, [activeVacancy, vacancy]);
+  }, [activeVacancy, vacancy, open]);
 
   return {
     isLoading,
@@ -133,7 +144,10 @@ export function useLowonganKerjaDetailForm({
     major: detail.major,
     target: detail.target,
     workLocation: detail.workLocation,
+    description: detail.description,
+    qualification: detail.qualification,
     qualificationLines: detail.qualificationLines,
+    isHtmlQualification: detail.isHtmlQualification,
     handleOpenChange,
   };
 }

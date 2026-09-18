@@ -1,10 +1,21 @@
 import { api } from "@/api/axios";
+import {
+  selectOptionsApi,
+  type SelectQuery,
+  type FetchPageOptions,
+  type SelectPageResult,
+} from "@/api/select-options";
 import type {
   JobVacancy,
   JobVacancyOptionsData,
 } from "./lowongan-kerja.schema";
 
 export const lowonganKerjaApi = {
+  getCompanies: (
+    query: SelectQuery,
+    opts?: FetchPageOptions,
+  ): Promise<SelectPageResult> => selectOptionsApi.getCompanies(query, opts),
+
   getOptions: async () => {
     const response = await api.get<{ data: JobVacancyOptionsData }>(
       "/admin/job-vacancies/options",

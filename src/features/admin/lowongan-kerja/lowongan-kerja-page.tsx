@@ -1,21 +1,17 @@
 import { PageHeader } from "@/components/custom";
+import { CardContent } from "@/components/ui/card";
 import { LowonganKerjaFilter } from "./lowongan-kerja-filter";
 import { LowonganKerjaTable } from "./lowongan-kerja-table";
-import { LowonganKerjaForm } from "./lowongan-kerja-form";
-import { LowonganKerjaDetailForm } from "./lowongan-kerja-detail-form";
-import { useLowonganKerja } from "./use-lowongan-kerja";
+import { LowonganKerjaDetail } from "./lowongan-kerja-detail";
+import { useLowonganKerja } from "./lowongan-kerja.page";
 import { Store } from "lucide-react";
 
 export function LowonganKerjaPage() {
   const {
-    isFormOpen,
-    selectedVacancy,
     isDetailOpen,
     detailVacancy,
-    handleOpenCreate,
+    handleCreate,
     handleView,
-    handleEdit,
-    handleFormOpenChange,
     handleDetailOpenChange,
     handleDeleteVacancy,
     selectedStatus,
@@ -28,7 +24,6 @@ export function LowonganKerjaPage() {
     majorOptions,
     targetOptions,
     vacancies,
-    totalCompaniesCount,
     loading,
     isLoadingOptions,
     currentPage,
@@ -37,33 +32,25 @@ export function LowonganKerjaPage() {
     totalItems,
     setCurrentPage,
     setPageSize,
-    refetchVacancies,
   } = useLowonganKerja();
 
   return (
-    <div className="flex flex-col gap-5 sm:gap-6">
+    <CardContent className="flex flex-col gap-5 sm:gap-6 p-0">
       <PageHeader
         variant="admin"
         title="Data Lowongan Kerja"
         description="Manajemen pembukaan lowongan kerja, kualifikasi, kuota pelamar, dan jadwal seleksi."
       >
-        <div className="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
+        <CardContent className="w-full sm:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 p-0">
           <PageHeader.Button
             variant="primary"
             icon={<Store className="h-4 w-4" />}
-            onClick={handleOpenCreate}
+            onClick={handleCreate}
             className="w-full sm:w-auto justify-center"
           >
             Tambah Lowongan Kerja
           </PageHeader.Button>
-          {/* <PageHeader.Button
-            variant="glass"
-            icon={<Printer className="h-4 w-4" />}
-            className="w-full sm:w-auto justify-center"
-          >
-            Import Excel
-          </PageHeader.Button> */}
-        </div>
+        </CardContent>
       </PageHeader>
 
       <LowonganKerjaFilter
@@ -76,7 +63,8 @@ export function LowonganKerjaPage() {
         onStatusChange={setSelectedStatus}
         onMajorChange={setSelectedMajor}
         onTargetChange={setSelectedTarget}
-        totalCount={totalCompaniesCount}
+        totalCount={totalItems}
+        totalLabel="Lowongan Kerja"
         isLoading={isLoadingOptions}
       />
 
@@ -90,22 +78,14 @@ export function LowonganKerjaPage() {
         onPageChange={setCurrentPage}
         onPageSizeChange={setPageSize}
         onView={handleView}
-        onEdit={handleEdit}
         onDelete={handleDeleteVacancy}
       />
 
-      <LowonganKerjaDetailForm
+      <LowonganKerjaDetail
         open={isDetailOpen}
         onOpenChange={handleDetailOpenChange}
         vacancy={detailVacancy}
       />
-
-      <LowonganKerjaForm
-        open={isFormOpen}
-        onOpenChange={handleFormOpenChange}
-        vacancy={selectedVacancy}
-        onSuccess={refetchVacancies}
-      />
-    </div>
+    </CardContent>
   );
 }

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { type FilterSelectOption } from "@/components/custom/filter-select";
 
 export interface Company {
   id: number | string;
@@ -22,10 +21,6 @@ export interface MajorItem {
   id: number | string;
   code: string;
   name: string;
-}
-
-export interface MajorFilterOption extends FilterSelectOption {
-  code?: string;
 }
 
 export interface JobVacancy {
@@ -64,6 +59,24 @@ export interface JobVacancyOptionsData {
   jobTypes: StandardTypeItem[];
 }
 
+export function isHtmlEmpty(html?: string): boolean {
+  if (!html) return true;
+  const trimmed = html.trim();
+  if (!trimmed || trimmed === "<p></p>" || trimmed === "<p><br></p>") return true;
+  if (typeof document !== "undefined") {
+    const temp = document.createElement("div");
+    temp.innerHTML = trimmed;
+    return !(temp.textContent || temp.innerText || "").trim();
+  }
+  return !trimmed
+    .replaceAll("<p>", "")
+    .replaceAll("</p>", "")
+    .replaceAll("<br>", "")
+    .replaceAll("<br/>", "")
+    .replaceAll("&nbsp;", "")
+    .trim();
+}
+
 export const jobVacancyFormSchema = z.object({
   companyId: z
     .string()
@@ -89,18 +102,29 @@ export const jobVacancyFormSchema = z.object({
     .refine((val) => !isNaN(Date.parse(val)), {
       message: "Format tanggal pendaftaran tidak valid.",
     }),
-  majorId: z.string().min(1, { message: "Jurusan wajib dipilih." }),
-  targetId: z.string().min(1, { message: "Target pelamar wajib dipilih." }),
+  majorId: z.string(),
+  targetId: z
+    .string()
+    .trim()
+    .min(1, { message: "Target pelamar wajib dipilih." })
+    .refine((val) => val !== "all", {
+      message: "Target pelamar wajib dipilih.",
+    }),
   workLocation: z
     .string()
     .trim()
     .min(1, { message: "Lokasi kerja wajib diisi." })
     .max(255, { message: "Lokasi kerja maksimal 255 karakter." }),
+  description: z.string().trim().optional(),
   qualification: z
     .string()
     .trim()
-    .min(1, { message: "Kualifikasi / persyaratan wajib diisi." }),
+    .min(1, { message: "Kualifikasi / persyaratan wajib diisi." })
+    .refine((val) => !isHtmlEmpty(val), {
+      message: "Kualifikasi / persyaratan wajib diisi.",
+    }),
   sendNotification: z.boolean(),
 });
 
 export type JobVacancyFormValues = z.infer<typeof jobVacancyFormSchema>;
+

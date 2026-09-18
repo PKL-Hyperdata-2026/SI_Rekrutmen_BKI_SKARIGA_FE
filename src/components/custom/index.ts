@@ -16,3 +16,8 @@ export * from "./metric-card";
 export * from "./modal";
 export * from "./searchable-select";
 export * from "./async-searchable-select";
+export * from "./text-editor/rich-text-editor";
+export * from "./text-editor/rich-text-toolbar";
+export * from "./text-editor/heading-dropdown";
+export * from "./box";
+export * from "./span";

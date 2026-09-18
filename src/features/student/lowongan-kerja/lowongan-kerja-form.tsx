@@ -15,6 +15,7 @@ import {
   Send,
   Loader2,
 } from "lucide-react";
+import { RichTextEditor } from "@/components/custom";
 import type { StudentJobVacancy } from "./lowongan-kerja.card";
 import { useLowonganKerjaForm } from "./lowongan-kerja.form";
 
@@ -177,9 +178,16 @@ export function LowonganKerjaForm({
               Deskripsi Pekerjaan
             </CardTitle>
           </CardContent>
-          <CardDescription className="text-xs text-slate-500 leading-relaxed font-sans">
-            {cleanDescription || "Deskripsi pekerjaan belum tersedia."}
-          </CardDescription>
+          {activeVacancy?.description ? (
+            <RichTextEditor.Content
+              content={activeVacancy.description}
+              className="text-xs text-slate-500 font-sans"
+            />
+          ) : (
+            <CardDescription className="text-xs text-slate-500 leading-relaxed font-sans">
+              {cleanDescription || "Deskripsi pekerjaan belum tersedia."}
+            </CardDescription>
+          )}
         </CardContent>
 
         <CardContent className="space-y-1.5 p-0">
@@ -189,7 +197,14 @@ export function LowonganKerjaForm({
               Syarat & Kualifikasi Berkas
             </CardTitle>
           </CardContent>
-          {qualificationLines.length === 0 ? (
+          {activeVacancy?.qualification &&
+          activeVacancy.qualification.includes("<") &&
+          activeVacancy.qualification.includes(">") ? (
+            <RichTextEditor.Content
+              content={activeVacancy.qualification}
+              className="text-xs text-slate-500 font-sans"
+            />
+          ) : qualificationLines.length === 0 ? (
             <CardDescription className="text-xs text-slate-500 italic font-sans">
               Belum ada syarat & kualifikasi yang dicantumkan.
             </CardDescription>

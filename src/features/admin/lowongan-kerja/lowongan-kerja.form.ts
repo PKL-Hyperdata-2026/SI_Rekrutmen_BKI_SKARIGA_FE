@@ -1,12 +1,47 @@
+import { useState, useEffect, useCallback } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "@/components/custom/sonner";
 import {
   jobVacancyFormSchema,
+  isHtmlEmpty,
   type JobVacancyFormValues,
   type JobVacancy,
   type MajorItem,
   type StandardTypeItem,
 } from "./lowongan-kerja.schema";
+import { lowonganKerjaApi } from "./lowongan-kerja.api";
+
+interface ApiErrorResponse {
+  response?: {
+    data?: {
+      message?: string;
+      errors?: Record<string, string[]>;
+    };
+  };
+}
+
+function isApiError(err: unknown): err is ApiErrorResponse {
+  return typeof err === "object" && err !== null && "response" in err;
+}
+
+function isJobVacancyFormField(
+  field: string,
+): field is keyof JobVacancyFormValues {
+  return (
+    field === "companyId" ||
+    field === "position" ||
+    field === "quota" ||
+    field === "deadline" ||
+    field === "majorId" ||
+    field === "targetId" ||
+    field === "workLocation" ||
+    field === "description" ||
+    field === "qualification" ||
+    field === "sendNotification"
+  );
+}
 
 export function toJobVacancyDefaultValues(
   vacancy?: JobVacancy | null,
@@ -20,8 +55,9 @@ export function toJobVacancyDefaultValues(
       quota: "",
       deadline: "",
       majorId: "all",
-      targetId: "all",
+      targetId: "",
       workLocation: "",
+      description: "",
       qualification: "",
       sendNotification: false,
     };
@@ -50,9 +86,9 @@ export function toJobVacancyDefaultValues(
     resolvedMajorId = matchedMajor ? String(matchedMajor.id) : firstMajorId;
   }
 
-  let resolvedTargetId = "all";
-  const vacTarget = vacancy.targetApplicant;
-  const vacTargetId = vacancy.targetApplicantId || vacTarget?.id;
+  let resolvedTargetId = "";
+  const vacTarget = vacancy?.targetApplicant;
+  const vacTargetId = vacancy?.targetApplicantId || vacTarget?.id;
   if (vacTarget || vacTargetId) {
     const matchedTarget = targets?.find(
       (t) =>
@@ -64,7 +100,10 @@ export function toJobVacancyDefaultValues(
     );
     resolvedTargetId = matchedTarget
       ? String(matchedTarget.id)
-      : String(vacTargetId || "all");
+      : String(vacTargetId || "");
+  } else if (vacancy && targets && targets.length > 0) {
+    const defaultBoth = targets.find((t) => t.code === "class_12_and_alumni");
+    resolvedTargetId = defaultBoth ? String(defaultBoth.id) : "";
   }
 
   return {
@@ -78,7 +117,8 @@ export function toJobVacancyDefaultValues(
     majorId: resolvedMajorId,
     targetId: resolvedTargetId,
     workLocation: vacancy.workLocation || "",
-    qualification: vacancy.qualification || vacancy.description || "",
+    description: vacancy.description || "",
+    qualification: vacancy.qualification || "",
     sendNotification: false,
   };
 }
@@ -94,7 +134,14 @@ export function toSubmitJobVacancyPayload(
     quota: parsedQuota > 0 ? parsedQuota : 1,
     deadline: values.deadline,
     work_location: values.workLocation.trim(),
-    qualification: values.qualification.trim(),
+    description:
+      values.description && !isHtmlEmpty(values.description)
+        ? values.description.trim()
+        : null,
+    qualification:
+      values.qualification && !isHtmlEmpty(values.qualification)
+        ? values.qualification.trim()
+        : "",
     send_notification: values.sendNotification,
     major_ids:
       values.majorId && values.majorId !== "all" ? [values.majorId] : [],
@@ -113,4 +160,214 @@ export function useLowonganKerjaForm(
     defaultValues: toJobVacancyDefaultValues(initialData, majors, targets),
     mode: "onBlur",
   });
+}
+
+export function useLowonganKerjaFormPage(customId?: string) {
+  const { id: routeId } = useParams<{ id: string }>();
+  const vacancyId = customId || routeId;
+  const navigate = useNavigate();
+
+  const handleBack = useCallback(() => {
+    navigate("/admin/lowongan");
+  }, [navigate]);
+
+  const [majors, setMajors] = useState<MajorItem[]>([]);
+  const [targetApplicants, setTargetApplicants] = useState<StandardTypeItem[]>(
+    [],
+  );
+  const [companyFallbackLabel, setCompanyFallbackLabel] = useState<
+    string | undefined
+  >(undefined);
+  const [loadedVacancyId, setLoadedVacancyId] = useState<
+    string | number | null
+  >(null);
+  const [isLoadingOptions, setIsLoadingOptions] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const isEditMode = Boolean(vacancyId);
+
+  const form = useLowonganKerjaForm(null, majors, targetApplicants);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    setError,
+    clearErrors,
+    control,
+    formState: { errors, isSubmitting },
+  } = form;
+
+  const companyId = watch("companyId");
+  const deadline = watch("deadline");
+  const majorId = watch("majorId");
+  const targetId = watch("targetId");
+  const sendNotification = watch("sendNotification");
+
+  const fetchOptions = useCallback(async () => {
+    setIsLoadingOptions(true);
+    try {
+      const data = await lowonganKerjaApi.getOptions();
+      if (data) {
+        if (Array.isArray(data.majors)) setMajors(data.majors);
+        if (Array.isArray(data.targetApplicants))
+          setTargetApplicants(data.targetApplicants);
+      }
+      return data ?? null;
+    } catch {
+      return null;
+    } finally {
+      setIsLoadingOptions(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function init() {
+      setErrorMsg("");
+
+      if (!vacancyId) {
+        setCompanyFallbackLabel(undefined);
+        setIsLoadingData(true);
+        const optionsRes = await fetchOptions();
+        if (!isMounted) return;
+        const resolvedMajors = optionsRes?.majors ?? [];
+        const resolvedTargets = optionsRes?.targetApplicants ?? [];
+        reset(toJobVacancyDefaultValues(null, resolvedMajors, resolvedTargets));
+        setIsLoadingData(false);
+        return;
+      }
+
+      setIsLoadingData(true);
+      try {
+        const [optionsRes, vacancyRes] = await Promise.all([
+          fetchOptions(),
+          lowonganKerjaApi.getVacancyDetail(vacancyId),
+        ]);
+
+        if (!isMounted) return;
+
+        if (vacancyRes) {
+          setLoadedVacancyId(vacancyRes.id);
+          const resolvedMajors = optionsRes?.majors ?? [];
+          const resolvedTargets = optionsRes?.targetApplicants ?? [];
+
+          const companyName = vacancyRes.company?.name;
+          if (companyName) {
+            setCompanyFallbackLabel(companyName);
+          }
+
+          reset(
+            toJobVacancyDefaultValues(
+              vacancyRes,
+              resolvedMajors,
+              resolvedTargets,
+            ),
+          );
+        } else {
+          setErrorMsg("Data lowongan tidak ditemukan.");
+        }
+      } catch (err: unknown) {
+        if (!isMounted) return;
+        if (isApiError(err)) {
+          setErrorMsg(
+            err.response?.data?.message || "Gagal memuat data lowongan kerja.",
+          );
+        } else {
+          setErrorMsg("Gagal memuat data lowongan kerja.");
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoadingData(false);
+        }
+      }
+    }
+
+    init();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [vacancyId, fetchOptions, reset]);
+
+  const onFormSubmit = handleSubmit(async (values: JobVacancyFormValues) => {
+    setErrorMsg("");
+    clearErrors();
+
+    try {
+      const payload = toSubmitJobVacancyPayload(values);
+
+      if (isEditMode) {
+        const targetIdToUpdate = loadedVacancyId || vacancyId;
+        if (!targetIdToUpdate) {
+          toast.error("ID lowongan tidak valid");
+          return;
+        }
+        await lowonganKerjaApi.updateVacancy(targetIdToUpdate, payload);
+        toast.success("Lowongan kerja berhasil diperbarui.");
+      } else {
+        await lowonganKerjaApi.createVacancy(payload);
+        toast.success("Lowongan kerja berhasil ditambahkan.");
+      }
+      navigate("/admin/lowongan");
+    } catch (err: unknown) {
+      if (isApiError(err)) {
+        const responseData = err.response?.data;
+        if (responseData?.errors) {
+          Object.entries(responseData.errors).forEach(([field, msgs]) => {
+            const mappedKey =
+              field === "company_id"
+                ? "companyId"
+                : field === "work_location"
+                  ? "workLocation"
+                  : field === "major_ids"
+                    ? "majorId"
+                    : field === "target_applicant_id"
+                      ? "targetId"
+                      : field;
+
+            if (isJobVacancyFormField(mappedKey) && msgs && msgs[0]) {
+              setError(mappedKey, { type: "manual", message: msgs[0] });
+            }
+          });
+        }
+        setErrorMsg(
+          responseData?.message || "Terjadi kesalahan saat menyimpan data.",
+        );
+        toast.error(
+          responseData?.message || "Terjadi kesalahan saat menyimpan data.",
+        );
+      } else {
+        setErrorMsg("Terjadi kesalahan jaringan.");
+        toast.error("Terjadi kesalahan jaringan.");
+      }
+    }
+  });
+
+  return {
+    isEditMode,
+    isLoadingData,
+    isLoadingOptions,
+    errorMsg,
+    register,
+    setValue,
+    companyId,
+    deadline,
+    majorId,
+    targetId,
+    sendNotification,
+    companyFallbackLabel,
+    setCompanyFallbackLabel,
+    majors,
+    targetApplicants,
+    errors,
+    control,
+    isSubmitting,
+    onFormSubmit,
+    handleBack,
+    getCompanies: lowonganKerjaApi.getCompanies,
+  };
 }

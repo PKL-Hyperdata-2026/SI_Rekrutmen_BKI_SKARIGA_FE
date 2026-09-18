@@ -1,5 +1,6 @@
 import { useState, useCallback, useRef } from "react";
-import { useLowonganKerjaFilter } from "./use-lowongan-kerja-filter";
+import { useNavigate } from "react-router-dom";
+import { useLowonganKerjaFilter } from "./lowongan-kerja.filter";
 import { type JobVacancy } from "./lowongan-kerja.schema";
 import { lowonganKerjaApi } from "./lowongan-kerja.api";
 import { toast } from "@/components/custom/sonner";
@@ -17,26 +18,17 @@ function isApiError(err: unknown): err is ApiErrorResponse {
 }
 
 export function useLowonganKerja() {
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [selectedVacancy, setSelectedVacancy] = useState<JobVacancy | null>(
-    null,
-  );
+  const navigate = useNavigate();
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [detailVacancy, setDetailVacancy] = useState<JobVacancy | null>(null);
 
-  const formTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const detailTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const filter = useLowonganKerjaFilter();
 
-  const handleOpenCreate = useCallback(() => {
-    if (formTimerRef.current) {
-      clearTimeout(formTimerRef.current);
-      formTimerRef.current = null;
-    }
-    setSelectedVacancy(null);
-    setIsFormOpen(true);
-  }, []);
+  const handleCreate = useCallback(() => {
+    navigate("/admin/lowongan/create");
+  }, [navigate]);
 
   const handleView = useCallback((item: JobVacancy) => {
     if (detailTimerRef.current) {
@@ -45,28 +37,6 @@ export function useLowonganKerja() {
     }
     setDetailVacancy(item);
     setIsDetailOpen(true);
-  }, []);
-
-  const handleEdit = useCallback((item: JobVacancy) => {
-    if (formTimerRef.current) {
-      clearTimeout(formTimerRef.current);
-      formTimerRef.current = null;
-    }
-    setSelectedVacancy(item);
-    setIsFormOpen(true);
-  }, []);
-
-  const handleFormOpenChange = useCallback((open: boolean) => {
-    if (formTimerRef.current) {
-      clearTimeout(formTimerRef.current);
-      formTimerRef.current = null;
-    }
-    setIsFormOpen(open);
-    if (!open) {
-      formTimerRef.current = setTimeout(() => {
-        setSelectedVacancy(null);
-      }, 260);
-    }
   }, []);
 
   const handleDetailOpenChange = useCallback((open: boolean) => {
@@ -102,14 +72,10 @@ export function useLowonganKerja() {
   );
 
   return {
-    isFormOpen,
-    selectedVacancy,
     isDetailOpen,
     detailVacancy,
-    handleOpenCreate,
+    handleCreate,
     handleView,
-    handleEdit,
-    handleFormOpenChange,
     handleDetailOpenChange,
     handleDeleteVacancy,
     ...filter,
