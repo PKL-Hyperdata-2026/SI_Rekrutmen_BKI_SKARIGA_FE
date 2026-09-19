@@ -78,7 +78,7 @@ frontend/src/
 │   │   ├── validasi-presensi/         # pages/validasi-presensi-page.tsx, components, hooks, types
 │   │   ├── penempatan/                # penempatan-page.tsx
 │   │   ├── tracer-study/              # tracer-page.tsx, tracer-stats-cards.tsx, tracer-detail-modal.tsx, tracer-form-modal.tsx, tracer-table.tsx, tracer.api.ts, tracer.schema.ts
-│   │   └── laporan/                   # laporan-page.tsx
+│   │   └── laporan/                   # laporan-page.tsx, components/ (header, filter-bar, stat-card, print-document, tabs), laporan.api.ts, laporan.types.ts
 │   └── hrd/                           # [Planned] Corporate HRD portal module
 ├── hooks/                             # Global reusable React hooks
 ├── layouts/                           # Master layout wrappers (auth.layout.tsx, main.layout.tsx)
@@ -114,7 +114,7 @@ frontend/src/
 │   │   ├── seleksi/                     # seleksi-page.tsx
 │   │   ├── validasi-presensi/           # pages/validasi-presensi-page.tsx, components, hooks, types
 │   │   ├── tracer-study/                # tracer-page.tsx
-│   │   └── laporan/                     # laporan-page.tsx
+│   │   └── laporan/                     # laporan-page.tsx, components/ (header, filter-bar, stat-card, print-document, tabs), laporan.api.ts, laporan.types.ts
 │   └── hrd/                             # Corporate HRD portal module
 │       ├── route.tsx                    # HRD sub-routes
 │       ├── lowongan/                    # lowongan-page.tsx, lowongan-form.tsx, lowongan-list.tsx, use-lowongan-page.ts, use-lowongan-list.ts, lowongan.schema.ts, lowongan.form.ts, lowongan.api.ts

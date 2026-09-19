@@ -75,13 +75,17 @@ export function MainLayout() {
             "--sidebar-width-icon": "4.5rem",
           } as React.CSSProperties
         }
-        className="bg-slate-50"
+        className="bg-slate-50 print:bg-white"
       >
-        <AppSidebar />
-        <SidebarInset className="w-full flex flex-col h-screen overflow-hidden bg-slate-50">
-          <ScrollArea ref={scrollAreaRef} className="h-full w-full">
-            <Topbar />
-            <main className="p-6 relative">
+        <div className="print:hidden">
+          <AppSidebar />
+        </div>
+        <SidebarInset className="w-full flex flex-col h-screen overflow-hidden bg-slate-50 print:h-auto print:overflow-visible print:bg-white print:m-0 print:p-0">
+          <ScrollArea ref={scrollAreaRef} className="h-full w-full print:h-auto print:overflow-visible">
+            <div className="print:hidden">
+              <Topbar />
+            </div>
+            <main className="p-6 relative print:p-0 print:m-0">
               <Outlet />
             </main>
           </ScrollArea>
