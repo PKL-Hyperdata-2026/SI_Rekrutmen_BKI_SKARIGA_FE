@@ -29,10 +29,12 @@ npm run preview                            # Preview production build locally
    - Page containers: `{feature}-page.tsx` exporting a PascalCase component (`users-page.tsx` -> `UsersManagementPage`).
    - Form components: `{feature}-form.tsx`.
    - Table column definitions: `{feature}-table.tsx`.
+   - Presentational cards: `{feature}-card.tsx` exporting a PascalCase component that receives item data and action callbacks through props (`lowongan-card.tsx` -> `LowonganCard`).
    - Form setup hooks & payload builders: `{feature}.form.ts` exporting `use{Feature}Form()` (wraps `useForm` + `zodResolver` + `defaultValues`) and pure payload builders (`toXxxPayload`).
    - Zod schemas & inferred types: `{feature}.schema.ts`.
    - Axios request modules: `{feature}.api.ts` (always built on the central `api` client).
    - Local feature hooks: `use{Feature}.ts`; global hooks, utilities, and slices: `camelCase.ts` (e.g. `use-mobile.ts`, `axios.ts`, `authSlice.ts`).
+   - Pure feature helpers: `{feature}.status.ts` exporting status, date, and ratio functions with no JSX and no hooks (`lowongan-status.ts` -> `isEffectivelyActive`, `formatVacancyDeadline`).
 4. NEVER make raw `fetch()` calls or create new Axios instances. Always use the central configured client at `src/api/axios.ts`.
 5. Global authentication and session state MUST be stored in Redux (`src/store/index.ts` and `src/slices/authSlice.ts`).
 6. Component UI styling MUST use Tailwind CSS utility classes, Shadcn UI primitives located in `src/components/ui/`, and custom layout components in `src/components/custom/` (e.g., `PageHeader`).

@@ -1,6 +1,6 @@
 # Frontend Codebase Reference (React 19 + TypeScript + Vite)
 
-Deep, factual reference for AI agents and developers. **Last verified: 2026-09-11.**
+Deep, factual reference for AI agents and developers. **Last verified: 2026-09-19.**
 If you modify code that alters any architecture, feature modules, state slices, or routes documented here, update this file in the same change.
 Operational instructions & boundaries: [`AGENTS.md`](./AGENTS.md).
 
@@ -47,8 +47,8 @@ frontend/src/
 │   └── select-options.ts                # Centralized async paginated options API
 ├── assets/                              # Static assets, logos, illustration SVGs
 ├── components/
-│   ├── custom/                          # Reusable global elements (PageHeader, Topbar, AppSidebar, DataTable, StatCard, GenericDummyPage, AsyncSearchableSelect, etc.)
-│   └── ui/                              # Shadcn UI primitives (Button, Dialog, Modal, SearchableSelect, etc.)
+│   ├── custom/                          # Global elements (PageHeader, Topbar, AppSidebar, DataTable, DataTablePagination, StatCard, Modal, SearchableSelect, AsyncSearchableSelect, DatePicker, FilterSelect, sonner, etc.)
+│   └── ui/                              # Shadcn UI primitives (Button, Dialog, Card, Input, Select, etc.)
 ├── config/
 │   └── menus.ts                         # Sidebar menus per role (STUDENT_MENUS, ADMIN_MENUS, HRD_MENUS)
 ├── features/                            # Role-based feature modules (kebab-case per feature domain)
@@ -98,9 +98,9 @@ frontend/src/
 │   │   ├── route.tsx                    # Student sub-routes
 │   │   ├── dashboard/                   # dashboard-page.tsx
 │   │   ├── lowongan-kerja/              # lowongan-kerja-page.tsx
-│   │   ├── lamaran/                     # lamaran-page.tsx
-│   │   ├── e-portfolio/                 # portofolio-page.tsx, personal-academic-form.tsx, portfolio.api.ts, portfolio.schema.ts, portfolio.form.ts, modals
-│   │   └── tracer-study/                # tracer-page.tsx
+│   │   ├── lamaran/                     # lamaran-page.tsx, lamaran.api.ts, lamaran.schema.ts, components/, hooks/, utils/
+│   │   ├── e-portfolio/                 # e-portfolio-page.tsx, personal-academic-form.tsx, portfolio.api.ts, portfolio.schema.ts, portfolio.form.ts, modals
+│   │   └── tracer-study/                # tracer-study-page.tsx, tracer-study-form.tsx, tracer-study.api.ts, tracer-study.schema.ts
 │   ├── admin/                           # Administrator portal module (admin, superadmin)
 │   │   ├── route.tsx                    # Admin sub-routes
 │   │   ├── dashboard/                   # dashboard-page.tsx
@@ -108,21 +108,26 @@ frontend/src/
 │   │   ├── jurusan/                     # jurusan-page.tsx, jurusan-form.tsx, jurusan-table.tsx, jurusan.api.ts, jurusan.schema.ts, jurusan.form.ts
 │   │   ├── users/                       # users-page.tsx, users-form.tsx, users-table.tsx, users.api.ts, users.schema.ts, users.form.ts (superadmin only)
 │   │   ├── dudi/                        # dudi-page.tsx, dudi-form.tsx, dudi-table.tsx, dudi.api.ts, dudi.schema.ts, dudi.form.ts
-│   │   ├── siswa/                       # siswa-page.tsx, siswa-form.tsx, siswa-table.tsx, siswa.api.ts, siswa.schema.ts, siswa.form.ts
+│   │   ├── siswa/                       # siswa-page.tsx, siswa-form.tsx, siswa-table.tsx + detail and portfolio modals
 │   │   ├── alumni/                      # alumni-page.tsx, alumni-form.tsx, alumni-detail-modal.tsx, alumni-table.tsx, alumni.api.ts, alumni.schema.ts, alumni.form.ts
+│   │   ├── lowongan-kerja/              # lowongan-kerja-page.tsx, lowongan-kerja-form.tsx, lowongan-kerja-filter.tsx, lowongan-kerja-table.tsx, lowongan-kerja-detail-form.tsx, lowongan-kerja.api.ts, lowongan-kerja.schema.ts, lowongan-kerja.form.ts, use-lowongan-kerja*.ts
+│   │   ├── seleksi/                     # seleksi-page.tsx, seleksi.api.ts, types.ts, components/, hooks/
+│   │   ├── validasi-presensi/           # pages/, components/, hooks/, types/
+│   │   ├── tracer-study/                # tracer-study pages and components
+│   │   └── laporan/                     # laporan-page.tsx
 │   │   ├── lowongan-kerja/              # lowongan-kerja-page.tsx and lowongan-kerja subcomponents
 │   │   ├── seleksi/                     # seleksi-page.tsx
 │   │   ├── validasi-presensi/           # pages/validasi-presensi-page.tsx, components, hooks, types
 │   │   ├── tracer-study/                # tracer-page.tsx
 │   │   └── laporan/                     # laporan-page.tsx, components/ (header, filter-bar, stat-card, print-document, tabs), laporan.api.ts, laporan.types.ts
 │   └── hrd/                             # Corporate HRD portal module
-│       ├── route.tsx                    # HRD sub-routes
-│       ├── lowongan/                    # lowongan-page.tsx, lowongan-form.tsx, lowongan-list.tsx, use-lowongan-page.ts, use-lowongan-list.ts, lowongan.schema.ts, lowongan.form.ts, lowongan.api.ts
-│       ├── review/                      # pages/review-page.tsx, components, hooks, api
-│       ├── jadwal/                      # pages/jadwal-page.tsx, components, hooks, api
-│       ├── hasil/                       # pages/hasil-page.tsx, components, hooks, api
-│       └── penempatan/                  # pages/penempatan-page.tsx, components, hooks, api, types
-├── hooks/                               # Global reusable React hooks
+│       ├── route.tsx                    # HRD sub-routes (dashboard path has no element yet)
+│       ├── lowongan/                    # lowongan-page.tsx, lowongan-form.tsx, lowongan-list.tsx, lowongan-card.tsx, lowongan-status-badge.tsx, lowongan-status.ts, lowongan.api.ts, lowongan.schema.ts, lowongan.form.ts, use-lowongan-page.ts, use-lowongan-list.ts
+│       ├── review/pages/                # review-page.tsx
+│       ├── jadwal/                      # index.ts, jadwal.api.ts, pages/, components/, hooks/, types/
+│       ├── hasil/pages/                 # hasil-page.tsx
+│       └── penempatan/                  # penempatan-page.tsx, penempatan-form.tsx, penempatan-table.tsx, penempatan-metric-cards.tsx, penempatan-update-status-form.tsx, penempatan.api.ts, penempatan.schema.ts, penempatan.form.ts, use-penempatan*.ts
+├── hooks/                               # Global reusable React hooks (use-app, use-mobile, use-notification, use-paginated-options)
 ├── layouts/                             # Master layout wrappers (auth.layout.tsx, main.layout.tsx)
 ├── lib/                                 # Utility functions (cn) & Echo
 ├── slices/                              # Redux authSlice
@@ -144,9 +149,14 @@ Features follow a **Role -> Feature Domain (kebab-case) -> Flat Files** organiza
    - `kebab-feature.form.ts`, `use{Feature}Form()` hook(s) that wrap `useForm` + `zodResolver` + `defaultValues`, plus pure payload/defaults builders (`toCreateUserPayload`, `toPortfolioProfileDefaults`). Form logic stays out of the DOM.
    - `kebab-feature-form.tsx`, Presentational form component. Reads RHF state via `useFormContext()` and only renders inputs; receives an `onSubmit(data)` prop for the host handler.
    - `kebab-feature-table.tsx`, Column definitions (`buildUserColumns`, `buildStudentColumns`, etc.), badges, and actions for DataTable.
+   - `kebab-feature-card.tsx`, Presentational card for grid views. Receives item data plus action callbacks through props and holds no fetch logic.
+   - `kebab-feature-status.ts`, Pure status, date, and ratio helpers shared by badges, cards, tables, and lists. Holds no JSX and no hooks.
+   - `use{Feature}-*.ts`, Feature-scoped hooks for page, list, table, and filter state.
    - `kebab-feature-page.tsx`, Main page/container component. Hosts the form instance from `{feature}.form.ts`, owns submit handlers (api/dispatch/navigate), and wraps presentational forms in `<FormProvider>`.
 
 Routing stays at role level: `src/features/{role}/route.tsx` imports each `*-page.tsx` from its feature domain and exports an array (`studentRoute`, `adminRoute`, `hrdRoute`, `authRoute`) consumed by `src/route.tsx`.
+
+HRD lowongan (`src/features/hrd/lowongan/`) owns card and list view modes. Card is the default. The choice persists in `localStorage` under `hrd-lowongan-view-mode`. Create-mode form drafts persist under `hrd-lowongan-draft-v1` and clear on successful submit. Effective vacancy status (active, quota full, expired, closed) is computed in `lowongan-status.ts` and mirrors the backend `effective_status` filter. The reopen flow updates the deadline first through `updateVacancy`, then re-activates.
 
 ## 5. State Management & Redux Store
 
@@ -172,6 +182,7 @@ Routing stays at role level: `src/features/{role}/route.tsx` imports each `*-pag
   - Handles `401 Unauthorized` by clearing `access_token` and redirecting to `/login`.
   - Backend envelope is `{ success: boolean, message: string, data: {}, errors? }`. Access payload via `response.data.data`.
 - Feature API modules (`*.api.ts`) wrap endpoints and return the unwrapped payload, so pages never build URL strings inline.
+- HRD vacancy list query runs server-side. `effective_status` accepts active, closed, quota_full, expiring. `sort` accepts newest, deadline, quota. Unknown values fall back to unfiltered newest-first.
 
 ## 7. Reusable Component Conventions
 
@@ -180,6 +191,7 @@ Routing stays at role level: `src/features/{role}/route.tsx` imports each `*-pag
 - **DataTable (`src/components/custom/data-table.tsx`):** Generic table with loading skeleton, empty state, pagination, and typed columns.
 - **GenericDummyPage (`src/components/custom/generic-dummy-page.tsx`):** Placeholder page with `variant: "student" | "admin"` for scaffolds.
 - **SearchableSelect (`src/components/custom/searchable-select.tsx`):** Accessible popover combobox with instant real-time search filter (`searchable?: boolean` default false) and full-width trigger.
+- **DatePicker (`src/components/custom/date-picker.tsx`):** Role-themed date input. Returns `YYYY-MM-DD` strings.
 
 ## 8. Async Selects (Server-Side Search + Pagination)
 
@@ -194,11 +206,13 @@ AsyncSearchableSelect (props: fetchPage, perPage=20, debounceMs=500, fallbackLab
 ```
 
 Request efficiency rules:
+
 - Search input debounces 500 ms. Opening the popover never searches, closing calls `onClose` to trigger `resetSearch()` (clears query, aborts in-flight requests, resets page).
 - Every new fetch aborts the previous one via `AbortController` (signal threaded through `FetchSelectPage` into axios). Stale responses are ignored by request id; identical queries are skipped.
 - Successful pages are cached in-memory per URL+params with 60 s TTL (`selectPageCache`, `clearSelectOptionsCache()` to invalidate manually). Reopening within a minute costs zero requests.
 
 Rules:
+
 - `fetchPage` receives `{ search, page, per_page }` and resolves `{ items: { value, label, extra? }[], hasMore, total }` from the Laravel paginator envelope (`response.data.data` = items, `response.data.meta` = page meta).
 - `value` is always the backend-encrypted id string. Never compare ids across payloads because encryption uses a random IV. All matching happens inside one loaded item array.
 - Edit forms show the current value via `fallbackLabel` taken from already loaded entity relations (e.g. `user.company.name`), or via the last picked item label tracked locally. No `fetchById` round-trip is needed.
