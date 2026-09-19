@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import {
   type AttendanceItem,
   cleanVacancyTitle,
-} from "../types/validasi-presensi-schema";
+} from "./validasi-presensi.schema";
 
 const POPOVER_EVENT_NAME = "bki-presensi-popover-open";
 

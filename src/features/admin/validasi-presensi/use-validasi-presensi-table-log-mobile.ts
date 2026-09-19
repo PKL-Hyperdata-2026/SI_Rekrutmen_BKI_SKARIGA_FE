@@ -3,7 +3,7 @@ import {
   type AttendanceItem,
   type OpaqueId,
   cleanVacancyTitle,
-} from "../types/validasi-presensi-schema";
+} from "./validasi-presensi.schema";
 
 export interface TableLogMobileItemViewModel {
   id: OpaqueId;

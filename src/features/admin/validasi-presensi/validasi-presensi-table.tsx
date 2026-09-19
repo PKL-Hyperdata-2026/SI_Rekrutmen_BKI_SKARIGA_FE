@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import {
   type AttendanceItem,
   cleanVacancyTitle,
-} from "../types/validasi-presensi-schema";
+} from "./validasi-presensi.schema";
 import { ValidasiPresensiMobileCards } from "./validasi-presensi-mobile-cards";
 import { ValidasiPresensiRejectButton } from "./validasi-presensi-reject";
 import { ValidasiPresensiInfoButton } from "./validasi-presensi-info";
@@ -25,7 +25,7 @@ import {
   formatTestSchedule,
   formatTestScheduleParts,
   getInitials,
-} from "../hooks/useValidasiPresensiTable";
+} from "./use-validasi-presensi-table";
 
 const DEFAULT_SELECTED_IDS: (string | number)[] = [];
 

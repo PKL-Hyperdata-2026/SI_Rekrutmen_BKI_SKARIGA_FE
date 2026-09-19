@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/popover";
 import { CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { type AttendanceItem } from "../types/validasi-presensi-schema";
-import { useValidasiPresensiInfo } from "../hooks/useValidasiPresensiInfo";
+import { type AttendanceItem } from "./validasi-presensi.schema";
+import { useValidasiPresensiInfo } from "./use-validasi-presensi-info";
 
 export interface ValidasiPresensiInfoButtonProps {
   item: AttendanceItem;

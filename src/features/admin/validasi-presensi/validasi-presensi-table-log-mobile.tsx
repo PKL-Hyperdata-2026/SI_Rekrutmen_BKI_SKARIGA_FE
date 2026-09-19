@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import {
   useValidasiPresensiTableLogMobile,
   type UseValidasiPresensiTableLogMobileParams,
-} from "../hooks/useValidasiPresensiTableLogMobile";
+} from "./use-validasi-presensi-table-log-mobile";
 
 export type ValidasiPresensiTableLogMobileCardsProps =
   UseValidasiPresensiTableLogMobileParams;

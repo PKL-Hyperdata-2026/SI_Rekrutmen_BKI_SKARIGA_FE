@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import {
   useValidasiPresensiMobileCards,
   type UseValidasiPresensiMobileCardsParams,
-} from "../hooks/useValidasiPresensiMobileCards";
+} from "./use-validasi-presensi-mobile-cards";
 
 export type ValidasiPresensiMobileCardsProps =
   UseValidasiPresensiMobileCardsParams;

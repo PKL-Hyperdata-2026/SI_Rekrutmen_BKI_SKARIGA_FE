@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { z } from "zod";
-import { api } from "@/api/axios";
+import { validasiPresensiApi } from "./validasi-presensi.api";
 import { toast } from "@/components/custom/sonner";
 import {
   type AttendanceItem,
   attendanceItemSchema,
   attendanceQueueResponseSchema,
-} from "../types/validasi-presensi-schema";
+} from "./validasi-presensi.schema";
 
 interface ApiErrorResponse {
   response?: {
@@ -181,7 +181,7 @@ export function useValidasiPresensiTable({
         params.job_vacancy_id = selectedVacancy;
       }
 
-      const response = await api.get("/admin/attendances/queue", { params });
+      const response = await validasiPresensiApi.getQueue(params);
       const parsed = attendanceQueueResponseSchema.safeParse(response.data);
 
       if (parsed.success) {
@@ -255,7 +255,7 @@ export function useValidasiPresensiTable({
         status === "verified" ? "Diteruskan ke HRD" : "Gugur / Tidak Hadir";
       try {
         try {
-          await api.patch("/admin/attendances/bulk-validate", {
+          await validasiPresensiApi.bulkValidate({
             attendance_ids: selectedIds,
             validation_status: status,
             system_action: systemAction,
@@ -263,13 +263,10 @@ export function useValidasiPresensiTable({
         } catch {
           await Promise.all(
             selectedIds.map((id) =>
-              api.patch(
-                `/admin/attendances/${encodeURIComponent(String(id))}/validate`,
-                {
-                  validation_status: status,
-                  system_action: systemAction,
-                },
-              ),
+              validasiPresensiApi.validateSingle(id, {
+                validation_status: status,
+                system_action: systemAction,
+              }),
             ),
           );
         }

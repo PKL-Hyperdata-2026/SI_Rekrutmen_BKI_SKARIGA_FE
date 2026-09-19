@@ -9,9 +9,9 @@ import {
 import { CardContent, CardDescription } from "@/components/ui/card";
 import { RotateCw } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useValidasiPresensiPage } from "../hooks/useValidasiPresensiPage";
-import { ValidasiPresensiTable } from "../components/validasi-presensi-table";
-import { ValidasiPresensiTableLog } from "../components/validasi-presensi-table-log";
+import { useValidasiPresensiPage } from "./use-validasi-presensi-page";
+import { ValidasiPresensiTable } from "./validasi-presensi-table";
+import { ValidasiPresensiTableLog } from "./validasi-presensi-table-log";
 
 export function ValidasiPresensiPage() {
   const {

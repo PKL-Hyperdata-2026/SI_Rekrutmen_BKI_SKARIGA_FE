@@ -16,13 +16,13 @@ import { cn } from "@/lib/utils";
 import {
   type AttendanceItem,
   cleanVacancyTitle,
-} from "../types/validasi-presensi-schema";
+} from "./validasi-presensi.schema";
 import { ValidasiPresensiTableLogMobileCards } from "./validasi-presensi-table-log-mobile";
 import {
   formatAttendanceParts,
   formatAttendanceTime,
   getInitials,
-} from "../hooks/useValidasiPresensiTableLog";
+} from "./use-validasi-presensi-table-log";
 
 export interface ValidasiPresensiTableLogProps {
   data: AttendanceItem[];

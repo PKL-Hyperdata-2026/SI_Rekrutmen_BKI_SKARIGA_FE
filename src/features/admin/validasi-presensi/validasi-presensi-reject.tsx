@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/popover";
 import { CardContent, CardTitle, CardDescription } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { useValidasiPresensiReject } from "../hooks/useValidasiPresensiReject";
+import { useValidasiPresensiReject } from "./use-validasi-presensi-reject";
 
 export interface ValidasiPresensiRejectButtonProps {
   applicantName?: string | null;

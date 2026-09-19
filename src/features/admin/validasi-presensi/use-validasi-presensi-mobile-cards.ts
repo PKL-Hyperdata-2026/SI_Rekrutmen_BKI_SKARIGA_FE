@@ -3,7 +3,7 @@ import { useCallback, useMemo } from "react";
 import {
   type AttendanceItem,
   type OpaqueId,
-} from "../types/validasi-presensi-schema";
+} from "./validasi-presensi.schema";
 
 export interface MobileCardItemViewModel {
   item: AttendanceItem;

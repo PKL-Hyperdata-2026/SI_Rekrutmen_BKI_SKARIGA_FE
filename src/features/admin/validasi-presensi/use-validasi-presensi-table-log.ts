@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
 import { z } from "zod";
-import { api } from "@/api/axios";
+import { validasiPresensiApi } from "./validasi-presensi.api";
 import { toast } from "@/components/custom/sonner";
 import {
   type AttendanceItem,
   attendanceItemSchema,
   attendanceQueueResponseSchema,
-} from "../types/validasi-presensi-schema";
+} from "./validasi-presensi.schema";
 
 interface ApiErrorResponse {
   response?: {
@@ -126,7 +126,7 @@ export function useValidasiPresensiTableLog({
         params.job_vacancy_id = selectedVacancy;
       }
 
-      const response = await api.get("/admin/attendances/history", { params });
+      const response = await validasiPresensiApi.getHistory(params);
       const parsed = attendanceQueueResponseSchema.safeParse(response.data);
 
       if (parsed.success) {

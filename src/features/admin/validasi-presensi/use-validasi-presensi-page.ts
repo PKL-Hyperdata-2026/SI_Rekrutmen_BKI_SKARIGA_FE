@@ -1,13 +1,13 @@
 import { useState, useCallback, useEffect, useMemo } from "react";
-import { api } from "@/api/axios";
+import { validasiPresensiApi } from "./validasi-presensi.api";
 import { toast } from "@/components/custom/sonner";
 import {
   vacancyOptionsResponseSchema,
   type VacancyOption,
   cleanVacancyTitle,
-} from "../types/validasi-presensi-schema";
-import { useValidasiPresensiTable } from "./useValidasiPresensiTable";
-import { useValidasiPresensiTableLog } from "./useValidasiPresensiTableLog";
+} from "./validasi-presensi.schema";
+import { useValidasiPresensiTable } from "./use-validasi-presensi-table";
+import { useValidasiPresensiTableLog } from "./use-validasi-presensi-table-log";
 
 export interface FormattedVacancyOption {
   id: string;
@@ -35,7 +35,7 @@ export function useValidasiPresensiPage() {
 
   const fetchVacancies = useCallback(async () => {
     try {
-      const res = await api.get("/admin/attendances/vacancies");
+      const res = await validasiPresensiApi.getVacancies();
       const parsed = vacancyOptionsResponseSchema.safeParse(res.data);
       if (parsed.success) {
         setVacancies(parsed.data.data);
@@ -51,8 +51,8 @@ export function useValidasiPresensiPage() {
 
   useEffect(() => {
     let ignore = false;
-    api
-      .get("/admin/attendances/vacancies")
+    validasiPresensiApi
+      .getVacancies()
       .then((res) => {
         if (!ignore) {
           const parsed = vacancyOptionsResponseSchema.safeParse(res.data);
