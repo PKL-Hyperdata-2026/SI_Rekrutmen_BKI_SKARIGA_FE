@@ -51,6 +51,7 @@ declare module "lucide-react" {
   export const FileQuestion: LucideIcon;
   export const FileSpreadsheet: LucideIcon;
   export const FileText: LucideIcon;
+  export const Filter: LucideIcon;
   export const FolderOpen: LucideIcon;
   export const Globe: LucideIcon;
   export const GraduationCap: LucideIcon;
