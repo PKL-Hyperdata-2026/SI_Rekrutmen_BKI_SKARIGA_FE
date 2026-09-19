@@ -14,11 +14,14 @@ Operational instructions & boundaries: [`AGENTS.md`](./AGENTS.md).
 | Language            | TypeScript 6          | Strict type checking (`tsc -b`)                            |
 | CSS & Styling       | Tailwind CSS v4       | Native CSS imports via `@tailwindcss/vite`, Geist font     |
 | UI Primitives       | Shadcn UI / Radix UI  | Accessible UI components (`src/components/ui/`)            |
-| State Management    | Redux Toolkit         | Central store (`src/store/index.ts`) & feature slices      |
+| State Management    | Redux Toolkit         | Central store (`src/store/index.ts`) & auth slice          |
 | Routing             | React Router v7       | Declarative routing with layout wrappers (`src/route.tsx`) |
 | HTTP Client         | Axios                 | Configured instance with interceptors (`src/api/axios.ts`) |
 | Forms & Validation  | React Hook Form + Zod | Schema-based form state and validation resolvers           |
 | Tables & Data       | TanStack React Table  | Headless datatables with sorting, pagination, & filtering  |
+| Rich Text Editor    | TipTap                | Modular rich text editor suite (`@tiptap/react`)           |
+| Maps & Geo          | Leaflet & React-Leaflet | Coordinate and radius map views                          |
+| Visuals & Charts    | Recharts & Lucide     | Data visualization charts and feather icon suite           |
 
 ## 2. Architecture (How Things Connect)
 
@@ -27,7 +30,7 @@ Application Mounting
   → src/main.tsx (Root DOM mounting)
       → Redux Provider (src/store/index.ts)
           → RouterProvider (src/route.tsx)
-              → Layout Wrappers (src/layouts/ - Sidebar, Navbar, Breadcrumbs)
+              → Layout Wrappers (src/layouts/ - Sidebar, Topbar, Breadcrumbs)
                   → Role-Guarded Feature Pages / Views (src/features/{role}/{feature}/)
                       → UI Components (src/components/ui/ + custom/)
                       → Custom Hooks (feature hooks or src/hooks/)
@@ -43,120 +46,115 @@ Route guards (`ProtectedRoute`, `DashboardRedirector`) live at the auth role roo
 ```text
 frontend/src/
 ├── api/
-│   ├── axios.ts                         # Configured Axios client with Bearer auth interceptors
-│   └── select-options.ts                # Centralized async paginated options API
-├── assets/                              # Static assets, logos, illustration SVGs
+│   ├── axios.ts                                 # Configured Axios client with Bearer auth interceptors
+│   └── select-options.ts                        # Centralized async paginated options API
+├── assets/                                      # Static assets, logos, illustration SVGs
 ├── components/
-│   ├── custom/                          # Global elements (PageHeader, Topbar, AppSidebar, DataTable, DataTablePagination, StatCard, Modal, SearchableSelect, AsyncSearchableSelect, DatePicker, FilterSelect, sonner, etc.)
-│   └── ui/                              # Shadcn UI primitives (Button, Dialog, Card, Input, Select, etc.)
+│   ├── custom/                                  # Global reusable composite components
+│   │   ├── text-editor/                         # Rich text editor suite
+│   │   │   ├── heading-dropdown.tsx
+│   │   │   ├── rich-text-editor.tsx
+│   │   │   └── rich-text-toolbar.tsx
+│   │   ├── app-sidebar.tsx
+│   │   ├── async-searchable-select.tsx
+│   │   ├── box.tsx
+│   │   ├── data-table-pagination.tsx
+│   │   ├── data-table.tsx
+│   │   ├── date-picker.tsx
+│   │   ├── date-range-picker.tsx
+│   │   ├── filter-select.tsx
+│   │   ├── generic-dummy-page.tsx
+│   │   ├── index.ts
+│   │   ├── interactive-item-card.tsx
+│   │   ├── metric-card.tsx
+│   │   ├── modal.tsx
+│   │   ├── page-header.tsx
+│   │   ├── pill-table-header.tsx
+│   │   ├── searchable-select.tsx
+│   │   ├── section-card.tsx
+│   │   ├── sidebar-cutout.tsx
+│   │   ├── sidebar-icon.tsx
+│   │   ├── sidebar-menu-item.tsx
+│   │   ├── sonner.tsx
+│   │   ├── span.tsx
+│   │   ├── stat-card.tsx
+│   │   └── topbar.tsx
+│   └── ui/                                      # Shadcn UI / Radix UI primitives (button, card, dialog, input, etc.)
 ├── config/
-│   └── menus.ts                         # Sidebar menus per role (STUDENT_MENUS, ADMIN_MENUS, HRD_MENUS)
-├── features/                            # Role-based feature modules (kebab-case per feature domain)
+│   └── menus.ts                                 # Sidebar menus per role (STUDENT_MENUS, ADMIN_MENUS, HRD_MENUS)
+├── features/                                    # Role-based feature modules
 │   ├── auth/
-│   │   ├── protected-route.tsx        # Role-aware route guard
-│   │   ├── dashboard-redirector.tsx   # Redirects "/" to role dashboard
-│   │   ├── route.tsx                  # Auth sub-routes
-│   │   ├── login/                     # login-page.tsx, login-form.tsx, login.schema.ts, login.form.ts, login.api.ts
-│   │   ├── forgot-password/           # forgot-password-modal.tsx, forgot-password-form.tsx, forgot-password.schema.ts, forgot-password.form.ts, forgot-password.api.ts
-│   │   └── reset-password/            # reset-password-page.tsx, reset-password-form.tsx, reset-password.schema.ts, reset-password.form.ts, reset-password.api.ts
-│   ├── student/                       # Student portal feature module
-│   │   ├── route.tsx                  # Student sub-routes
-│   │   ├── dashboard/                 # dashboard-page.tsx
-│   │   ├── lowongan-kerja/            # lowongan-kerja-page.tsx
-│   │   ├── lamaran/                   # lamaran-page.tsx
-│   │   ├── e-portfolio/               # portofolio-page.tsx, personal-academic-form.tsx, portfolio.api.ts, portfolio.schema.ts, portfolio.form.ts, modals
-│   │   └── tracer-study/              # tracer-page.tsx
-│   ├── admin/                         # Administrator portal module
-│   │   ├── route.tsx                  # Admin sub-routes
-│   │   ├── dashboard/                 # dashboard-page.tsx
-│   │   ├── users/                     # users-page.tsx, users-form.tsx, users-table.tsx, users.api.ts, users.schema.ts, users.form.ts
-│   │   ├── dudi/                      # dudi-page.tsx, dudi-form.tsx, dudi-table.tsx, dudi.api.ts, dudi.schema.ts, dudi.form.ts
-│   │   ├── siswa/                     # siswa-page.tsx, siswa-form.tsx, siswa-table.tsx, siswa.api.ts, siswa.schema.ts, siswa.form.ts
-│   │   ├── alumni/                    # alumni-page.tsx, alumni-form.tsx, alumni-detail-modal.tsx, alumni-table.tsx, alumni.api.ts, alumni.schema.ts, alumni.form.ts
-│   │   ├── lowongan-kerja/            # lowongan-kerja-page.tsx and lowongan-kerja subcomponents
-│   │   ├── seleksi/                   # seleksi-page.tsx
-│   │   ├── validasi-presensi/         # pages/validasi-presensi-page.tsx, components, hooks, types
-│   │   ├── penempatan/                # penempatan-page.tsx
-│   │   ├── tracer-study/              # tracer-page.tsx, tracer-stats-cards.tsx, tracer-detail-modal.tsx, tracer-form-modal.tsx, tracer-table.tsx, tracer.api.ts, tracer.schema.ts
-│   │   └── laporan/                   # laporan-page.tsx, components/ (header, filter-bar, stat-card, print-document, tabs), laporan.api.ts, laporan.types.ts
-│   └── hrd/                           # [Planned] Corporate HRD portal module
-├── hooks/                             # Global reusable React hooks
-├── layouts/                           # Master layout wrappers (auth.layout.tsx, main.layout.tsx)
-├── lib/                               # Utility functions (cn) & Echo
-├── slices/                            # Redux authSlice
-├── store/                             # Redux store index
-├── main.tsx                           # React entry point
-├── route.tsx                          # Top-level routing configuration
-└── index.css                          # Global styles, Tailwind v4 imports, CSS variables
-│   │   ├── protected-route.tsx          # Role-aware route guard (siswa, alumni, admin, superadmin, hrd)
-│   │   ├── dashboard-redirector.tsx     # Redirects "/" to respective role dashboard
-│   │   ├── route.tsx                    # Auth sub-routes
-│   │   ├── login/                       # login-page.tsx, login-form.tsx, login.schema.ts, login.form.ts, login.api.ts
-│   │   ├── forgot-password/             # forgot-password-modal.tsx, forgot-password-form.tsx, forgot-password.schema.ts, forgot-password.form.ts, forgot-password.api.ts
-│   │   └── reset-password/              # reset-password-page.tsx, reset-password-form.tsx, reset-password.schema.ts, reset-password.form.ts, reset-password.api.ts
-│   ├── student/                         # Student & Alumni portal feature module
-│   │   ├── route.tsx                    # Student sub-routes
-│   │   ├── dashboard/                   # dashboard-page.tsx
-│   │   ├── lowongan-kerja/              # lowongan-kerja-page.tsx
-│   │   ├── lamaran/                     # lamaran-page.tsx, lamaran.api.ts, lamaran.schema.ts, components/, hooks/, utils/
-│   │   ├── e-portfolio/                 # e-portfolio-page.tsx, personal-academic-form.tsx, portfolio.api.ts, portfolio.schema.ts, portfolio.form.ts, modals
-│   │   └── tracer-study/                # tracer-study-page.tsx, tracer-study-form.tsx, tracer-study.api.ts, tracer-study.schema.ts
-│   ├── admin/                           # Administrator portal module (admin, superadmin)
-│   │   ├── route.tsx                    # Admin sub-routes
-│   │   ├── dashboard/                   # dashboard-page.tsx
-│   │   ├── departemen/                  # departemen-page.tsx, departemen-form.tsx, departemen-table.tsx, departemen.api.ts, departemen.schema.ts, departemen.form.ts
-│   │   ├── jurusan/                     # jurusan-page.tsx, jurusan-form.tsx, jurusan-table.tsx, jurusan.api.ts, jurusan.schema.ts, jurusan.form.ts
-│   │   ├── users/                       # users-page.tsx, users-form.tsx, users-table.tsx, users.api.ts, users.schema.ts, users.form.ts (superadmin only)
-│   │   ├── dudi/                        # dudi-page.tsx, dudi-form.tsx, dudi-table.tsx, dudi.api.ts, dudi.schema.ts, dudi.form.ts
-│   │   ├── siswa/                       # siswa-page.tsx, siswa-form.tsx, siswa-table.tsx + detail and portfolio modals
-│   │   ├── alumni/                      # alumni-page.tsx, alumni-form.tsx, alumni-detail-modal.tsx, alumni-table.tsx, alumni.api.ts, alumni.schema.ts, alumni.form.ts
-│   │   ├── lowongan-kerja/              # lowongan-kerja-page.tsx, lowongan-kerja-form.tsx, lowongan-kerja-filter.tsx, lowongan-kerja-table.tsx, lowongan-kerja-detail-form.tsx, lowongan-kerja.api.ts, lowongan-kerja.schema.ts, lowongan-kerja.form.ts, use-lowongan-kerja*.ts
-│   │   ├── seleksi/                     # seleksi-page.tsx, seleksi.api.ts, types.ts, components/, hooks/
-│   │   ├── validasi-presensi/           # pages/, components/, hooks/, types/
-│   │   ├── tracer-study/                # tracer-study pages and components
-│   │   └── laporan/                     # laporan-page.tsx
-│   │   ├── lowongan-kerja/              # lowongan-kerja-page.tsx and lowongan-kerja subcomponents
-│   │   ├── seleksi/                     # seleksi-page.tsx
-│   │   ├── validasi-presensi/           # pages/validasi-presensi-page.tsx, components, hooks, types
-│   │   ├── tracer-study/                # tracer-page.tsx
-│   │   └── laporan/                     # laporan-page.tsx, components/ (header, filter-bar, stat-card, print-document, tabs), laporan.api.ts, laporan.types.ts
-│   └── hrd/                             # Corporate HRD portal module
-│       ├── route.tsx                    # HRD sub-routes (dashboard path has no element yet)
-│       ├── lowongan/                    # lowongan-page.tsx, lowongan-form.tsx, lowongan-list.tsx, lowongan-card.tsx, lowongan-status-badge.tsx, lowongan-status.ts, lowongan.api.ts, lowongan.schema.ts, lowongan.form.ts, use-lowongan-page.ts, use-lowongan-list.ts
-│       ├── review/pages/                # review-page.tsx
-│       ├── jadwal/                      # index.ts, jadwal.api.ts, pages/, components/, hooks/, types/
-│       ├── hasil/pages/                 # hasil-page.tsx
-│       └── penempatan/                  # penempatan-page.tsx, penempatan-form.tsx, penempatan-table.tsx, penempatan-metric-cards.tsx, penempatan-update-status-form.tsx, penempatan.api.ts, penempatan.schema.ts, penempatan.form.ts, use-penempatan*.ts
-├── hooks/                               # Global reusable React hooks (use-app, use-mobile, use-notification, use-paginated-options)
-├── layouts/                             # Master layout wrappers (auth.layout.tsx, main.layout.tsx)
-├── lib/                                 # Utility functions (cn) & Echo
-├── slices/                              # Redux authSlice
-├── store/                               # Redux store index
-├── main.tsx                             # React entry point
-├── route.tsx                            # Top-level routing configuration
-└── index.css                            # Global styles, Tailwind v4 imports, CSS variables
+│   │   ├── forgot-password/                     # forgot-password-modal.tsx, form, api, schema
+│   │   ├── login/                               # login-page.tsx, login-form.tsx, api, form, schema
+│   │   ├── reset-password/                      # reset-password-page.tsx, form, api, schema
+│   │   ├── dashboard-redirector.tsx             # Redirects "/" to respective role dashboard
+│   │   ├── protected-route.tsx                  # Role-aware route guard
+│   │   └── route.tsx                            # Auth sub-routes
+│   ├── student/                                 # Student & Alumni portal feature module
+│   │   ├── dashboard/                           # dashboard-page.tsx
+│   │   ├── e-portfolio/                         # e-portfolio-page.tsx, personal-academic-form.tsx, portfolio.api.ts, portfolio.schema.ts, portfolio.form.ts, modals
+│   │   ├── lamaran/                             # lamaran-page.tsx, lamaran-card.tsx, lamaran-detail-stepper.tsx, lamaran.api.ts, lamaran.schema.ts, placement-letter.ts, hooks
+│   │   ├── lowongan-kerja/                      # lowongan-kerja-page.tsx, card, filter, form, api, hooks
+│   │   ├── tracer-study/                        # tracer-study-page.tsx, tracer-stats-sidebar.tsx, tracer-study.form.ts, tracer-study.api.ts, tracer-study.schema.ts
+│   │   └── route.tsx                            # Student sub-routes
+│   ├── admin/                                   # Administrator portal module (admin, superadmin)
+│   │   ├── alumni/                              # alumni-page.tsx, alumni-table.tsx, alumni-form.tsx, alumni-detail-modal.tsx, api, schema, form
+│   │   ├── dashboard/                           # dashboard-page.tsx
+│   │   ├── departemen/                          # departemen-page.tsx, departemen-table.tsx, departemen-form.tsx, api, schema, form
+│   │   ├── dudi/                                # dudi-page.tsx, dudi-table.tsx, dudi-form.tsx, api, schema, form
+│   │   ├── jurusan/                             # jurusan-page.tsx, jurusan-table.tsx, jurusan-form.tsx, api, schema, form
+│   │   ├── laporan/                             # laporan-page.tsx, components/, laporan.api.ts, laporan.types.ts
+│   │   ├── lowongan-kerja/                      # lowongan-kerja-page.tsx, detail, form, table, filter, api, schema, hooks
+│   │   ├── seleksi/                             # seleksi-page.tsx, seleksi.api.ts, types.ts, components/, hooks/
+│   │   ├── siswa/                               # siswa-page.tsx, siswa-table.tsx, siswa-form.tsx, siswa-detail-modal.tsx, siswa-portfolio-modal.tsx, api, schema, form
+│   │   ├── tracer-study/                        # tracer-study-page.tsx, tracer-study-table.tsx, stats-cards, form-modal, detail-modal, api, schema, form
+│   │   ├── users/                               # users-page.tsx, users-table.tsx, users-form.tsx, api, schema, form (superadmin)
+│   │   ├── validasi-presensi/                   # pages/validasi-presensi-page.tsx, components/, hooks/, types/
+│   │   └── route.tsx                            # Admin sub-routes
+│   └── hrd/                                     # Corporate HRD portal module
+│       ├── lowongan/                            # lowongan-page.tsx, form, list, card, status-badge, api, schema, form, hooks (Production)
+│       ├── penempatan/                          # penempatan-page.tsx, form, table, metric-cards, update-form, api, schema, form, hooks (Production)
+│       ├── hasil/                               # pages/hasil-page.tsx (Placeholder stub view)
+│       ├── jadwal/                              # pages/jadwal-page.tsx (Placeholder stub view)
+│       ├── review/                              # pages/review-page.tsx (Placeholder stub view)
+│       └── route.tsx                            # HRD sub-routes
+├── hooks/                                       # Global reusable React hooks
+│   ├── use-app.ts
+│   ├── use-heading-dropdown.ts
+│   ├── use-mobile.ts
+│   ├── use-notification.ts
+│   ├── use-paginated-options.ts
+│   ├── use-rich-text-editor.ts
+│   └── use-rich-text-toolbar.ts
+├── layouts/                                     # Master layout wrappers (auth.layout.tsx, main.layout.tsx)
+├── lib/                                         # Utility functions (utils.ts, echo.ts)
+├── slices/                                      # Redux slices (authSlice.ts)
+├── store/                                       # Redux store index (index.ts)
+├── lucide-react.d.ts                            # Ambient module declarations
+├── main.tsx                                     # React entry point
+├── route.tsx                                    # Top-level routing configuration
+└── index.css                                    # Global styles, Tailwind v4 imports, CSS variables
 ```
 
 ## 4. Feature Module Pattern
 
-Features follow a **Role -> Feature Domain (kebab-case) -> Flat Files** organization:
+Features follow a **Role -> Feature Domain (kebab-case) -> Files** organization:
 
 1. **Role Level (`src/features/{role}`):** Groups modules by user persona (`auth`, `student`, `admin`, `hrd`).
-2. **Feature Level (`src/features/{role}/{kebab-feature}`):** Dedicated folder per business capability (e.g. `student/e-portfolio`, `admin/departemen`, `admin/jurusan`, `admin/users`, `admin/dudi`, `admin/siswa`, `admin/alumni`, `hrd/penempatan`).
-3. **Files inside Feature Domain:**
-   - `kebab-feature.api.ts`, Axios request functions for the feature endpoints. Uses central `api` from `src/api/axios.ts`, never raw `fetch()` or new Axios instance.
-   - `kebab-feature.schema.ts`, Zod validation schemas & inferred TypeScript types.
-   - `kebab-feature.form.ts`, `use{Feature}Form()` hook(s) that wrap `useForm` + `zodResolver` + `defaultValues`, plus pure payload/defaults builders (`toCreateUserPayload`, `toPortfolioProfileDefaults`). Form logic stays out of the DOM.
-   - `kebab-feature-form.tsx`, Presentational form component. Reads RHF state via `useFormContext()` and only renders inputs; receives an `onSubmit(data)` prop for the host handler.
-   - `kebab-feature-table.tsx`, Column definitions (`buildUserColumns`, `buildStudentColumns`, etc.), badges, and actions for DataTable.
-   - `kebab-feature-card.tsx`, Presentational card for grid views. Receives item data plus action callbacks through props and holds no fetch logic.
-   - `kebab-feature-status.ts`, Pure status, date, and ratio helpers shared by badges, cards, tables, and lists. Holds no JSX and no hooks.
-   - `use{Feature}-*.ts`, Feature-scoped hooks for page, list, table, and filter state.
-   - `kebab-feature-page.tsx`, Main page/container component. Hosts the form instance from `{feature}.form.ts`, owns submit handlers (api/dispatch/navigate), and wraps presentational forms in `<FormProvider>`.
+2. **Feature Level (`src/features/{role}/{kebab-feature}`):** Dedicated folder per business capability.
+3. **Standard Flat Files Convention:**
+   - `kebab-feature.api.ts`: Axios request functions for endpoints. Uses central `api` from `src/api/axios.ts`.
+   - `kebab-feature.schema.ts`: Zod validation schemas & inferred TypeScript types.
+   - `kebab-feature.form.ts`: Hook(s) wrapping `useForm` + `zodResolver` + `defaultValues`, plus payload/defaults builders.
+   - `kebab-feature-form.tsx`: Presentational form component reading RHF context.
+   - `kebab-feature-table.tsx`: Column definitions, badges, and actions for DataTable.
+   - `kebab-feature-card.tsx`: Presentational card for grid views.
+   - `kebab-feature-page.tsx`: Main container component hosting form/table instances and submit handlers.
+4. **Architectural Complexity Exceptions:**
+   - Certain high-density features (`admin/validasi-presensi`, `admin/seleksi`, `admin/laporan`) encapsulate internal components and hooks inside subfolders (`components/`, `hooks/`, `pages/`, `types/`) to isolate domain logic.
+   - HRD stub modules (`review`, `jadwal`, `hasil`) currently render single placeholder views in `pages/` pending full implementation.
 
-Routing stays at role level: `src/features/{role}/route.tsx` imports each `*-page.tsx` from its feature domain and exports an array (`studentRoute`, `adminRoute`, `hrdRoute`, `authRoute`) consumed by `src/route.tsx`.
-
-HRD lowongan (`src/features/hrd/lowongan/`) owns card and list view modes. Card is the default. The choice persists in `localStorage` under `hrd-lowongan-view-mode`. Create-mode form drafts persist under `hrd-lowongan-draft-v1` and clear on successful submit. Effective vacancy status (active, quota full, expired, closed) is computed in `lowongan-status.ts` and mirrors the backend `effective_status` filter. The reopen flow updates the deadline first through `updateVacancy`, then re-activates.
+Routing stays at role level: `src/features/{role}/route.tsx` imports each page and exports an array (`studentRoute`, `adminRoute`, `hrdRoute`, `authRoute`) consumed by `src/route.tsx`.
 
 ## 5. State Management & Redux Store
 
@@ -170,28 +168,28 @@ HRD lowongan (`src/features/hrd/lowongan/`) owns card and list view modes. Card 
 - Use `authSlice.ts` to manage:
   - `user`: Authenticated user entity with roles.
   - `isAuthenticated`: Boolean state flag.
-  - `token`: Sanctum Bearer token is stored in `localStorage` (key `access_token`), read/written by `src/api/axios.ts` interceptors.
+  - *Note:* Sanctum Bearer token is stored and managed via `localStorage` (key `access_token`), read/written directly by `src/api/axios.ts` interceptors.
 
 ## 6. API Client & Networking Layer
 
 - Single Axios instance exported from `src/api/axios.ts`.
 - Base URL configured from environment variable `VITE_API_URL` (fallback `http://localhost:8000/api`).
-- Request Interceptor: Injects `Authorization: Bearer ${token}` retrieved from `localStorage.getItem("access_token")`.
+- Request Interceptor: Injects `Authorization: Bearer ${token}` from `localStorage.getItem("access_token")`.
 - Response Interceptor:
   - Passes successful responses through.
   - Handles `401 Unauthorized` by clearing `access_token` and redirecting to `/login`.
-  - Backend envelope is `{ success: boolean, message: string, data: {}, errors? }`. Access payload via `response.data.data`.
-- Feature API modules (`*.api.ts`) wrap endpoints and return the unwrapped payload, so pages never build URL strings inline.
-- HRD vacancy list query runs server-side. `effective_status` accepts active, closed, quota_full, expiring. `sort` accepts newest, deadline, quota. Unknown values fall back to unfiltered newest-first.
+  - Backend envelope is `{ success: boolean, message: string, data: {} }`. Access payload via `response.data.data`.
+- Feature API modules (`*.api.ts`) wrap endpoints and return unwrapped payload data.
 
 ## 7. Reusable Component Conventions
 
 - **Page Header (`src/components/custom/page-header.tsx`):** Universal top banner with role theming (`admin`, `student`, `alumni`, `hrd`, `auto`).
-- **Modal Boilerplate (`src/components/custom/modal.tsx`):** Dual-mode dialog wrapper over Radix UI primitives (`src/components/ui/dialog.tsx`).
+- **Modal Boilerplate (`src/components/custom/modal.tsx`):** Dual-mode dialog wrapper over Radix UI primitives.
 - **DataTable (`src/components/custom/data-table.tsx`):** Generic table with loading skeleton, empty state, pagination, and typed columns.
-- **GenericDummyPage (`src/components/custom/generic-dummy-page.tsx`):** Placeholder page with `variant: "student" | "admin"` for scaffolds.
-- **SearchableSelect (`src/components/custom/searchable-select.tsx`):** Accessible popover combobox with instant real-time search filter (`searchable?: boolean` default false) and full-width trigger.
-- **DatePicker (`src/components/custom/date-picker.tsx`):** Role-themed date input. Returns `YYYY-MM-DD` strings.
+- **AsyncSearchableSelect (`src/components/custom/async-searchable-select.tsx`):** Server-side debounced searchable select with pagination.
+- **Rich Text Editor Suite (`src/components/custom/text-editor/`):** TipTap based rich text editor with toolbar and heading dropdown.
+- **Metric Cards & Stat Cards (`metric-card.tsx`, `stat-card.tsx`):** Analytical overview and KPI metric visual cards.
+- **Date Pickers (`date-picker.tsx`, `date-range-picker.tsx`):** Standard and range date picker components.
 
 ## 8. Async Selects (Server-Side Search + Pagination)
 
@@ -206,17 +204,6 @@ AsyncSearchableSelect (props: fetchPage, perPage=20, debounceMs=500, fallbackLab
 ```
 
 Request efficiency rules:
-
-- Search input debounces 500 ms. Opening the popover never searches, closing calls `onClose` to trigger `resetSearch()` (clears query, aborts in-flight requests, resets page).
-- Every new fetch aborts the previous one via `AbortController` (signal threaded through `FetchSelectPage` into axios). Stale responses are ignored by request id; identical queries are skipped.
-- Successful pages are cached in-memory per URL+params with 60 s TTL (`selectPageCache`, `clearSelectOptionsCache()` to invalidate manually). Reopening within a minute costs zero requests.
-
-Rules:
-
-- `fetchPage` receives `{ search, page, per_page }` and resolves `{ items: { value, label, extra? }[], hasMore, total }` from the Laravel paginator envelope (`response.data.data` = items, `response.data.meta` = page meta).
-- `value` is always the backend-encrypted id string. Never compare ids across payloads because encryption uses a random IV. All matching happens inside one loaded item array.
-- Edit forms show the current value via `fallbackLabel` taken from already loaded entity relations (e.g. `user.company.name`), or via the last picked item label tracked locally. No `fetchById` round-trip is needed.
-- Extra server-computed fields ride in `item.extra` (e.g. eligible-student autofill fields, `resolvedMajorId`/`resolvedMajorName` for class to major auto-resolution, `code`). Read them in `onOptionSelect`, never from a second list.
-- `emptyOptionLabel` prepends a static `{ value: "", label }` row for clearable selects (status, company). `onOptionSelect` only fires for server items.
-- Feature-specific composition lives in the feature `{feature}.api.ts` (e.g. alumni `getClassMajorSelectPage` merges class + major pages with `class_`/`major_` value prefixes; alumni `suggestCompanies` feeds the manual company-name datalist; siswa/alumni `getFilterOptions` loads small master lists with `per_page=100` for table filter dropdowns).
-- Small static enums (roles, years) stay as inline `SearchableSelect` options. Years are generated locally via alumni `buildGraduationYears()`.
+- Search input debounces 500 ms. Opening the popover never searches, closing calls `onClose` to trigger `resetSearch()`.
+- Every new fetch aborts previous requests via `AbortController`.
+- Successful pages are cached in-memory per URL+params with 60 s TTL (`selectPageCache`, `clearSelectOptionsCache()`).
