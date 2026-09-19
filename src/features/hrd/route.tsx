@@ -1,7 +1,7 @@
 import { LowonganPage } from "./lowongan/lowongan-page";
-import { ReviewPage } from "./review/pages/review-page";
-import { JadwalPage } from "./jadwal/pages/jadwal-page";
-import { HasilPage } from "./hasil/pages/hasil-page";
+import { ReviewPage } from "./review/review-page";
+import { JadwalPage } from "./jadwal/jadwal-page";
+import { HasilPage } from "./hasil/hasil-page";
 import { PenempatanPage } from "./penempatan/penempatan-page";
 
 export const hrdRoute = [
