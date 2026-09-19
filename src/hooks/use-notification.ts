@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { echo } from "../lib/echo";
-import { api } from "@/api/axios";
+import { notificationApi } from "@/api/notification.api";
 import { toast } from "@/components/custom/sonner";
 
 export interface NotificationItem {
@@ -32,17 +32,11 @@ export const useNotification = (userId?: string | number | null) => {
 
     const controller = new AbortController();
 
-    api
-      .get<{
-        success: boolean;
-        data: NotificationItem[];
-        total_unread?: number;
-      }>("/notification/unread", {
-        signal: controller.signal,
-      })
+    notificationApi
+      .getUnread(controller.signal)
       .then((response) => {
-        setNotifications(response.data.data || []);
-        setUnreadCount(response.data.total_unread ?? response.data.data?.length ?? 0);
+        setNotifications((response.data.data as unknown as NotificationItem[]) || []);
+        setUnreadCount(response.data.total_unread ?? (response.data.data?.length ?? 0));
         setError(null);
       })
       .catch((err: unknown) => {
@@ -81,7 +75,7 @@ export const useNotification = (userId?: string | number | null) => {
 
   const markAsRead = async (id: string) => {
     try {
-      await api.patch(`/notification/${id}/read`);
+      await notificationApi.markAsRead(id);
       setNotifications((prev) =>
         prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n))
       );
@@ -93,7 +87,7 @@ export const useNotification = (userId?: string | number | null) => {
 
   const markAllAsRead = async () => {
     try {
-      await api.patch("/notification/read-all");
+      await notificationApi.markAllAsRead();
       setNotifications((prev) =>
         prev.map((n) => ({ ...n, read_at: n.read_at || new Date().toISOString() }))
       );
