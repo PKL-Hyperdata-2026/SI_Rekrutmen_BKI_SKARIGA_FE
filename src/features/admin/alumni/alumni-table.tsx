@@ -147,7 +147,6 @@ export function buildAlumniColumns(
         }
 
         const secondContact = socialUrl || email || "-";
-        const isUrl = Boolean(socialUrl);
 
         return (
           <div className="space-y-1">
@@ -156,24 +155,24 @@ export function buildAlumniColumns(
               <span>{phone}</span>
             </div>
             <div className="flex items-center gap-1.5 text-xs text-slate-500">
-              {isUrl ? (
+              {socialUrl ? (
                 <>
                   <Globe className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                   <a
-                    href={socialUrl!}
+                    href={socialUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="truncate max-w-[200px] hover:underline text-purple-600 hover:text-purple-700"
-                    title={socialUrl!}
+                    className="truncate max-w-48 hover:underline text-purple-600 hover:text-purple-700"
+                    title={socialUrl}
                   >
-                    {socialUrl!.replace(/^https?:\/\/(www\.)?/, "")}
+                    {socialUrl.replace(/^https?:\/\/(www\.)?/, "")}
                   </a>
                 </>
               ) : (
                 <>
                   <Mail className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                   <span
-                    className="truncate max-w-[200px]"
+                    className="truncate max-w-48"
                     title={secondContact}
                   >
                     {secondContact}

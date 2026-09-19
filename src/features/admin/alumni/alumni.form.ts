@@ -163,7 +163,7 @@ export function useAlumniForm(alumni?: AlumniItem | null) {
       waiting_time_months: alumni?.waitingTimeMonths
         ? String(alumni.waitingTimeMonths)
         : "",
-      is_active: isEdit ? alumni!.isActive : true,
+      is_active: isEdit ? (alumni?.isActive ?? true) : true,
     },
   });
 }
