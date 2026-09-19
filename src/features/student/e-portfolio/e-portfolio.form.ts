@@ -5,7 +5,7 @@ import {
   type StudentProfileSchemaType,
   type StudentProfileData,
   type SocialMediaItem,
-} from "./portfolio.schema";
+} from "./e-portfolio.schema";
 
 export function usePortfolioProfileForm(
   initialData?: StudentProfileData | null,

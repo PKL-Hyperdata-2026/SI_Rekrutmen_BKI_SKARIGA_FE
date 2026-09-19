@@ -3,7 +3,7 @@ import type {
   StudentProfileData,
   PortfolioFormOptions,
   PortfolioItem,
-} from "./portfolio.schema";
+} from "./e-portfolio.schema";
 
 export interface UpdateProfilePayload {
   phone: string;

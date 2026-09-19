@@ -10,7 +10,7 @@ import type {
   PortfolioFormOptions,
   StudentProfileSchemaType,
   SocialMediaItem,
-} from "./portfolio.schema";
+} from "./e-portfolio.schema";
 import { MONOCHROME_PLATFORMS } from "./add-social-media-modal";
 
 interface PersonalAcademicFormProps {

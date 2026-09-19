@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import type { PortfolioCategory } from "./portfolio.schema";
+import type { PortfolioCategory } from "./e-portfolio.schema";
 
 interface UploadDocumentModalProps {
   isOpen: boolean;
