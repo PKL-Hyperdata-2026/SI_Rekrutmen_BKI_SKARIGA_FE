@@ -1,5 +1,6 @@
 import { DataTable, type DataTableColumn } from "@/components/custom";
 import { LaporanStatCard } from "./laporan-stat-card";
+import { FileCheck, CheckCircle, Building2 } from "lucide-react";
 import type { RecruitmentMetrics, RecruitmentRow } from "../laporan.types";
 
 interface TabRekrutmenProps {
@@ -61,24 +62,31 @@ const columns: DataTableColumn<RecruitmentRow>[] = [
 export function TabRekrutmen({ metrics, data, isLoading = false }: TabRekrutmenProps) {
   return (
     <div className="space-y-6">
-      {/* 3 Metric Cards */}
+      {/* 3 Metric Cards - Sesuai Styling Seleksi Rekrutmen */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <LaporanStatCard
+          tag="TOTAL PELAMAR"
+          tagColor="text-[#4F28D9]"
           label="Total Pelamar Terdaftar"
           value={`${metrics?.total_applicants ?? 0} Siswa / Alumni`}
-          sublabel="*Berdasarkan hasil seleksi"
+          accentColor="text-[#4F28D9]"
+          icon={<FileCheck className="h-6 w-6 text-[#4F28D9] shrink-0" strokeWidth={1.85} />}
         />
         <LaporanStatCard
+          tag="LOLOS SELEKSI"
+          tagColor="text-[#00875A]"
           label="Lolos Seleksi Akhir"
           value={`${metrics?.total_accepted ?? 0} Peserta`}
-          sublabel={`Tingkat Kelulusan: ${metrics?.pass_rate ?? 0}%`}
-          accentColor="text-emerald-600"
+          accentColor="text-[#00875A]"
+          icon={<CheckCircle className="h-6 w-6 text-[#00875A] shrink-0" strokeWidth={1.85} />}
         />
         <LaporanStatCard
+          tag="MITRA INDUSTRI"
+          tagColor="text-blue-600"
           label="Perusahaan Mitra Aktif"
           value={`${metrics?.active_companies ?? 0} Perusahaan`}
-          sublabel="Berdasarkan Data Perusahaan"
           accentColor="text-blue-600"
+          icon={<Building2 className="h-6 w-6 text-blue-600 shrink-0" strokeWidth={1.85} />}
         />
       </div>
 

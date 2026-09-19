@@ -1,36 +1,64 @@
-import { FileDown } from "lucide-react";
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
-interface LaporanStatCardProps {
+export interface LaporanStatCardProps extends React.HTMLAttributes<HTMLDivElement> {
+  tag?: string;
+  tagColor?: string;
   label: string;
   value: string | number;
-  sublabel: string;
+  sublabel?: string;
+  icon?: React.ReactNode;
   accentColor?: string;
 }
 
 export function LaporanStatCard({
+  tag,
+  tagColor = "text-slate-500",
   label,
   value,
   sublabel,
+  icon,
   accentColor = "text-slate-900",
+  className,
+  ...props
 }: LaporanStatCardProps) {
   return (
-    <div className="relative rounded-2xl border border-slate-200/90 bg-white p-5 shadow-xs transition-all hover:shadow-sm">
-      <div className="flex items-start justify-between gap-2">
-        <span className="text-xs font-semibold text-slate-600">
-          {label}
-        </span>
-        <FileDown className="h-4 w-4 shrink-0 text-slate-400" />
+    <div
+      className={cn(
+        "relative bg-white rounded-2xl border border-slate-100 p-5 shadow-sm flex flex-col gap-2 overflow-hidden transition-all hover:shadow-md",
+        className
+      )}
+      {...props}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-0.5 min-w-0">
+          {tag && (
+            <span
+              className={cn(
+                "text-[11px] font-bold tracking-widest uppercase",
+                tagColor
+              )}
+            >
+              {tag}
+            </span>
+          )}
+          <span className="text-sm font-bold text-slate-900 leading-tight">
+            {label}
+          </span>
+        </div>
+        {icon && <div className="shrink-0">{icon}</div>}
       </div>
 
-      <div className="mt-2.5">
-        <p className={`text-xl font-bold tracking-tight ${accentColor}`}>
+      <div className="mt-0.5 flex flex-col">
+        <span className={cn("text-xl font-bold tracking-tight", accentColor)}>
           {value}
-        </p>
-        <p className="mt-1 text-[11px] font-normal text-slate-400">
-          {sublabel}
-        </p>
+        </span>
+        {sublabel && (
+          <span className="mt-0.5 text-[11px] font-normal text-slate-400">
+            {sublabel}
+          </span>
+        )}
       </div>
     </div>
   );
 }
-

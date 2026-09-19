@@ -1,5 +1,6 @@
 import { DataTable, type DataTableColumn } from "@/components/custom";
 import { LaporanStatCard } from "./laporan-stat-card";
+import { GraduationCap, Award, Building2, BookOpen } from "lucide-react";
 import type { AbsorptionMetrics, AbsorptionRow } from "../laporan.types";
 
 interface TabKeterserapanProps {
@@ -64,28 +65,36 @@ export function TabKeterserapan({ metrics, data, isLoading = false }: TabKeterse
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <LaporanStatCard
+          tag="KELAS 12"
+          tagColor="text-emerald-600"
           label="Keterserapan Kelas 12"
           value={`${metrics?.class_12_rate ?? 0}%`}
-          sublabel="Diterima Sebelum Lulus"
           accentColor="text-emerald-600"
+          icon={<GraduationCap className="h-6 w-6 text-emerald-600 shrink-0" strokeWidth={1.85} />}
         />
         <LaporanStatCard
+          tag="ALUMNI"
+          tagColor="text-amber-600"
           label="Keterserapan Alumni"
           value={`${metrics?.alumni_rate ?? 0}%`}
-          sublabel="Lulusan Terakhir"
           accentColor="text-amber-600"
+          icon={<Award className="h-6 w-6 text-amber-600 shrink-0" strokeWidth={1.85} />}
         />
         <LaporanStatCard
+          tag="BEKERJA"
+          tagColor="text-blue-600"
           label="Bekerja di DUDI"
           value={`${metrics?.working_dudi_rate ?? 0}%`}
-          sublabel="Sesuai Jurusan"
           accentColor="text-blue-600"
+          icon={<Building2 className="h-6 w-6 text-blue-600 shrink-0" strokeWidth={1.85} />}
         />
         <LaporanStatCard
+          tag="STUDI & WIRAUSAHA"
+          tagColor="text-[#4F28D9]"
           label="Kuliah / Wirausaha"
           value={`${metrics?.study_entrepreneur_rate ?? 0}%`}
-          sublabel="Lanjut Studi & Usaha"
-          accentColor="text-primary"
+          accentColor="text-[#4F28D9]"
+          icon={<BookOpen className="h-6 w-6 text-[#4F28D9] shrink-0" strokeWidth={1.85} />}
         />
       </div>
 

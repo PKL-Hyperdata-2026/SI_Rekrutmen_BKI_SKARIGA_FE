@@ -1,5 +1,6 @@
 import { DataTable, type DataTableColumn } from "@/components/custom";
 import { LaporanStatCard } from "./laporan-stat-card";
+import { Clock, Building2, MapPin } from "lucide-react";
 import type { TracerStudyMetrics, TracerStudyRow } from "../laporan.types";
 
 interface TabTracerStudyProps {
@@ -56,22 +57,28 @@ export function TabTracerStudy({ metrics, data, isLoading = false }: TabTracerSt
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <LaporanStatCard
+          tag="MASA TUNGGU"
+          tagColor="text-blue-600"
           label="Rata-Rata Masa Tunggu kerja"
           value={metrics?.avg_waiting_time ?? "-"}
-          sublabel="Target BKK: <3 Bulan"
           accentColor="text-blue-600"
+          icon={<Clock className="h-6 w-6 text-blue-600 shrink-0" strokeWidth={1.85} />}
         />
         <LaporanStatCard
+          tag="SEBARAN INDUSTRI"
+          tagColor="text-[#4F28D9]"
           label="Sebaran Perusahaan"
           value={`${metrics?.industries_count ?? 0} Industri`}
-          sublabel="Tipe Sektor Bisnis"
-          accentColor="text-slate-900"
+          accentColor="text-[#4F28D9]"
+          icon={<Building2 className="h-6 w-6 text-[#4F28D9] shrink-0" strokeWidth={1.85} />}
         />
         <LaporanStatCard
+          tag="WILAYAH KERJA"
+          tagColor="text-emerald-600"
           label="Sebaran Wilayah Kerja"
           value={`${metrics?.regions_count ?? 0} Kota/Provinsi`}
-          sublabel="Berdasarkan Data Perusahaan"
-          accentColor="text-blue-600"
+          accentColor="text-emerald-600"
+          icon={<MapPin className="h-6 w-6 text-emerald-600 shrink-0" strokeWidth={1.85} />}
         />
       </div>
 
@@ -84,8 +91,8 @@ export function TabTracerStudy({ metrics, data, isLoading = false }: TabTracerSt
         role="admin"
         className="[&_th]:py-3.5 [&_th]:px-6"
         rowClassName="[&>td]:py-4 [&>td]:px-6"
-        emptyMessage="Tidak ada data tracer study"
-        emptyDescription="Coba sesuaikan rentang waktu atau filter tahun lulus."
+        emptyMessage="Tidak ada data laporan tracer study"
+        emptyDescription="Coba sesuaikan rentang waktu atau filter tahun kelulusan."
       />
     </div>
   );

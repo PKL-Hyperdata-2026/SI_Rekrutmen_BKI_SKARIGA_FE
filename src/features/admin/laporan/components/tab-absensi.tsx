@@ -1,5 +1,6 @@
 import { DataTable, type DataTableColumn } from "@/components/custom";
 import { LaporanStatCard } from "./laporan-stat-card";
+import { UserCheck, ClipboardCheck, Users } from "lucide-react";
 import type { AttendanceMetrics, AttendanceRow } from "../laporan.types";
 
 interface TabAbsensiProps {
@@ -56,22 +57,28 @@ export function TabAbsensi({ metrics, data, isLoading = false }: TabAbsensiProps
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <LaporanStatCard
+          tag="SOSIALISASI"
+          tagColor="text-emerald-600"
           label="Kehadiran Sosialisasi"
           value={`${metrics?.sosialisasi_rate ?? 0}%`}
-          sublabel="QR Code & GPS Validate"
           accentColor="text-emerald-600"
+          icon={<UserCheck className="h-6 w-6 text-emerald-600 shrink-0" strokeWidth={1.85} />}
         />
         <LaporanStatCard
+          tag="TES SELEKSI"
+          tagColor="text-[#4F28D9]"
           label="Kehadiran Tes Seleksi / Psikotes"
           value={`${metrics?.psikotes_rate ?? 0}%`}
-          sublabel="QR Code & GPS Validate"
-          accentColor="text-primary"
+          accentColor="text-[#4F28D9]"
+          icon={<ClipboardCheck className="h-6 w-6 text-[#4F28D9] shrink-0" strokeWidth={1.85} />}
         />
         <LaporanStatCard
+          tag="INTERVIEW HRD"
+          tagColor="text-blue-600"
           label="Kehadiran Interview HRD"
           value={`${metrics?.interview_rate ?? 0}%`}
-          sublabel="Tepat Waktu Sesuai Jadwal"
           accentColor="text-blue-600"
+          icon={<Users className="h-6 w-6 text-blue-600 shrink-0" strokeWidth={1.85} />}
         />
       </div>
 
