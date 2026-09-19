@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { PageHeader } from "@/components/custom/page-header";
-import { SeleksiFilter } from "./components/seleksi-filter";
-import { SeleksiTable } from "./components/seleksi-table";
-import { CekStatusModal } from "./components/cek-status-modal";
-import { useSeleksi } from "./hooks/useSeleksi";
+import { SeleksiFilter } from "./seleksi-filter";
+import { SeleksiTable } from "./seleksi-table";
+import { CekStatusModal } from "./cek-status-modal";
+import { useSeleksi } from "./use-seleksi";
 import { toast } from "@/components/custom/sonner";
 import { FileCheck, CheckCircle, FileSpreadsheet } from "lucide-react";
 import type { RecruitmentSelectionItem } from "./types";

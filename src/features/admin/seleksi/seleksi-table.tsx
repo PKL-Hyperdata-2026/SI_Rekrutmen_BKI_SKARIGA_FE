@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { DataTable, type DataTableColumn } from "@/components/custom/data-table";
 import { DataTablePagination } from "@/components/custom/data-table-pagination";
 import { getAvatarUrl } from "@/lib/utils";
-import type { RecruitmentSelectionItem } from "../types";
+import type { RecruitmentSelectionItem } from "./types";
 
 export interface SeleksiTableProps {
   data: RecruitmentSelectionItem[];
@@ -179,7 +179,7 @@ export function SeleksiTable({
               type="button"
               size="sm"
               onClick={() => handleCekStatus?.(row)}
-              className="h-8 rounded-xl px-5 bg-[#351c75] hover:bg-[#2A1B7B] text-white text-xs font-semibold shadow-sm border-0 cursor-pointer"
+              className="h-8 rounded-xl px-5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-sm border-0 cursor-pointer"
             >
               Cek Status
             </Button>
@@ -240,11 +240,11 @@ export function SeleksiTable({
 
                 <CardContent className="grid grid-cols-2 gap-2 text-xs pt-2.5 border-t border-slate-100 p-0">
                   <div className="flex flex-col gap-1">
-                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Jurusan</span>
+                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Jurusan</span>
                     <span className="text-sm font-bold text-slate-900">{majorName}</span>
                   </div>
                   <div className="flex flex-col gap-1 items-start">
-                    <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Absensi</span>
+                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Absensi</span>
                     <Badge variant="outline" className={`rounded-full px-3 py-1 text-xs font-semibold border ${attendanceBadge.className}`}>
                       {attendanceBadge.label}
                     </Badge>
@@ -256,7 +256,7 @@ export function SeleksiTable({
                     type="button"
                     size="sm"
                     onClick={() => handleCekStatus?.(row)}
-                    className="w-full h-9 rounded-xl bg-[#351c75] hover:bg-[#2A1B7B] text-white text-xs font-semibold shadow-sm border-0 cursor-pointer"
+                    className="w-full h-9 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-sm border-0 cursor-pointer"
                   >
                     Cek Status
                   </Button>

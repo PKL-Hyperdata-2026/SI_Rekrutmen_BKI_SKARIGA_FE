@@ -9,7 +9,7 @@ import {
 import type {
   SelectionJobVacancyOption,
   SelectionStageOption,
-} from "../types";
+} from "./types";
 
 export interface SeleksiFilterProps {
   vacancyOptions: SelectionJobVacancyOption[];
@@ -82,10 +82,10 @@ export function SeleksiFilter({
         <Select value={selectedVacancyId} onValueChange={onVacancyChange}>
           <SelectTrigger
             isLoading={isLoadingOptions}
-            className="w-[220px] sm:w-[240px] h-10 rounded-xl bg-white border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50/80 transition-colors shadow-none cursor-pointer"
+            className="w-56 sm:w-60 h-10 rounded-xl bg-white border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50/80 transition-colors shadow-none cursor-pointer"
           >
             <div className="flex items-center gap-2 min-w-0 flex-1">
-              <Building2 className="h-4 w-4 text-[#7B4DFF] shrink-0" />
+              <Building2 className="h-4 w-4 text-primary shrink-0" />
               <span className="truncate text-xs font-semibold text-slate-700" title={selectedVacancyLabel}>
                 {selectedVacancyLabel}
               </span>
@@ -108,10 +108,10 @@ export function SeleksiFilter({
         <Select value={selectedStageId} onValueChange={onStageChange}>
           <SelectTrigger
             isLoading={isLoadingOptions}
-            className="w-[210px] sm:w-[230px] h-10 rounded-xl bg-white border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50/80 transition-colors shadow-none cursor-pointer"
+            className="w-52 sm:w-56 h-10 rounded-xl bg-white border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50/80 transition-colors shadow-none cursor-pointer"
           >
             <div className="flex items-center gap-2 min-w-0 flex-1">
-              <Layers className="h-4 w-4 text-[#7B4DFF] shrink-0" />
+              <Layers className="h-4 w-4 text-primary shrink-0" />
               <span className="truncate text-xs font-semibold text-slate-700" title={tahapanLabel}>
                 {tahapanLabel}
               </span>
@@ -132,9 +132,9 @@ export function SeleksiFilter({
 
         {/* Filter 3: Kehadiran */}
         <Select value={selectedAttendance} onValueChange={onAttendanceChange}>
-          <SelectTrigger className="w-[200px] sm:w-[220px] h-10 rounded-xl bg-white border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50/80 transition-colors shadow-none cursor-pointer">
+          <SelectTrigger className="w-48 sm:w-56 h-10 rounded-xl bg-white border-slate-200 text-xs font-semibold text-slate-700 hover:bg-slate-50/80 transition-colors shadow-none cursor-pointer">
             <div className="flex items-center gap-2 min-w-0 flex-1">
-              <CalendarCheck className="h-4 w-4 text-[#7B4DFF] shrink-0" />
+              <CalendarCheck className="h-4 w-4 text-primary shrink-0" />
               <span className="truncate text-xs font-semibold text-slate-700" title={kehadiranLabel}>
                 {kehadiranLabel}
               </span>

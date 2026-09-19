@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/compone
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { RecruitmentSelectionItem } from "../types";
+import type { RecruitmentSelectionItem } from "./types";
 
 export interface CekStatusModalProps {
   open: boolean;
@@ -50,9 +50,9 @@ export function CekStatusModal({ open, onOpenChange, item }: CekStatusModalProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-0 max-w-[95vw] sm:max-w-[620px] overflow-hidden rounded-2xl bg-white border-0 shadow-2xl flex flex-col max-h-[90vh]">
+      <DialogContent className="p-0 max-w-xl w-full overflow-hidden rounded-2xl bg-white border-0 shadow-2xl flex flex-col max-h-screen">
         {/* Header gradien ungu spec */}
-        <div className="relative px-6 py-5 flex items-start justify-between gap-4 bg-gradient-to-r from-[#2A1B7B] to-[#7B4DFF] text-white shrink-0">
+        <div className="relative px-6 py-5 flex items-start justify-between gap-4 bg-gradient-to-r from-primary to-accent text-white shrink-0">
           <div className="flex flex-col gap-1 min-w-0">
             <DialogTitle className="text-lg font-bold tracking-tight text-white leading-tight">
               Cek Status
@@ -154,7 +154,7 @@ export function CekStatusModal({ open, onOpenChange, item }: CekStatusModalProps
               readOnly
               disabled
               rows={5}
-              className="min-h-[120px] rounded-xl border-slate-200 bg-slate-50 text-slate-900 text-sm leading-relaxed disabled:opacity-100 disabled:cursor-not-allowed disabled:bg-slate-50 resize-none"
+              className="min-h-28 rounded-xl border-slate-200 bg-slate-50 text-slate-900 text-sm leading-relaxed disabled:opacity-100 disabled:cursor-not-allowed disabled:bg-slate-50 resize-none"
             />
           </div>
         </div>

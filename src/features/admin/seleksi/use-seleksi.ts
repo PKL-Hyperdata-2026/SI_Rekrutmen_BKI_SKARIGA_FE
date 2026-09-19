@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { api } from "@/api/axios";
+import { seleksiApi } from "./seleksi.api";
 import type {
   RecruitmentSelectionItem,
   SelectionJobVacancyOption,
@@ -7,7 +7,7 @@ import type {
   SelectionSummaryStats,
   SelectionListEnvelope,
   SelectionPaginationMeta,
-} from "../types";
+} from "./types";
 
 type AttendanceFilterValue = "all" | "hadir" | "tidak_hadir" | "belum_absensi";
 
@@ -247,74 +247,12 @@ export function useSeleksi(): UseSeleksiReturn {
   const fetchOptions = useCallback(async () => {
     setIsLoadingOptions(true);
     try {
-      const vacancyReq = api.get<{
-        success?: boolean;
-        message?: string;
-        data?: {
-          data?: Array<{
-            id: string | number;
-            title?: string;
-            position?: string;
-            company?: { name?: string } | null;
-            companyName?: string | null;
-          }>;
-          meta?: unknown;
-        } | Array<unknown>;
-      }>("/admin/job-vacancies", {
-        params: { page: 1, per_page: 100 },
-      });
+      const vacancyReq = seleksiApi.getVacancies();
 
-      const stageReq = api
-        .get<{
-          success?: boolean;
-          message?: string;
-          data?: {
-            data?: Array<{
-              id: string | number;
-              name?: string;
-              code?: string;
-              sequence_order?: number;
-              sequenceOrder?: number;
-            }>;
-            meta?: unknown;
-          } | Array<unknown>;
-        }>("/admin/standard-types", {
-          params: { category: "stage_type", page: 1, per_page: 100 },
-        })
-        .catch(() =>
-          api.get<{
-            success?: boolean;
-            message?: string;
-            data?: {
-              data?: Array<{
-                id: string | number;
-                name?: string;
-                code?: string;
-                sequence_order?: number;
-                sequenceOrder?: number;
-              }>;
-              meta?: unknown;
-            } | Array<unknown>;
-          }>("/admin/standard-types", {
-            params: { category: "selection_stage", page: 1, per_page: 100 },
-          })
-        )
-        .catch(() =>
-          api.get<{
-            success?: boolean;
-            message?: string;
-            data?: {
-              data?: Array<{
-                id: string | number;
-                name?: string;
-                code?: string;
-                sequence_order?: number;
-              }>;
-            };
-          }>("/admin/selection-stages", {
-            params: { page: 1, per_page: 100 },
-          }).catch(() => null)
-        );
+      const stageReq = seleksiApi
+        .getStages("stage_type")
+        .catch(() => seleksiApi.getStages("selection_stage"))
+        .catch(() => seleksiApi.getSelectionStagesFallback().catch(() => null));
 
       const [vacancyRes, stageRes] = await Promise.all([vacancyReq, stageReq]);
 
@@ -400,9 +338,7 @@ export function useSeleksi(): UseSeleksiReturn {
       }
       if (debouncedSearch) params.search = debouncedSearch;
 
-      const res = await api.get<SelectionListEnvelope>("/admin/recruitment-selections", {
-        params,
-      });
+      const res = await seleksiApi.getRecruitmentSelections(params);
 
       const envelope = res.data;
       const { rows, meta, summary } = normalizeSelectionsPayload(envelope);
