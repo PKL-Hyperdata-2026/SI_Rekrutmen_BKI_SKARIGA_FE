@@ -13,3 +13,8 @@ export const loginApi = async (payload: LoginSchemaType) => {
   const response = await api.post<LoginResponse>("/login", payload);
   return response.data;
 };
+
+export const getMeApi = async () => {
+  const response = await api.get<{ user: User }>("/me");
+  return response.data;
+};

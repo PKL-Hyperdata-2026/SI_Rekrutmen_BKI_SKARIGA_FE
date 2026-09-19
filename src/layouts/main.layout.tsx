@@ -2,7 +2,7 @@ import { Outlet, Navigate, useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/hooks/use-app";
 import { logout, setCredentials } from "@/slices/authSlice";
 import { useEffect, useState, useRef } from "react";
-import { api } from "@/api/axios";
+import { getMeApi } from "@/features/auth/login/login.api";
 import { Loader2 } from "lucide-react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,9 +20,9 @@ export function MainLayout() {
 
   useEffect(() => {
     if (token && !user) {
-      api.get('/me')
-      .then((res) => {
-        dispatch(setCredentials(res.data.user));
+      getMeApi()
+      .then((data) => {
+        dispatch(setCredentials(data.user));
       })
       .catch(() => {
         dispatch(logout());
