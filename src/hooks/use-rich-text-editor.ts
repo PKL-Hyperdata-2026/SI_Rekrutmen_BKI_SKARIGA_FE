@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useEditor, Extension, type Editor } from "@tiptap/react";
+import type { CommandProps, RawCommands } from "@tiptap/core";
 import { Selection, TextSelection } from "@tiptap/pm/state";
 import { StarterKit } from "@tiptap/starter-kit";
 import { Placeholder } from "@tiptap/extension-placeholder";
@@ -62,7 +63,7 @@ const IndentExtension = Extension.create({
     return {
       indent:
         () =>
-        ({ tr, state, dispatch }) => {
+        ({ tr, state, dispatch }: CommandProps) => {
           const { selection } = state;
           const { from, to } = selection;
           let modified = false;
@@ -86,7 +87,7 @@ const IndentExtension = Extension.create({
         },
       outdent:
         () =>
-        ({ tr, state, dispatch }) => {
+        ({ tr, state, dispatch }: CommandProps) => {
           const { selection } = state;
           const { from, to } = selection;
           let modified = false;
@@ -108,7 +109,7 @@ const IndentExtension = Extension.create({
           }
           return modified;
         },
-    };
+    } as unknown as Partial<RawCommands>;
   },
 });
 

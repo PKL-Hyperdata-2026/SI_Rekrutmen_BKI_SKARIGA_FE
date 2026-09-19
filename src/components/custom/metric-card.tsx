@@ -280,7 +280,7 @@ export function MetricCardSkeleton({ className }: { className?: string }) {
   );
 }
 
-export interface MetricCardGridProps extends React.ComponentProps<"div"> {}
+export type MetricCardGridProps = React.ComponentProps<"div">;
 
 export function MetricCardGrid({ className, ...props }: MetricCardGridProps) {
   return (

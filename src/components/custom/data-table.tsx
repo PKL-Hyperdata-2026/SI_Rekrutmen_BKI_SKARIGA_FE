@@ -14,10 +14,16 @@ import {
   type RoleType,
 } from "./data-table-pagination";
 
-function getNestedValue(obj: any, path?: string): any {
-  if (!path || !obj) return null;
-  if (!path.includes(".")) return obj[path] ?? null;
-  return path.split(".").reduce((acc, part) => acc?.[part], obj) ?? null;
+function getNestedValue(obj: unknown, path?: string): unknown {
+  if (!path || !obj || typeof obj !== "object") return null;
+  const record = obj as Record<string, unknown>;
+  if (!path.includes(".")) return record[path] ?? null;
+  return path.split(".").reduce<unknown>((acc, part) => {
+    if (acc && typeof acc === "object" && part in acc) {
+      return (acc as Record<string, unknown>)[part];
+    }
+    return null;
+  }, obj) ?? null;
 }
 
 export interface DataTableColumn<T> {
@@ -272,7 +278,7 @@ const roleThemeHeader: Record<RoleType, string> = {
   default: "border-purple-200/80 bg-purple-50/60 text-purple-900",
 };
 
-export function DataTable<T extends Record<string, any>>({
+export function DataTable<T>({
   columns,
   data,
   loading = false,
@@ -523,7 +529,7 @@ export function DataTable<T extends Record<string, any>>({
                         {col.cell
                           ? col.cell(row, rowIdx)
                           : col.accessorKey
-                            ? getNestedValue(row, col.accessorKey as string)
+                            ? (getNestedValue(row, col.accessorKey as string) as React.ReactNode)
                             : null}
                       </td>
                     ))}
