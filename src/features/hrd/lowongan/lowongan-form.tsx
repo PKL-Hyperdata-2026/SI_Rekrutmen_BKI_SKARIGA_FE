@@ -411,7 +411,21 @@ export function LowonganForm({
                 type="text"
                 inputMode="numeric"
                 maxLength={4}
-                {...register("quota")}
+                {...register("quota", {
+                  onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                    e.target.value = e.target.value.replace(/\D/g, "");
+                  },
+                })}
+                onKeyDown={(e) => {
+                  if (
+                    !/[0-9]/.test(e.key) &&
+                    !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab", "Enter"].includes(e.key) &&
+                    !e.ctrlKey &&
+                    !e.metaKey
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
                 placeholder="cth. 25"
                 aria-required="true"
                 aria-invalid={Boolean(errors.quota)}
