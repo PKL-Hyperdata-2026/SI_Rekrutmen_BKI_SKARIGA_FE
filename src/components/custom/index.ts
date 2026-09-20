@@ -21,3 +21,4 @@ export * from "./text-editor/rich-text-toolbar";
 export * from "./text-editor/heading-dropdown";
 export * from "./box";
 export * from "./span";
+export * from "./char-counter";

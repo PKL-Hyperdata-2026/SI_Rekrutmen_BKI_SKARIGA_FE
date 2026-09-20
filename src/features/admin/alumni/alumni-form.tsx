@@ -4,6 +4,7 @@ import { GraduationCap, UserPlus, X, Send, Loader2, Lock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { SearchableSelect } from "@/components/custom/searchable-select";
 import { AsyncSearchableSelect } from "@/components/custom/async-searchable-select";
+import { CharCounter } from "@/components/custom";
 import { selectOptionsApi } from "@/api/select-options";
 import type { AsyncSelectItem, FetchPageOptions, SelectQuery } from "@/api/select-options";
 import {
@@ -73,6 +74,12 @@ export function AlumniForm({
   const currentClassId = watch("class_id");
   const currentGraduationYear = watch("graduation_year");
   const currentStatusId = watch("employment_status_id");
+
+  const watchedNis = watch("nis") || "";
+  const watchedFullName = watch("full_name") || "";
+  const watchedProfileUrl = watch("profile_url") || "";
+  const watchedCompanyManual = watch("company_name_manual") || "";
+  const watchedCurrentPosition = watch("current_position") || "";
 
   const isPending = isSubmitting || formIsSubmitting;
   const isStudentLocked = !isEditing && currentMode === "graduate" && Boolean(currentUserId);
@@ -301,14 +308,17 @@ export function AlumniForm({
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
                 <span>Nomor Induk Siswa (NIS) *</span>
-                {isStudentLocked && (
+                {isStudentLocked ? (
                   <span className="text-[10px] text-slate-400 font-normal flex items-center gap-1">
                     <Lock className="h-2.5 w-2.5" /> Terkunci
                   </span>
+                ) : (
+                  <CharCounter length={watchedNis.length} max={30} />
                 )}
               </label>
               <Input
                 {...register("nis")}
+                maxLength={30}
                 readOnly={isStudentLocked}
                 placeholder="cth. 212200881"
                 className={cn(
@@ -324,14 +334,17 @@ export function AlumniForm({
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
                 <span>Nama Lengkap *</span>
-                {isStudentLocked && (
+                {isStudentLocked ? (
                   <span className="text-[10px] text-slate-400 font-normal flex items-center gap-1">
                     <Lock className="h-2.5 w-2.5" /> Terkunci
                   </span>
+                ) : (
+                  <CharCounter length={watchedFullName.length} max={150} />
                 )}
               </label>
               <Input
                 {...register("full_name")}
+                maxLength={150}
                 readOnly={isStudentLocked}
                 placeholder="cth. Bagas Setiawan"
                 className={cn(
@@ -434,11 +447,15 @@ export function AlumniForm({
           {/* Row 4: Tautan Profil * & Nama Kampus/PT/Usaha * */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">
-                Tautan Profil *
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-700">
+                  Tautan Profil *
+                </label>
+                <CharCounter length={watchedProfileUrl.length} max={255} />
+              </div>
               <Input
                 {...register("profile_url")}
+                maxLength={255}
                 placeholder="https://linkedin.com/in/... atau website"
                 className="h-10 rounded-xl"
               />
@@ -448,11 +465,15 @@ export function AlumniForm({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-700">
-                Nama Kampus/PT/Usaha *
-              </label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-700">
+                  Nama Kampus/PT/Usaha *
+                </label>
+                <CharCounter length={watchedCompanyManual.length} max={255} />
+              </div>
               <Input
                 {...companyManualRest}
+                maxLength={255}
                 onChange={handleCompanyManualChange}
                 placeholder="Nama Tempat Kerja / Perusahaan / Kampus"
                 className="h-10 rounded-xl"
@@ -480,9 +501,13 @@ export function AlumniForm({
           </summary>
           <div className="pt-3 grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="space-y-1">
-              <label className="text-[11px] font-semibold text-slate-600">Posisi / Jabatan</label>
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-semibold text-slate-600">Posisi / Jabatan</label>
+                <CharCounter length={watchedCurrentPosition.length} max={255} />
+              </div>
               <Input
                 {...register("current_position")}
+                maxLength={255}
                 placeholder="cth. Software Engineer"
                 className="h-9 text-xs rounded-lg"
               />
@@ -523,7 +548,7 @@ export function AlumniForm({
           type={onSubmit ? "button" : "submit"}
           onClick={onSubmit ? () => onSubmit() : undefined}
           disabled={isPending}
-          className="h-10 px-5 rounded-xl bg-[#2A1063] hover:bg-[#351477] text-white font-semibold text-xs sm:text-sm transition-all flex items-center gap-2 shadow-sm cursor-pointer disabled:opacity-50"
+          className="h-10 px-5 sm:px-6 rounded-xl bg-linear-to-r from-sidebar-strip to-primary hover:opacity-90 text-white font-semibold text-xs sm:text-sm transition-all flex items-center gap-2 shadow-sm cursor-pointer disabled:opacity-50"
         >
           {isPending ? (
             <>
