@@ -1,6 +1,5 @@
 import type { DataTableColumn } from "@/components/custom";
 import { Eye, Pencil, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import type { AdminTracerItem } from "./tracer-study.schema";
 
 interface BuildTracerColumnsProps {
@@ -202,38 +201,32 @@ export function buildTracerColumns({
       cell: (item) => {
         return (
           <div className="flex items-center justify-center gap-1.5 min-w-[90px]">
-            <Button
+            <button
               type="button"
-              variant="ghost"
-              size="icon"
               onClick={() => onDetail(item)}
-              className="h-8 w-8 rounded-lg text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50/80 transition-colors cursor-pointer"
+              className="h-8 w-8 rounded-lg border border-sky-200/80 bg-sky-50/70 text-sky-600 hover:bg-sky-100 hover:text-sky-700 flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
               title="Lihat Detail Profil Alumni"
             >
-              <Eye className="h-4 w-4" />
-            </Button>
+              <Eye className="h-3.5 w-3.5" />
+            </button>
 
-            <Button
+            <button
               type="button"
-              variant="ghost"
-              size="icon"
               onClick={() => onEdit(item)}
-              className="h-8 w-8 rounded-lg text-amber-600 hover:text-amber-800 hover:bg-amber-50/80 transition-colors cursor-pointer"
+              className="h-8 w-8 rounded-lg border border-purple-200/80 bg-purple-50/70 text-purple-600 hover:bg-purple-100 hover:text-purple-700 flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
               title="Edit Data Tracer Study"
             >
-              <Pencil className="h-4 w-4" />
-            </Button>
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
 
-            <Button
+            <button
               type="button"
-              variant="ghost"
-              size="icon"
               onClick={() => onDelete(item)}
-              className="h-8 w-8 rounded-lg text-rose-600 hover:text-rose-800 hover:bg-rose-50/80 transition-colors cursor-pointer"
-              title="Hapus Data (Soft Delete)"
+              className="h-8 w-8 rounded-lg border border-rose-200/80 bg-rose-50/70 text-rose-600 hover:bg-rose-100 hover:text-rose-700 flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
+              title="Hapus Data Tracer Study"
             >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
           </div>
         );
       },

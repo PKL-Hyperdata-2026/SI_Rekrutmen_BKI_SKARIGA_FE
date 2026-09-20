@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Users } from "lucide-react";
+import { Users, FileText } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -171,18 +171,18 @@ export function SeleksiTable({
       {
         header: "AKSI",
         align: "center",
-        headerClassName: "text-center w-36",
-        className: "text-center w-36",
+        headerClassName: "text-center w-20 select-none",
+        className: "text-center w-20",
         cell: (row) => (
           <div className="flex justify-center">
-            <Button
+            <button
               type="button"
-              size="sm"
               onClick={() => handleCekStatus?.(row)}
-              className="h-8 rounded-xl px-5 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-sm border-0 cursor-pointer"
+              title="Cek Status Seleksi"
+              className="h-8 w-8 rounded-lg border border-sky-200/80 bg-sky-50/70 text-sky-600 hover:bg-sky-100 hover:text-sky-700 flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
             >
-              Cek Status
-            </Button>
+              <FileText className="h-3.5 w-3.5" />
+            </button>
           </div>
         ),
       },

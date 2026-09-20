@@ -135,11 +135,11 @@ function useValidasiPresensiTableColumns({
         header: "AKSI",
         align: "center",
         headerClassName:
-          "text-center whitespace-nowrap min-w-[125px] px-2.5 2xl:px-4 select-none",
+          "text-center whitespace-nowrap w-20 px-2.5 2xl:px-4 select-none",
         className: "text-center whitespace-nowrap px-2.5 2xl:px-4",
         cell: (row) => (
           <CardContent className="flex items-center justify-center p-0 whitespace-nowrap">
-            <ValidasiPresensiInfoButton item={row} label="Detail Pelamar" />
+            <ValidasiPresensiInfoButton item={row} />
           </CardContent>
         ),
       },

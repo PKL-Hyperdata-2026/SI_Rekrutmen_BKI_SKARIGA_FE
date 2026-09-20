@@ -71,7 +71,7 @@ export function ValidasiPresensiInfoButton({
             )}
             title={buttonTitle}
           >
-            <Info className={label ? "size-3.5" : "size-4"} />
+            <Info className="size-3.5" />
             {label ? (
               <Badge
                 variant="outline"
