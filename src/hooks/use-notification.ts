@@ -11,7 +11,9 @@ export interface NotificationItem {
   message: string;
   data?: Record<string, unknown>;
   read_at?: string | null;
-  created_at: string;
+  readAt?: string | null;
+  created_at?: string;
+  createdAt?: string;
 }
 
 export const useNotification = (userId?: string | number | null) => {
@@ -76,8 +78,9 @@ export const useNotification = (userId?: string | number | null) => {
   const markAsRead = async (id: string) => {
     try {
       await notificationApi.markAsRead(id);
+      const nowIso = new Date().toISOString();
       setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, read_at: new Date().toISOString() } : n))
+        prev.map((n) => (n.id === id ? { ...n, read_at: nowIso, readAt: nowIso } : n))
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (err: unknown) {
@@ -88,8 +91,9 @@ export const useNotification = (userId?: string | number | null) => {
   const markAllAsRead = async () => {
     try {
       await notificationApi.markAllAsRead();
+      const nowIso = new Date().toISOString();
       setNotifications((prev) =>
-        prev.map((n) => ({ ...n, read_at: n.read_at || new Date().toISOString() }))
+        prev.map((n) => ({ ...n, read_at: n.read_at || nowIso, readAt: n.readAt || nowIso }))
       );
       setUnreadCount(0);
     } catch (err: unknown) {

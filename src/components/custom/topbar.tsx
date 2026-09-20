@@ -7,11 +7,15 @@ import {
   Power,
   CheckCheck,
   Briefcase,
-  FileText,
   Sparkles,
   RotateCw,
   AlertCircle,
   X,
+  UserPlus,
+  Calendar,
+  CheckCircle2,
+  XCircle,
+  Building2,
 } from "lucide-react";
 import { getRoleMenus } from "@/config/menus";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -61,8 +65,20 @@ function getNotificationIcon(type: string) {
   switch (type) {
     case "job_vacancy":
       return <Briefcase className="h-4 w-4 text-sky-600" />;
+    case "job_application":
     case "application":
-      return <FileText className="h-4 w-4 text-emerald-600" />;
+      return <UserPlus className="h-4 w-4 text-purple-600" />;
+    case "test_schedule":
+    case "test_schedule_update":
+    case "test_reminder":
+      return <Calendar className="h-4 w-4 text-amber-600" />;
+    case "attendance_validated":
+      return <CheckCircle2 className="h-4 w-4 text-emerald-600" />;
+    case "attendance_rejected":
+      return <XCircle className="h-4 w-4 text-rose-600" />;
+    case "job_placement":
+    case "job_placement_update":
+      return <Building2 className="h-4 w-4 text-indigo-600" />;
     default:
       return <Sparkles className="h-4 w-4 text-primary" />;
   }
@@ -114,14 +130,39 @@ export function Topbar() {
   };
 
   const handleNotificationClick = (n: NotificationItem) => {
-    if (!n.read_at) {
+    const isRead = Boolean(n.read_at || n.readAt);
+    if (!isRead) {
       markAsRead(n.id);
     }
     setPopoverOpen(false);
 
-    if (n.type === "job_vacancy") {
-      const isStudentRole = user?.role === "siswa" || user?.role === "alumni";
-      navigate(isStudentRole ? "/student/lowongan" : "/admin/lowongan");
+    const role = user?.role;
+    const isStudentRole = role === "siswa" || role === "alumni";
+    const isHrdRole = role === "hrd";
+
+    switch (n.type) {
+      case "job_vacancy":
+        navigate(isStudentRole ? "/student/lowongan" : isHrdRole ? "/hrd/lowongan" : "/admin/lowongan");
+        break;
+      case "job_application":
+      case "application":
+        navigate(isHrdRole ? "/hrd/review" : isStudentRole ? "/student/lamaran" : "/admin/seleksi");
+        break;
+      case "test_schedule":
+      case "test_schedule_update":
+      case "test_reminder":
+        navigate(isStudentRole ? "/student/lamaran" : isHrdRole ? "/hrd/jadwal" : "/admin/seleksi");
+        break;
+      case "attendance_validated":
+      case "attendance_rejected":
+        navigate(isStudentRole ? "/student/lamaran" : "/admin/validasi-presensi");
+        break;
+      case "job_placement":
+      case "job_placement_update":
+        navigate(isStudentRole ? "/student/tracer" : isHrdRole ? "/hrd/penempatan" : "/admin/tracer");
+        break;
+      default:
+        break;
     }
   };
 
@@ -304,43 +345,48 @@ export function Topbar() {
                     </p>
                   </div>
                 ) : (
-                  notifications.map((item) => (
-                    <div
-                      key={item.id}
-                      onClick={() => handleNotificationClick(item)}
-                      className={cn(
-                        "flex gap-3 px-4 py-3 transition-colors cursor-pointer hover:bg-slate-50/80",
-                        !item.read_at && "bg-sky-50/30"
-                      )}
-                    >
-                      <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
-                        {getNotificationIcon(item.type)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-1.5">
-                          <p
-                            className={cn(
-                              "text-xs leading-snug truncate",
-                              item.read_at
-                                ? "font-medium text-slate-700"
-                                : "font-bold text-slate-900"
-                            )}
-                          >
-                            {item.title}
-                          </p>
-                          {!item.read_at && (
-                            <span className="h-2 w-2 rounded-full bg-primary shrink-0 mt-1" />
-                          )}
+                  notifications.map((item) => {
+                    const isRead = Boolean(item.read_at || item.readAt);
+                    const createdAt = item.created_at || item.createdAt || "";
+
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => handleNotificationClick(item)}
+                        className={cn(
+                          "flex gap-3 px-4 py-3 transition-colors cursor-pointer hover:bg-slate-50/80",
+                          !isRead && "bg-sky-50/30"
+                        )}
+                      >
+                        <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
+                          {getNotificationIcon(item.type)}
                         </div>
-                        <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-2 mt-0.5">
-                          {item.message}
-                        </p>
-                        <span className="text-[10px] text-slate-400 mt-1 block">
-                          {formatRelativeTime(item.created_at)}
-                        </span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-1.5">
+                            <p
+                              className={cn(
+                                "text-xs leading-snug truncate",
+                                isRead
+                                  ? "font-medium text-slate-700"
+                                  : "font-bold text-slate-900"
+                              )}
+                            >
+                              {item.title}
+                            </p>
+                            {!isRead && (
+                              <span className="h-2 w-2 rounded-full bg-primary shrink-0 mt-1" />
+                            )}
+                          </div>
+                          <p className="text-[11px] text-slate-500 leading-relaxed line-clamp-2 mt-0.5">
+                            {item.message}
+                          </p>
+                          <span className="text-[10px] text-slate-400 mt-1 block">
+                            {formatRelativeTime(createdAt)}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
             </PopoverContent>
