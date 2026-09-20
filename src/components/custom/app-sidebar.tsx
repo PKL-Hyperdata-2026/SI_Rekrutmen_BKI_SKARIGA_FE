@@ -172,7 +172,7 @@ export function AppSidebar() {
           <div
             className={cn(
               "flex-1 h-10 flex items-center overflow-hidden whitespace-nowrap pl-6 transition-all duration-300 ease-in-out",
-              isCollapsed ? "opacity-0 pointer-events-none -translate-x-3" : "opacity-100 translate-x-0"
+              isCollapsed ? "opacity-0 max-w-0 pointer-events-none -translate-x-3" : "opacity-100 max-w-48 translate-x-0"
             )}
           >
             <div className="flex flex-col justify-center min-w-0 pr-2">
