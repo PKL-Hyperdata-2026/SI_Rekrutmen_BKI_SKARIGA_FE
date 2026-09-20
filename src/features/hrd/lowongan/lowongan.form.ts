@@ -40,8 +40,8 @@ export function toLowonganDefaultValues(
       .map((vm) => {
         const match = options.majors.find(
           (m) =>
-            Boolean(vm.code && m.code && m.code.toLowerCase() === vm.code.toLowerCase()) ||
-            Boolean(vm.name && m.name && m.name.toLowerCase() === vm.name.toLowerCase()) ||
+            Boolean(m.code?.toLowerCase() === vm.code?.toLowerCase()) ||
+            Boolean(m.name?.toLowerCase() === vm.name?.toLowerCase()) ||
             Boolean(vm.id && m.id && String(m.id) === String(vm.id))
         );
         return match ? String(match.id) : String(vm.id);
@@ -58,8 +58,8 @@ export function toLowonganDefaultValues(
   if ((target || targetId) && options?.targetApplicants) {
     const match = options.targetApplicants.find(
       (t) =>
-        Boolean(target?.code && t?.code && t.code.toLowerCase() === target.code.toLowerCase()) ||
-        Boolean(target?.name && t?.name && t.name.toLowerCase() === target.name.toLowerCase()) ||
+        Boolean(t?.code?.toLowerCase() === target?.code?.toLowerCase()) ||
+        Boolean(t?.name?.toLowerCase() === target?.name?.toLowerCase()) ||
         Boolean(targetId && t?.id && String(t.id) === String(targetId))
     );
     resolvedTargetId = match ? String(match.id) : String(targetId || "");
@@ -72,8 +72,8 @@ export function toLowonganDefaultValues(
   if ((jobType || jobTypeId) && options?.jobTypes) {
     const match = options.jobTypes.find(
       (jt) =>
-        Boolean(jobType?.code && jt?.code && jt.code.toLowerCase() === jobType.code.toLowerCase()) ||
-        Boolean(jobType?.name && jt?.name && jt.name.toLowerCase() === jobType.name.toLowerCase()) ||
+        Boolean(jt?.code?.toLowerCase() === jobType?.code?.toLowerCase()) ||
+        Boolean(jt?.name?.toLowerCase() === jobType?.name?.toLowerCase()) ||
         Boolean(jobTypeId && jt?.id && String(jt.id) === String(jobTypeId))
     );
     resolvedJobTypeId = match ? String(match.id) : String(jobTypeId || "");
