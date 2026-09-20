@@ -13,6 +13,11 @@ import type { MenuItem } from "@/config/menus";
 import { Building2, PanelLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SidebarMenuItem } from "./sidebar-menu-item";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function AppSidebar() {
   const { user } = useAppSelector((state) => state.auth);
@@ -222,19 +227,25 @@ export function AppSidebar() {
         {!isMobile && (
           <div className="h-12 shrink-0 border-none flex items-center pb-1.5 pt-1 relative">
             <div className="w-14 flex justify-center items-center shrink-0">
-              <button
-                onClick={toggleSidebar}
-                title={isCollapsed ? "Perluas Sidebar" : "Perkecil Sidebar"}
-                aria-label={isCollapsed ? "Perluas Sidebar" : "Perkecil Sidebar"}
-                className="flex justify-center items-center h-8 w-8 text-white/80 hover:text-white rounded-lg hover:bg-white/10 transition-all duration-300 ease-in-out cursor-pointer"
-              >
-                <PanelLeft
-                  className={cn(
-                    "h-4 w-4 transition-transform duration-300 ease-in-out",
-                    isCollapsed ? "rotate-180" : "rotate-0"
-                  )}
-                />
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={toggleSidebar}
+                    aria-label={isCollapsed ? "Perluas Sidebar" : "Perkecil Sidebar"}
+                    className="flex justify-center items-center h-8 w-8 text-white/80 hover:text-white rounded-lg hover:bg-white/10 transition-all duration-300 ease-in-out cursor-pointer"
+                  >
+                    <PanelLeft
+                      className={cn(
+                        "h-4 w-4 transition-transform duration-300 ease-in-out",
+                        isCollapsed ? "rotate-180" : "rotate-0"
+                      )}
+                    />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right" align="center">
+                  {isCollapsed ? "Perluas Sidebar" : "Perkecil Sidebar"}
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
         )}
