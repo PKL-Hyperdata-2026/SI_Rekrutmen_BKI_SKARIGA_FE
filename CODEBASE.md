@@ -123,7 +123,7 @@ frontend/src/
 │   └── hrd/                             # Corporate HRD portal module
 │       ├── route.tsx                    # HRD sub-routes (dashboard path has no element yet)
 │       ├── lowongan/                    # lowongan-page.tsx, lowongan-form.tsx, lowongan-list.tsx, lowongan-card.tsx, lowongan-status-badge.tsx, lowongan-status.ts, lowongan.api.ts, lowongan.schema.ts, lowongan.form.ts, use-lowongan-page.ts, use-lowongan-list.ts
-│       ├── review/pages/                # review-page.tsx
+│       ├── review/                      # review.schema.ts, review.api.ts, review.status.ts, review.form.ts, use-review-page.ts, review-table.tsx, review-decision-actions.tsx, review-applicant-card.tsx, review-filter-bar.tsx, review-summary-cards.tsx, review-confirm-modal.tsx, pages/review-page.tsx
 │       ├── jadwal/                      # index.ts, jadwal.api.ts, pages/, components/, hooks/, types/
 │       ├── hasil/pages/                 # hasil-page.tsx
 │       └── penempatan/                  # penempatan-page.tsx, penempatan-form.tsx, penempatan-table.tsx, penempatan-metric-cards.tsx, penempatan-update-status-form.tsx, penempatan.api.ts, penempatan.schema.ts, penempatan.form.ts, use-penempatan*.ts
