@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import {
+  Power,
   Search,
   Mail,
   Bell,
   PanelLeft,
-  Power,
   CheckCheck,
   Briefcase,
   Sparkles,
@@ -42,8 +42,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { getAvatarUrl } from "@/lib/utils";
-import { cn } from "@/lib/utils";
+import { getAvatarUrl, cn } from "@/lib/utils";
 
 function formatRelativeTime(dateString: string): string {
   try {
