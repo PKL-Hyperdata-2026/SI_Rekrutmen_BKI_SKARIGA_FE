@@ -2,7 +2,7 @@ import { Outlet, Navigate, useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/hooks/use-app";
 import { logout, setCredentials } from "@/slices/authSlice";
 import { useEffect, useState, useRef } from "react";
-import { api } from "@/api/axios";
+import { getMeApi } from "@/features/auth/login/login.api";
 import { Loader2 } from "lucide-react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,9 +20,9 @@ export function MainLayout() {
 
   useEffect(() => {
     if (token && !user) {
-      api.get('/me')
-      .then((res) => {
-        dispatch(setCredentials(res.data.user));
+      getMeApi()
+      .then((data) => {
+        dispatch(setCredentials(data.user));
       })
       .catch(() => {
         dispatch(logout());
@@ -35,7 +35,6 @@ export function MainLayout() {
 
   const themeClass = user?.role === "siswa" || user?.role === "alumni" ? "theme-siswa" : (user?.role === "admin" || user?.role === "superadmin") ? "theme-admin" : "theme-hrd";
 
-  // Pasang class tema di <body> agar konten portal (Sheet sidebar mobile) ikut mewarisi CSS variables.
   useEffect(() => {
     if (!themeClass) return;
     document.body.classList.add(themeClass);
@@ -80,12 +79,12 @@ export function MainLayout() {
         <div className="print:hidden">
           <AppSidebar />
         </div>
-        <SidebarInset className="w-full flex flex-col h-screen overflow-hidden bg-slate-50 print:h-auto print:overflow-visible print:bg-white print:m-0 print:p-0">
-          <ScrollArea ref={scrollAreaRef} className="h-full w-full print:h-auto print:overflow-visible">
+        <SidebarInset className="w-full min-w-0 flex flex-col h-screen overflow-hidden bg-slate-50 print:h-auto print:overflow-visible print:bg-white print:m-0 print:p-0">
+          <ScrollArea ref={scrollAreaRef} className="h-full w-full min-w-0 print:h-auto print:overflow-visible [&>div>div]:!block [&>div>div]:w-full [&>div>div]:min-w-0">
             <div className="print:hidden">
               <Topbar />
             </div>
-            <main className="p-6 relative print:p-0 print:m-0">
+            <main className="p-3.5 sm:p-4 md:p-6 w-full max-w-full min-w-0 relative print:p-0 print:m-0">
               <Outlet />
             </main>
           </ScrollArea>

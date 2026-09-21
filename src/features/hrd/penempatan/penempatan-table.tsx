@@ -3,9 +3,9 @@ import { Pencil } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   DataTable,
+  DataTablePagination,
   type DataTableColumn,
 } from "@/components/custom/data-table";
-import { DataTablePagination } from "@/components/custom/data-table-pagination";
 import {
   Card,
   CardHeader,
@@ -253,19 +253,18 @@ export function PenempatanTable(props: PenempatanTableProps) {
       {
         header: "AKSI",
         align: "center",
-        headerClassName: "text-center",
+        headerClassName: "text-center w-20 select-none",
+        className: "text-center w-20",
         cell: (row) => (
           <CardContent className="flex justify-center p-0">
-            <Button
+            <button
               type="button"
-              variant="outline"
-              size="sm"
               onClick={() => handleAction?.(row)}
-              className="h-8.5 rounded-lg border-[#D069D7]/40 bg-[#D069D7]/10 text-[#8D1D96] hover:bg-[#8D1D96] hover:border-[#8D1D96] hover:text-white gap-1.5 px-3.5 text-xs font-semibold shadow-none transition-colors select-none cursor-pointer"
+              title="Update Status Penempatan"
+              className="h-8 w-8 rounded-lg border border-purple-200/80 bg-purple-50/70 text-purple-600 hover:bg-purple-100 hover:text-purple-700 flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
             >
-              <Pencil className="size-3.5" />
-              Update Status
-            </Button>
+              <Pencil className="h-3.5 w-3.5" />
+            </button>
           </CardContent>
         ),
       },

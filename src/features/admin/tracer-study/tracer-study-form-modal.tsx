@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { Loader2, User, Building2, GraduationCap, Store } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { DatePicker, SearchableSelect } from "@/components/custom";
+import { Loader2, User, Building2, GraduationCap, Store, X, Send } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { DatePicker, SearchableSelect, CharCounter } from "@/components/custom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -67,6 +67,16 @@ export function TracerFormModal({
   const businessStartDate = watch("business_start_date");
   const minimumSalary = watch("minimum_salary");
 
+  const companyName = watch("company_name") || "";
+  const companySector = watch("company_sector") || "";
+  const jobTitle = watch("job_title") || "";
+  const jobLocation = watch("job_location") || "";
+  const universityName = watch("university_name") || "";
+  const studyProgram = watch("study_program") || "";
+  const businessName = watch("business_name") || "";
+  const businessAddress = watch("business_address") || "";
+  const instagramHandle = watch("instagram_handle") || "";
+
   useEffect(() => {
     reset(toAdminTracerDefaultValues(editingItem));
   }, [editingItem, isOpen, reset]);
@@ -81,20 +91,33 @@ export function TracerFormModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl p-6 sm:p-7">
-        <DialogHeader>
-          <DialogTitle className="text-lg sm:text-xl font-bold text-slate-900">
-            {isEditing ? "Edit Data Tracer Study" : "Tambah Data Tracer Study Alumni"}
-          </DialogTitle>
-          <p className="text-xs sm:text-sm text-slate-500">
-            {isEditing
-              ? "Perbarui detail karir, penempatan, atau studi alumni (identitas alumni terkunci/readonly)."
-              : "Pilih alumni terdaftar untuk memasukkan data survei keterserapan karir."}
-          </p>
-        </DialogHeader>
+      <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-2xl border-none shadow-2xl [&>button]:hidden flex flex-col max-h-[90vh]">
+        <div className="bg-gradient-to-r from-[#2A1063] via-[#351477] to-[#8B5CF6] text-white p-5 sm:p-6 relative rounded-t-2xl select-none shrink-0">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <DialogTitle className="text-lg sm:text-xl font-bold text-white tracking-tight">
+                {isEditing ? "Edit Data Tracer Study" : "Tambah Data Tracer Study Alumni"}
+              </DialogTitle>
+              <DialogDescription className="text-xs sm:text-sm text-purple-100/90 mt-1">
+                {isEditing
+                  ? "Perbarui detail karir, penempatan, atau studi alumni (identitas alumni terkunci/readonly)."
+                  : "Pilih alumni terdaftar untuk memasukkan data survei keterserapan karir."}
+              </DialogDescription>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-full p-1.5 text-white/80 hover:text-white hover:bg-white/15 transition-all outline-none cursor-pointer border-none bg-transparent shrink-0"
+              aria-label="Tutup"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
 
-        <form onSubmit={onFormSubmit} className="space-y-5 mt-2">
-          <div className="space-y-2">
+        <form onSubmit={onFormSubmit} className="flex flex-col flex-1 overflow-hidden min-h-0">
+          <div className="p-5 sm:p-6 space-y-4 max-h-[65vh] overflow-y-auto flex-1">
+            <div className="space-y-2">
             <Label className="text-xs font-bold text-slate-700">
               Pilih Alumni {isEditing ? "(Readonly)" : "*"}
             </Label>
@@ -178,11 +201,15 @@ export function TracerFormModal({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700">
-                    Nama Perusahaan / Tempat Kerja *
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-semibold text-slate-700">
+                      Nama Perusahaan / Tempat Kerja *
+                    </Label>
+                    <CharCounter length={companyName.length} max={255} />
+                  </div>
                   <Input
                     placeholder="Contoh: PT Astra Honda Motor"
+                    maxLength={255}
                     {...register("company_name")}
                     className="h-10 rounded-xl bg-white text-xs sm:text-sm"
                   />
@@ -192,22 +219,30 @@ export function TracerFormModal({
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700">
-                    Sektor Industri
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-semibold text-slate-700">
+                      Sektor Industri
+                    </Label>
+                    <CharCounter length={companySector.length} max={255} />
+                  </div>
                   <Input
                     placeholder="Contoh: Sektor : Teknologi Digital"
+                    maxLength={255}
                     {...register("company_sector")}
                     className="h-10 rounded-xl bg-white text-xs sm:text-sm"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700">
-                    Posisi / Jabatan *
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-semibold text-slate-700">
+                      Posisi / Jabatan *
+                    </Label>
+                    <CharCounter length={jobTitle.length} max={255} />
+                  </div>
                   <Input
                     placeholder="Contoh: Junior Web Developer"
+                    maxLength={255}
                     {...register("job_title")}
                     className="h-10 rounded-xl bg-white text-xs sm:text-sm"
                   />
@@ -217,11 +252,15 @@ export function TracerFormModal({
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700">
-                    Lokasi / Wilayah Kerja
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-semibold text-slate-700">
+                      Lokasi / Wilayah Kerja
+                    </Label>
+                    <CharCounter length={jobLocation.length} max={255} />
+                  </div>
                   <Input
                     placeholder="Contoh: Malang, Jawa Timur"
+                    maxLength={255}
                     {...register("job_location")}
                     className="h-10 rounded-xl bg-white text-xs sm:text-sm"
                   />
@@ -309,11 +348,15 @@ export function TracerFormModal({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700">
-                    Nama Universitas / Perguruan Tinggi *
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-semibold text-slate-700">
+                      Nama Universitas / Perguruan Tinggi *
+                    </Label>
+                    <CharCounter length={universityName.length} max={255} />
+                  </div>
                   <Input
                     placeholder="Contoh: Universitas Brawijaya"
+                    maxLength={255}
                     {...register("university_name")}
                     className="h-10 rounded-xl bg-white text-xs sm:text-sm"
                   />
@@ -325,11 +368,15 @@ export function TracerFormModal({
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700">
-                    Program Studi *
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-semibold text-slate-700">
+                      Program Studi *
+                    </Label>
+                    <CharCounter length={studyProgram.length} max={255} />
+                  </div>
                   <Input
                     placeholder="Contoh: D4 Teknik Elektro"
+                    maxLength={255}
                     {...register("study_program")}
                     className="h-10 rounded-xl bg-white text-xs sm:text-sm"
                   />
@@ -341,22 +388,30 @@ export function TracerFormModal({
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700">
-                    Kategori Perguruan Tinggi
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-semibold text-slate-700">
+                      Kategori Perguruan Tinggi
+                    </Label>
+                    <CharCounter length={companySector.length} max={255} />
+                  </div>
                   <Input
                     placeholder="Perguruan Tinggi Negeri / Swasta"
+                    maxLength={255}
                     {...register("company_sector")}
                     className="h-10 rounded-xl bg-white text-xs sm:text-sm"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700">
-                    Lokasi Kampus / Kota
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-semibold text-slate-700">
+                      Lokasi Kampus / Kota
+                    </Label>
+                    <CharCounter length={jobLocation.length} max={255} />
+                  </div>
                   <Input
                     placeholder="Contoh: Malang, Jatim"
+                    maxLength={255}
                     {...register("job_location")}
                     className="h-10 rounded-xl bg-white text-xs sm:text-sm"
                   />
@@ -374,11 +429,15 @@ export function TracerFormModal({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700">
-                    Nama Usaha *
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-semibold text-slate-700">
+                      Nama Usaha *
+                    </Label>
+                    <CharCounter length={businessName.length} max={255} />
+                  </div>
                   <Input
                     placeholder="Contoh: Kedai Kopi Skariga"
+                    maxLength={255}
                     {...register("business_name")}
                     className="h-10 rounded-xl bg-white text-xs sm:text-sm"
                   />
@@ -418,11 +477,15 @@ export function TracerFormModal({
                 </div>
 
                 <div className="space-y-1.5 sm:col-span-2">
-                  <Label className="text-xs font-semibold text-slate-700">
-                    Alamat Lengkap Usaha *
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-semibold text-slate-700">
+                      Alamat Lengkap Usaha *
+                    </Label>
+                    <CharCounter length={businessAddress.length} max={255} />
+                  </div>
                   <Input
                     placeholder="Contoh: Jl. Danau Ranau No. 12, Sawojajar, Malang"
+                    maxLength={255}
                     {...register("business_address")}
                     className="h-10 rounded-xl bg-white text-xs sm:text-sm"
                   />
@@ -434,11 +497,15 @@ export function TracerFormModal({
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700">
-                    Akun Instagram / Media Sosial
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-semibold text-slate-700">
+                      Akun Instagram / Media Sosial
+                    </Label>
+                    <CharCounter length={instagramHandle.length} max={255} />
+                  </div>
                   <Input
                     placeholder="Contoh: @kedaikopis kariga"
+                    maxLength={255}
                     {...register("instagram_handle")}
                     className="h-10 rounded-xl bg-white text-xs sm:text-sm"
                   />
@@ -491,33 +558,36 @@ export function TracerFormModal({
               </p>
             </div>
           )}
+          </div>
 
-          <DialogFooter className="pt-2">
+          <div className="p-4 sm:p-5 border-t border-slate-100 bg-slate-50/70 flex items-center justify-end gap-3 rounded-b-2xl shrink-0">
             <Button
               type="button"
               variant="outline"
               onClick={onClose}
-              className="rounded-xl text-xs font-semibold h-10 px-5"
+              disabled={isSubmitting}
+              className="h-10 px-5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100 font-medium text-xs sm:text-sm transition-all cursor-pointer disabled:opacity-50"
             >
               Batal
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold h-10 px-6 cursor-pointer shadow-xs"
+              className="h-10 px-5 sm:px-6 rounded-xl bg-linear-to-r from-sidebar-strip to-primary hover:opacity-90 text-white font-semibold text-xs sm:text-sm transition-all flex items-center gap-2 shadow-sm cursor-pointer disabled:opacity-50"
             >
               {isSubmitting ? (
-                <div className="flex items-center gap-2">
+                <>
                   <Loader2 className="h-4 w-4 animate-spin" />
                   <span>Menyimpan...</span>
-                </div>
-              ) : isEditing ? (
-                "Simpan Perubahan"
+                </>
               ) : (
-                "Tambah Data"
+                <>
+                  <span>{isEditing ? "Simpan Perubahan" : "Tambah Data"}</span>
+                  <Send className="h-4 w-4" />
+                </>
               )}
             </Button>
-          </DialogFooter>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

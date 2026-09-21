@@ -1,7 +1,7 @@
 import { useId, useState } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { AsyncSearchableSelect } from "@/components/custom/async-searchable-select";
+import { AsyncSearchableSelect, CharCounter } from "@/components/custom";
 import { selectOptionsApi } from "@/api/select-options";
 import type { SelectQuery, AsyncSelectItem } from "@/api/select-options";
 import type { SiswaFormSchemaType } from "./siswa.schema";
@@ -57,6 +57,10 @@ export function SiswaForm({
   const currentClassId = watch("class_id");
   const currentStatusId = watch("employment_status_id");
   const currentCompanyId = watch("current_company_id");
+  const watchedNis = watch("nis") ?? "";
+  const watchedFullName = watch("full_name") ?? "";
+  const watchedPosition = watch("current_position") ?? "";
+  const watchedSocialMedia = watch("social_media") ?? "";
 
   const [autoMajorLabel, setAutoMajorLabel] = useState<string | undefined>(
     undefined
@@ -76,12 +80,16 @@ export function SiswaForm({
       {/* Baris 1: NIS & Nama Lengkap */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-700">
-            Nomor Induk Siswa (NIS) <span className="text-rose-500">*</span>
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-700">
+              Nomor Induk Siswa (NIS) <span className="text-rose-500">*</span>
+            </label>
+            <CharCounter length={watchedNis.length} max={20} />
+          </div>
           <Input
             {...register("nis")}
             placeholder="cth. 212200881"
+            maxLength={20}
             className="h-10 rounded-xl"
           />
           {errors.nis && (
@@ -90,12 +98,16 @@ export function SiswaForm({
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-700">
-            Nama Lengkap Siswa <span className="text-rose-500">*</span>
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-700">
+              Nama Lengkap Siswa <span className="text-rose-500">*</span>
+            </label>
+            <CharCounter length={watchedFullName.length} max={255} />
+          </div>
           <Input
             {...register("full_name")}
             placeholder="cth. Muhammad Rizky Pratama"
+            maxLength={255}
             className="h-10 rounded-xl"
           />
           {errors.full_name && (
@@ -236,23 +248,31 @@ export function SiswaForm({
       {/* Baris 6: Posisi Jabatan & Tautan Sosial Media */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-700">
-            Posisi / Jabatan Pekerjaan (Opsional)
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-700">
+              Posisi / Jabatan Pekerjaan (Opsional)
+            </label>
+            <CharCounter length={watchedPosition.length} max={255} />
+          </div>
           <Input
             {...register("current_position")}
             placeholder="cth. Frontend Developer Junior"
+            maxLength={255}
             className="h-10 rounded-xl"
           />
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-700">
-            Tautan Profil / Media Sosial (Opsional)
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-700">
+              Tautan Profil / Media Sosial (Opsional)
+            </label>
+            <CharCounter length={watchedSocialMedia.length} max={255} />
+          </div>
           <Input
             {...register("social_media")}
             placeholder="https://linkedin.com/in/... atau @username"
+            maxLength={255}
             className="h-10 rounded-xl"
           />
         </div>

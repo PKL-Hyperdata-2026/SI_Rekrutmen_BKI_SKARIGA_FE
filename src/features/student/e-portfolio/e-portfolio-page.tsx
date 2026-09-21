@@ -34,9 +34,9 @@ import {
   type PortfolioItem,
   type PortfolioCategory,
   type SocialMediaItem,
-} from "./portfolio.schema";
-import { portfolioApi } from "./portfolio.api";
-import { usePortfolioProfileForm } from "./portfolio.form";
+} from "./e-portfolio.schema";
+import { portfolioApi } from "./e-portfolio.api";
+import { usePortfolioProfileForm } from "./e-portfolio.form";
 import { PersonalAcademicForm } from "./personal-academic-form";
 import {
   AddSocialMediaModal,

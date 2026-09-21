@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Modal } from "@/components/custom/modal";
 import { Form } from "@/components/ui/form";
 import { Field, FieldGroup, FieldError } from "@/components/ui/field";
 import { CardContent } from "@/components/ui/card";
@@ -7,8 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { DatePicker } from "@/components/custom/date-picker";
-import { AsyncSearchableSelect } from "@/components/custom/async-searchable-select";
+import { DatePicker, AsyncSearchableSelect, Modal, CharCounter } from "@/components/custom";
 import { selectOptionsApi } from "@/api/select-options";
 import { Send, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -72,6 +70,7 @@ export function PenempatanForm({
   } = form;
 
   const studentAlumniId = watch("studentAlumniId");
+  const watchedPosition = watch("position") ?? "";
   const acceptedDate = watch("acceptedDate");
   const startDate = watch("startDate");
 
@@ -206,18 +205,22 @@ export function PenempatanForm({
         </Field>
 
         <Field className="flex flex-col gap-1.5">
-          <Label className="text-sm font-semibold text-[#1e1b4b] flex items-center gap-1">
-            Posisi/Jabatan
-            <Badge
-              variant="outline"
-              className="border-none bg-transparent p-0 text-red-500 shadow-none text-sm font-bold"
-            >
-              *
-            </Badge>
-          </Label>
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-semibold text-[#1e1b4b] flex items-center gap-1">
+              Posisi/Jabatan
+              <Badge
+                variant="outline"
+                className="border-none bg-transparent p-0 text-red-500 shadow-none text-sm font-bold"
+              >
+                *
+              </Badge>
+            </Label>
+            <CharCounter length={watchedPosition.length} max={255} />
+          </div>
           <Input
             {...register("position")}
             placeholder="cth. IT Support"
+            maxLength={255}
             className={cn(
               "h-10 w-full rounded-lg border bg-[#F8F9FD] px-3.5 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:bg-white focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all",
               errors.position

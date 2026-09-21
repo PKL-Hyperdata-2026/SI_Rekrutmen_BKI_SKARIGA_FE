@@ -36,7 +36,7 @@ export function StatCard({
   return (
     <Card
       className={cn(
-        "rounded-2xl border border-slate-100 bg-white p-3 shadow-xs hover:shadow-md transition-all",
+        "rounded-xl border border-slate-100 bg-white p-3 shadow-xs hover:shadow-md transition-all cursor-default",
         className
       )}
       {...props}

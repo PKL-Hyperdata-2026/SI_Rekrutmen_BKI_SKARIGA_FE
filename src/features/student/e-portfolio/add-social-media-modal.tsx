@@ -12,7 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { SocialMediaItem } from "./portfolio.schema";
+import { CharCounter } from "@/components/custom";
+import type { SocialMediaItem } from "./e-portfolio.schema";
 
 interface AddSocialMediaModalProps {
   isOpen: boolean;
@@ -617,14 +618,18 @@ export function AddSocialMediaModal({
             </div>
 
             <div>
-              <Label className="block text-xs font-bold text-slate-700 mb-1">
-                {selectedPlatformId === "portfolio"
-                  ? "Tautan Portofolio / CV"
-                  : "Username Akun"}
-              </Label>
+              <div className="flex items-center justify-between mb-1">
+                <Label className="block text-xs font-bold text-slate-700">
+                  {selectedPlatformId === "portfolio"
+                    ? "Tautan Portofolio / CV"
+                    : "Username Akun"}
+                </Label>
+                <CharCounter length={inputValue.length} max={255} />
+              </div>
               <div className="relative">
                 <Input
                   type="text"
+                  maxLength={255}
                   value={inputValue}
                   onChange={(e) => {
                     setInputValue(e.target.value);

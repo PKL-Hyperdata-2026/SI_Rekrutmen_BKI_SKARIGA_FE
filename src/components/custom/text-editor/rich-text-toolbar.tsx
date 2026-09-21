@@ -34,12 +34,12 @@ function ToolbarButton({
       }}
       className={cn(
         "inline-flex h-7 min-w-7 px-1.5 items-center justify-center rounded text-xs transition-all duration-150 select-none",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/40",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
         disabled
           ? "opacity-35 cursor-not-allowed pointer-events-none"
           : "cursor-pointer active:scale-95",
         active
-          ? "bg-purple-100 text-purple-700 font-bold hover:bg-purple-200/90 hover:text-purple-900 shadow-xs"
+          ? "bg-primary/15 text-primary font-bold hover:bg-primary/25 shadow-xs"
           : "text-slate-600 hover:bg-slate-200/80 hover:text-slate-900",
       )}
     >

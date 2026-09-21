@@ -27,7 +27,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Modal } from "@/components/custom/modal";
-import { DataTablePagination } from "@/components/custom/data-table-pagination";
+import { DataTablePagination } from "@/components/custom/table/data-table-pagination";
 import { DatePicker } from "@/components/custom/date-picker";
 import {
   type useLowonganList,

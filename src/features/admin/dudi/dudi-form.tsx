@@ -2,7 +2,7 @@ import { useId } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { AsyncSearchableSelect } from "@/components/custom/async-searchable-select";
+import { AsyncSearchableSelect, CharCounter } from "@/components/custom";
 import { selectOptionsApi } from "@/api/select-options";
 import type { SelectQuery } from "@/api/select-options";
 import type { DudiFormSchemaType } from "./dudi.schema";
@@ -27,14 +27,23 @@ export function DudiForm({ form, industryFallbackLabel }: DudiFormProps) {
 
   const currentIndustryId = watch("industry_id");
   const isActive = watch("is_active");
+  const watchedName = watch("name") ?? "";
+  const watchedEmail = watch("email") ?? "";
+  const watchedWebsite = watch("website") ?? "";
+  const watchedAddress = watch("address") ?? "";
+  const watchedPicName = watch("pic_name") ?? "";
 
   return (
     <div className="space-y-4 py-2">
       <div className="space-y-1.5">
-        <label className="text-xs font-bold text-slate-700">Nama Perusahaan / Instansi *</label>
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-bold text-slate-700">Nama Perusahaan / Instansi *</label>
+          <CharCounter length={watchedName.length} max={255} />
+        </div>
         <Input
           {...register("name")}
           placeholder="cth. PT United Tractors Tbk"
+          maxLength={255}
           className="h-10 rounded-xl"
         />
         {errors.name && (
@@ -62,11 +71,15 @@ export function DudiForm({ form, industryFallbackLabel }: DudiFormProps) {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-700">Email Perusahaan</label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-700">Email Perusahaan</label>
+            <CharCounter length={watchedEmail.length} max={255} />
+          </div>
           <Input
             type="email"
             {...register("email")}
             placeholder="hrd@perusahaan.co.id"
+            maxLength={255}
             className="h-10 rounded-xl"
           />
           {errors.email && (
@@ -89,10 +102,14 @@ export function DudiForm({ form, industryFallbackLabel }: DudiFormProps) {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-700">Website Resmi</label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-700">Website Resmi</label>
+            <CharCounter length={watchedWebsite.length} max={255} />
+          </div>
           <Input
             {...register("website")}
             placeholder="https://perusahaan.co.id"
+            maxLength={255}
             className="h-10 rounded-xl"
           />
           {errors.website && (
@@ -102,10 +119,14 @@ export function DudiForm({ form, industryFallbackLabel }: DudiFormProps) {
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-xs font-bold text-slate-700">Alamat Lengkap</label>
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-bold text-slate-700">Alamat Lengkap</label>
+          <CharCounter length={watchedAddress.length} max={500} />
+        </div>
         <Input
           {...register("address")}
           placeholder="Jl. Raya Industri No. 45, Kawasan Industri SIER"
+          maxLength={500}
           className="h-10 rounded-xl"
         />
         {errors.address && (
@@ -115,10 +136,14 @@ export function DudiForm({ form, industryFallbackLabel }: DudiFormProps) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-700">Nama PIC / HRD</label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-700">Nama PIC / HRD</label>
+            <CharCounter length={watchedPicName.length} max={255} />
+          </div>
           <Input
             {...register("pic_name")}
             placeholder="cth. Ibu Ratna (HR Manager)"
+            maxLength={255}
             className="h-10 rounded-xl"
           />
           {errors.pic_name && (

@@ -35,6 +35,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useNavigate } from "react-router-dom";
 
 const chartData = [
   { month: "Jun", melamar: 68, diterima: 30, kehadiran: 64, baseline: 0 },
@@ -117,6 +118,8 @@ const tableColumns = [
 ];
 
 export function DashboardPage() {
+  const navigate = useNavigate();
+  
   return (
     <div className="space-y-5 sm:space-y-6">
       <PageHeader
@@ -127,6 +130,7 @@ export function DashboardPage() {
         <PageHeader.Button
           variant="primary"
           icon={<FilePlus className="h-4 w-4" />}
+          onClick={() => navigate("/admin/lowongan")}
         >
           Buat Lowongan
         </PageHeader.Button>

@@ -40,6 +40,7 @@ import { buildAlumniColumns } from "./alumni-table";
 import type {
   AlumniItem,
   AlumniPaginationMeta,
+  AlumniPaginatedResponse,
 } from "./alumni.schema";
 
 const FALLBACK_EMPLOYMENT_STATUSES = [
@@ -120,8 +121,8 @@ export function AlumniPage() {
       if (statusFilter !== "all") params.employment_status_id = statusFilter;
 
       const res = await alumniApi.getAlumni(params);
-      const resPayload = res.data as Record<string, any> | undefined;
-      const nested = resPayload?.data;
+      const resPayload = res.data;
+      const nested = resPayload?.data as unknown;
 
       if (Array.isArray(nested)) {
         setAlumniList(nested as AlumniItem[]);
@@ -141,19 +142,21 @@ export function AlumniPage() {
       } else if (
         nested &&
         typeof nested === "object" &&
-        Array.isArray(nested.data)
+        "data" in nested &&
+        Array.isArray((nested as { data: unknown }).data)
       ) {
-        setAlumniList(nested.data as AlumniItem[]);
-        if (nested.meta) {
-          setMeta(nested.meta);
+        const nestedObj = nested as AlumniPaginatedResponse;
+        setAlumniList(nestedObj.data);
+        if (nestedObj.meta) {
+          setMeta(nestedObj.meta);
         } else {
           setMeta({
-            current_page: nested.current_page || currentPage,
-            last_page: nested.last_page || 1,
-            per_page: nested.per_page || perPage,
-            total: nested.total ?? nested.data.length,
-            from: nested.from ?? 1,
-            to: nested.to ?? nested.data.length,
+            current_page: nestedObj.current_page || currentPage,
+            last_page: nestedObj.last_page || 1,
+            per_page: nestedObj.per_page || perPage,
+            total: nestedObj.total ?? nestedObj.data.length,
+            from: nestedObj.from ?? 1,
+            to: nestedObj.to ?? nestedObj.data.length,
           });
         }
       } else {
@@ -339,7 +342,9 @@ export function AlumniPage() {
         if (detail && typeof detail === "object") {
           setActiveDetailAlumni(detail as AlumniItem);
         }
-      } catch {}
+      } catch {
+        void 0;
+      }
     }
     fetchAlumni();
   };

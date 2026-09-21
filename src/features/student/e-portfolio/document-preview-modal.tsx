@@ -1,6 +1,6 @@
 import { X, ExternalLink, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { PortfolioItem } from "./portfolio.schema";
+import type { PortfolioItem } from "./e-portfolio.schema";
 
 interface DocumentPreviewModalProps {
   portfolio: PortfolioItem | null;
@@ -16,7 +16,7 @@ export function DocumentPreviewModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-xs animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-4xl h-[85vh] bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-slate-100 animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-4xl h-5/6 max-h-screen bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-slate-100 animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="bg-slate-900 px-6 py-4 text-white flex items-center justify-between shrink-0">

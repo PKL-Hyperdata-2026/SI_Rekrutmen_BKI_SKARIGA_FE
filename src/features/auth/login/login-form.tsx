@@ -29,7 +29,7 @@ function RememberCheckbox() {
             : "border-gray-300 bg-white"
         )}
       >
-        {checked && <Check className="h-3 w-3 text-primary stroke-[3]" />}
+        {checked && <Check className="h-3 w-3 text-primary stroke-3" />}
       </div>
       <span className="text-[11px]">Ingat Saya</span>
     </label>
@@ -121,8 +121,8 @@ export function LoginForm({
               className="w-full bg-transparent outline-none font-medium text-foreground text-[13px] placeholder:text-gray-400 autofill:shadow-[inset_0_0_0px_1000px_#e8f4fd] autofill:[-webkit-text-fill-color:#111827]"
               {...register("password")}
             />
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="text-gray-400 ml-2 hover:text-gray-600 transition-colors shrink-0"
             >
@@ -145,10 +145,10 @@ export function LoginForm({
           </button>
         </div>
 
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           disabled={isSubmitting}
-          className="w-full py-2 rounded-md border border-white/20 bg-gradient-to-r from-[#1f66a8] to-primary hover:opacity-90 text-primary-foreground font-semibold text-[13px] shadow-sm transition-all flex justify-center items-center"
+          className="w-full py-2 rounded-md border border-white/20 bg-linear-to-r from-[#1f66a8] to-primary hover:opacity-90 text-primary-foreground font-semibold text-[13px] shadow-sm transition-all flex justify-center items-center cursor-pointer"
         >
           {isSubmitting && <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" />}
           {isSubmitting ? "Memproses..." : "Masuk"}

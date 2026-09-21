@@ -1,8 +1,7 @@
 import { useId } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { SearchableSelect } from "@/components/custom/searchable-select";
-import { AsyncSearchableSelect } from "@/components/custom/async-searchable-select";
+import { SearchableSelect, AsyncSearchableSelect, CharCounter } from "@/components/custom";
 import { selectOptionsApi } from "@/api/select-options";
 import type {
   UsersFormSchemaType,
@@ -29,15 +28,21 @@ export function UserForm({ form, companyFallbackLabel, isEditing = false }: User
 
   const currentRole = watch("role");
   const currentCompanyId = watch("company_id");
+  const watchedFullName = watch("full_name") ?? "";
+  const watchedEmail = watch("email") ?? "";
 
   return (
     <div className="space-y-4 py-2">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-700">Nama Lengkap</label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-700">Nama Lengkap</label>
+            <CharCounter length={watchedFullName.length} max={255} />
+          </div>
           <Input
             {...register("full_name")}
             placeholder="cth. Budi Santoso, S.Pd"
+            maxLength={255}
             className="h-10 rounded-xl"
           />
           {errors.full_name && (
@@ -46,11 +51,15 @@ export function UserForm({ form, companyFallbackLabel, isEditing = false }: User
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-700">Email Akun</label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-700">Email Akun</label>
+            <CharCounter length={watchedEmail.length} max={255} />
+          </div>
           <Input
             type="email"
             {...register("email")}
             placeholder="nama@skariga.sch.id"
+            maxLength={255}
             className="h-10 rounded-xl"
           />
           {errors.email && (

@@ -26,7 +26,7 @@ export const SidebarIcon: React.FC<SidebarIconProps> = ({
         <Icon
           className={cn(
             "h-4 w-4 transition-transform duration-300 ease-in-out relative z-30",
-            isActive ? "text-white scale-110" : "text-white/80 group-hover:text-white"
+            isActive ? "text-white scale-110" : "text-white/80 group-hover/item:text-white"
           )}
         />
       )}

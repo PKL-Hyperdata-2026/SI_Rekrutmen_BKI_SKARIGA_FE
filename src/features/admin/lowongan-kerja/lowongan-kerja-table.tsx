@@ -2,9 +2,9 @@ import { useMemo } from "react";
 import { Loader2 } from "lucide-react";
 import {
   DataTable,
+  DataTablePagination,
   type DataTableColumn,
 } from "@/components/custom/data-table";
-import { DataTablePagination } from "@/components/custom/data-table-pagination";
 import {
   Card,
   CardContent,
@@ -133,7 +133,7 @@ export function LowonganKerjaTable({
             onView={onView}
             onEdit={handleEdit}
             onDelete={onDelete}
-            deleteItemName={(r) => r.position || r.title || "Lowongan Kerja"}
+            deleteTitle="Hapus Lowongan Kerja ini?"
           />
         ),
       },
@@ -236,9 +236,7 @@ export function LowonganKerjaTable({
                     onView={onView}
                     onEdit={handleEdit}
                     onDelete={onDelete}
-                    deleteItemName={(r) =>
-                      r.position || r.title || "Lowongan Kerja"
-                    }
+                    deleteTitle="Hapus Lowongan Kerja ini?"
                   />
                 </CardContent>
               </Card>

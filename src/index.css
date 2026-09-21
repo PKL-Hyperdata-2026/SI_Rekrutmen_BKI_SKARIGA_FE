@@ -342,6 +342,17 @@ textarea.custom-scrollbar {
   scrollbar-color: color-mix(in srgb, var(--primary) 45%, transparent) transparent;
 }
 
+@media (max-width: 639px) {
+  [data-slot="dialog-content"] .overflow-y-auto {
+    scrollbar-width: none !important;
+  }
+  [data-slot="dialog-content"] .overflow-y-auto::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+}
+
 .custom-scrollbar::-webkit-scrollbar,
 [data-slot="select-content"] [data-slot="select-viewport"]::-webkit-scrollbar,
 [data-slot="select-content"] [class*="overflow-y-auto"]::-webkit-scrollbar,

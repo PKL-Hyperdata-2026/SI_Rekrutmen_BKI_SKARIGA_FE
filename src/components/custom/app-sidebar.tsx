@@ -13,6 +13,11 @@ import type { MenuItem } from "@/config/menus";
 import { Building2, PanelLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { SidebarMenuItem } from "./sidebar-menu-item";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export function AppSidebar() {
   const { user } = useAppSelector((state) => state.auth);
@@ -167,7 +172,7 @@ export function AppSidebar() {
           <div
             className={cn(
               "flex-1 h-10 flex items-center overflow-hidden whitespace-nowrap pl-6 transition-all duration-300 ease-in-out",
-              isCollapsed ? "opacity-0 pointer-events-none -translate-x-3" : "opacity-100 translate-x-0"
+              isCollapsed ? "opacity-0 max-w-0 pointer-events-none -translate-x-3" : "opacity-100 max-w-48 translate-x-0"
             )}
           >
             <div className="flex flex-col justify-center min-w-0 pr-2">
@@ -222,19 +227,25 @@ export function AppSidebar() {
         {!isMobile && (
           <div className="h-12 shrink-0 border-none flex items-center pb-1.5 pt-1 relative">
             <div className="w-14 flex justify-center items-center shrink-0">
-              <button
-                onClick={toggleSidebar}
-                title={isCollapsed ? "Perluas Sidebar" : "Perkecil Sidebar"}
-                aria-label={isCollapsed ? "Perluas Sidebar" : "Perkecil Sidebar"}
-                className="flex justify-center items-center h-8 w-8 text-white/80 hover:text-white rounded-lg hover:bg-white/10 transition-all duration-300 ease-in-out cursor-pointer"
-              >
-                <PanelLeft
-                  className={cn(
-                    "h-4 w-4 transition-transform duration-300 ease-in-out",
-                    isCollapsed ? "rotate-180" : "rotate-0"
-                  )}
-                />
-              </button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={toggleSidebar}
+                    aria-label={isCollapsed ? "Perluas Sidebar" : "Perkecil Sidebar"}
+                    className="flex justify-center items-center h-8 w-8 text-white/80 hover:text-white rounded-lg hover:bg-white/10 transition-all duration-300 ease-in-out cursor-pointer"
+                  >
+                    <PanelLeft
+                      className={cn(
+                        "h-4 w-4 transition-transform duration-300 ease-in-out",
+                        isCollapsed ? "rotate-180" : "rotate-0"
+                      )}
+                    />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right" align="center">
+                  {isCollapsed ? "Perluas Sidebar" : "Perkecil Sidebar"}
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
         )}

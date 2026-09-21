@@ -3,7 +3,7 @@ import { Check, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardTitle } from "@/components/ui/card";
 import { DataTable, type DataTableColumn } from "@/components/custom/data-table";
-import { DataTablePagination } from "@/components/custom/data-table-pagination";
+import { DataTablePagination } from "@/components/custom/table/data-table-pagination";
 import { cn } from "@/lib/utils";
 import { ReviewDecisionActions } from "./review-decision-actions";
 import {

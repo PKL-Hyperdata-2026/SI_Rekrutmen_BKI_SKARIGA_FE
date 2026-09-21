@@ -72,10 +72,8 @@ export function toJobVacancyDefaultValues(
     const matchedMajor = majors?.find(
       (m) =>
         String(m.id) === String(vacMajor.id) ||
-        (vacMajor.code &&
-          m.code?.toLowerCase() === vacMajor.code.toLowerCase()) ||
-        (vacMajor.name &&
-          m.name?.toLowerCase() === vacMajor.name.toLowerCase()),
+        (m.code?.toLowerCase() === vacMajor.code?.toLowerCase()) ||
+        (m.name?.toLowerCase() === vacMajor.name?.toLowerCase()),
     );
     resolvedMajorId = matchedMajor
       ? String(matchedMajor.id)
@@ -93,10 +91,8 @@ export function toJobVacancyDefaultValues(
     const matchedTarget = targets?.find(
       (t) =>
         (vacTargetId && String(t.id) === String(vacTargetId)) ||
-        (vacTarget?.code &&
-          t.code?.toLowerCase() === vacTarget.code.toLowerCase()) ||
-        (vacTarget?.name &&
-          t.name?.toLowerCase() === vacTarget.name.toLowerCase()),
+        (t.code?.toLowerCase() === vacTarget?.code?.toLowerCase()) ||
+        (t.name?.toLowerCase() === vacTarget?.name?.toLowerCase()),
     );
     resolvedTargetId = matchedTarget
       ? String(matchedTarget.id)
@@ -126,7 +122,7 @@ export function toJobVacancyDefaultValues(
 export function toSubmitJobVacancyPayload(
   values: JobVacancyFormValues,
 ): Record<string, unknown> {
-  const parsedQuota = parseInt(values.quota, 10);
+  const parsedQuota = Number.parseInt(values.quota, 10);
   return {
     company_id: values.companyId,
     position: values.position.trim(),
@@ -353,6 +349,7 @@ export function useLowonganKerjaFormPage(customId?: string) {
     isLoadingOptions,
     errorMsg,
     register,
+    watch,
     setValue,
     companyId,
     deadline,

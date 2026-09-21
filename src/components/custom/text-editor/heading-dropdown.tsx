@@ -28,12 +28,12 @@ export function HeadingDropdown({ editor, disabled }: HeadingDropdownProps) {
         onClick={handleToggleOpen}
         className={cn(
           "inline-flex h-7 items-center justify-between gap-1.5 rounded px-2 text-xs font-medium transition-all duration-150 select-none",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/40",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
           disabled
             ? "opacity-35 cursor-not-allowed pointer-events-none"
             : "cursor-pointer active:scale-95",
           currentLabel !== "Normal"
-            ? "bg-purple-100 text-purple-700 font-bold hover:bg-purple-200/90 hover:text-purple-900 shadow-xs"
+            ? "bg-primary/15 text-primary font-bold hover:bg-primary/25 shadow-xs"
             : "text-slate-700 hover:bg-slate-200/80 hover:text-slate-900",
         )}
         title="Pilihan Ukuran Teks"
@@ -67,14 +67,14 @@ export function HeadingDropdown({ editor, disabled }: HeadingDropdownProps) {
             className={cn(
               "w-full flex items-center justify-between px-2.5 py-1.5 text-left text-xs rounded transition-colors cursor-pointer",
               currentLabel === "Normal"
-                ? "bg-purple-50 text-purple-700 font-semibold hover:bg-purple-100/80"
+                ? "bg-primary/10 text-primary font-semibold hover:bg-primary/20"
                 : "text-slate-700 hover:bg-slate-100 hover:text-slate-900",
             )}
           >
             <span>Normal</span>
             {currentLabel === "Normal" && (
               <svg
-                className="size-3.5 text-purple-600"
+                className="size-3.5 text-primary"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -93,14 +93,14 @@ export function HeadingDropdown({ editor, disabled }: HeadingDropdownProps) {
             className={cn(
               "w-full flex items-center justify-between px-2.5 py-1.5 text-left text-sm font-bold rounded transition-colors cursor-pointer",
               currentLabel === "Heading 1"
-                ? "bg-purple-50 text-purple-700 hover:bg-purple-100/80"
+                ? "bg-primary/10 text-primary hover:bg-primary/20"
                 : "text-slate-900 hover:bg-slate-100",
             )}
           >
             <span>Heading 1</span>
             {currentLabel === "Heading 1" && (
               <svg
-                className="size-3.5 text-purple-600"
+                className="size-3.5 text-primary"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -119,14 +119,14 @@ export function HeadingDropdown({ editor, disabled }: HeadingDropdownProps) {
             className={cn(
               "w-full flex items-center justify-between px-2.5 py-1.5 text-left text-xs font-bold rounded transition-colors cursor-pointer",
               currentLabel === "Heading 2"
-                ? "bg-purple-50 text-purple-700 hover:bg-purple-100/80"
+                ? "bg-primary/10 text-primary hover:bg-primary/20"
                 : "text-slate-800 hover:bg-slate-100 hover:text-slate-900",
             )}
           >
             <span>Heading 2</span>
             {currentLabel === "Heading 2" && (
               <svg
-                className="size-3.5 text-purple-600"
+                className="size-3.5 text-primary"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -145,14 +145,14 @@ export function HeadingDropdown({ editor, disabled }: HeadingDropdownProps) {
             className={cn(
               "w-full flex items-center justify-between px-2.5 py-1.5 text-left text-xs font-semibold rounded transition-colors cursor-pointer",
               currentLabel === "Heading 3"
-                ? "bg-purple-50 text-purple-700 hover:bg-purple-100/80"
+                ? "bg-primary/10 text-primary hover:bg-primary/20"
                 : "text-slate-800 hover:bg-slate-100 hover:text-slate-900",
             )}
           >
             <span>Heading 3</span>
             {currentLabel === "Heading 3" && (
               <svg
-                className="size-3.5 text-purple-600"
+                className="size-3.5 text-primary"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
