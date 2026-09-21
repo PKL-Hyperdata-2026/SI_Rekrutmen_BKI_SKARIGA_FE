@@ -3,9 +3,9 @@ import { Pencil } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   DataTable,
+  DataTablePagination,
   type DataTableColumn,
 } from "@/components/custom/data-table";
-import { DataTablePagination } from "@/components/custom/data-table-pagination";
 import {
   Card,
   CardHeader,

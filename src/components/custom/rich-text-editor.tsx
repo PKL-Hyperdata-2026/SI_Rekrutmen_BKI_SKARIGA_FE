@@ -1,7 +1,11 @@
 import { EditorContent } from "@tiptap/react";
 import { cn } from "@/lib/utils";
 import { useRichTextEditor } from "@/hooks/use-rich-text-editor";
-import { RichTextToolbar } from "./rich-text-toolbar";
+import { RichTextToolbar } from "./text-editor/rich-text-toolbar";
+import {
+  type RichTextRole,
+  roleThemeClasses,
+} from "./text-editor/rich-text-theme";
 
 export interface RichTextEditorProps {
   value?: string;
@@ -11,6 +15,7 @@ export interface RichTextEditorProps {
   disabled?: boolean;
   className?: string;
   minHeight?: string;
+  role?: RichTextRole;
 }
 
 export function RichTextEditor({
@@ -21,6 +26,7 @@ export function RichTextEditor({
   disabled = false,
   className,
   minHeight = "min-h-[150px]",
+  role = "admin",
 }: RichTextEditorProps) {
   const editor = useRichTextEditor({
     value,
@@ -39,6 +45,7 @@ export function RichTextEditor({
       }}
       className={cn(
         "w-full min-w-0 max-w-full rounded-lg border bg-[#F8F9FD] text-slate-800 transition-all overflow-hidden focus-within:bg-white focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 cursor-text",
+        roleThemeClasses[role],
         hasError ? "border-red-500 bg-red-50/20" : "border-slate-200",
         disabled && "opacity-60 pointer-events-none",
         className,
@@ -72,9 +79,14 @@ export function RichTextEditor({
 export interface RichTextContentProps {
   content?: string | null;
   className?: string;
+  role?: RichTextRole;
 }
 
-export function RichTextContent({ content, className }: RichTextContentProps) {
+export function RichTextContent({
+  content,
+  className,
+  role = "admin",
+}: RichTextContentProps) {
   if (!content || !content.trim()) {
     return <span className="text-slate-400 text-xs">-</span>;
   }
@@ -86,6 +98,7 @@ export function RichTextContent({ content, className }: RichTextContentProps) {
       <div
         className={cn(
           "prose prose-sm max-w-none text-slate-700 text-sm leading-relaxed min-w-0 wrap-anywhere [word-break:break-word]",
+          roleThemeClasses[role],
           "[&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-2",
           "[&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-2",
           "[&_li]:my-1 [&_li]:pl-0 [&_li]:wrap-break-word",
@@ -95,7 +108,7 @@ export function RichTextContent({ content, className }: RichTextContentProps) {
           "[&_h2]:text-base [&_h2]:font-bold [&_h2]:text-slate-900 [&_h2]:my-1.5 [&_h2]:wrap-break-word",
           "[&_h3]:text-sm [&_h3]:font-bold [&_h3]:text-slate-900 [&_h3]:my-1 [&_h3]:wrap-break-word",
           "[&_u]:underline",
-          "[&_blockquote]:border-l-2 [&_blockquote]:border-purple-300 [&_blockquote]:pl-3 [&_blockquote]:italic [&_blockquote]:text-slate-600",
+          "[&_blockquote]:border-l-2 [&_blockquote]:border-primary/40 [&_blockquote]:pl-3 [&_blockquote]:italic [&_blockquote]:text-slate-600",
           "[&_a]:text-primary [&_a]:underline [&_a]:font-medium",
           "[&_code]:bg-slate-100 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_code]:break-all",
           className,
@@ -109,6 +122,7 @@ export function RichTextContent({ content, className }: RichTextContentProps) {
     <div
       className={cn(
         "text-sm text-slate-700 whitespace-pre-line leading-relaxed min-w-0 max-w-full wrap-anywhere [word-break:break-word]",
+        roleThemeClasses[role],
         className,
       )}
     >
@@ -118,3 +132,5 @@ export function RichTextContent({ content, className }: RichTextContentProps) {
 }
 
 RichTextEditor.Content = RichTextContent;
+
+export { type RichTextRole, roleThemeClasses };

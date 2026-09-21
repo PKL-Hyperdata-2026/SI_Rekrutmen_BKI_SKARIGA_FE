@@ -1,29 +1,30 @@
 import * as React from "react";
-import { Trash2, AlertCircle, FileText, Pencil } from "lucide-react";
+import { FileText, Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
-import {
   DataTablePagination,
   type DataTablePaginationProps,
   type RoleType,
-} from "./data-table-pagination";
+} from "./table/data-table-pagination";
+import {
+  DataTableDeleteButton,
+  type DataTableDeleteButtonProps,
+} from "./table/data-table-delete";
 
 function getNestedValue(obj: unknown, path?: string): unknown {
   if (!path || !obj || typeof obj !== "object") return null;
   const record = obj as Record<string, unknown>;
   if (!path.includes(".")) return record[path] ?? null;
-  return path.split(".").reduce<unknown>((acc, part) => {
-    if (acc && typeof acc === "object" && part in acc) {
-      return (acc as Record<string, unknown>)[part];
-    }
-    return null;
-  }, obj) ?? null;
+  return (
+    path.split(".").reduce<unknown>((acc, part) => {
+      if (acc && typeof acc === "object" && part in acc) {
+        return (acc as Record<string, unknown>)[part];
+      }
+      return null;
+    }, obj) ?? null
+  );
 }
 
 export interface DataTableColumn<T> {
@@ -35,123 +36,6 @@ export interface DataTableColumn<T> {
   sortable?: boolean;
   sortKey?: string;
   cell?: (row: T, index: number) => React.ReactNode;
-}
-
-export interface DataTableDeleteButtonProps {
-  onConfirm?: () => void | Promise<void>;
-  itemName?: string;
-  title?: string;
-  description?: string;
-  buttonTitle?: string;
-  className?: string;
-  align?: "end" | "center" | "start";
-  side?: "top" | "right" | "bottom" | "left";
-  disabled?: boolean;
-}
-
-export function DataTableDeleteButton({
-  onConfirm,
-  itemName,
-  title,
-  description,
-  buttonTitle = "Hapus",
-  className,
-  align = "end",
-  side = "left",
-  disabled = false,
-}: DataTableDeleteButtonProps) {
-  const [open, setOpen] = React.useState(false);
-  const [isDeleting, setIsDeleting] = React.useState(false);
-
-  const handleConfirm = async (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    if (!onConfirm) {
-      setOpen(false);
-      return;
-    }
-    setIsDeleting(true);
-    try {
-      await onConfirm();
-      setOpen(false);
-    } catch (err) {
-      console.error("Delete confirmation failed:", err);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  const popoverTitle =
-    title ?? (itemName ? `Hapus Data ${itemName}` : "Hapus Data");
-
-  const message =
-    description ??
-    "Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.";
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          disabled={disabled}
-          className={cn(
-            "h-8 w-8 rounded-lg border-rose-200 text-rose-500 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-300 cursor-pointer shadow-none transition-colors",
-            className,
-          )}
-          title={buttonTitle}
-        >
-          <Trash2 className="size-3.5" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        align={align}
-        side={side}
-        onClick={(e) => e.stopPropagation()}
-        className="w-72 p-3.5 shadow-xl border border-slate-200/90 rounded-xl bg-white text-slate-800 z-50"
-      >
-        <div className="flex flex-col gap-2.5">
-          <div className="flex items-start gap-2.5">
-            <div className="p-1.5 rounded-full bg-rose-50 text-rose-600 shrink-0 mt-0.5">
-              <AlertCircle className="size-4" />
-            </div>
-            <div>
-              <h4 className="text-xs font-semibold text-slate-900 leading-tight">
-                {popoverTitle}
-              </h4>
-              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                {message}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-100">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={isDeleting}
-              onClick={(e) => {
-                e.stopPropagation();
-                setOpen(false);
-              }}
-              className="h-7 px-2.5 text-xs font-medium rounded-lg border-slate-200 hover:bg-slate-50 text-slate-700 cursor-pointer"
-            >
-              Batal
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              disabled={isDeleting}
-              onClick={handleConfirm}
-              className="h-7 px-2.5 text-xs font-medium rounded-lg bg-rose-600 hover:bg-rose-700 text-white cursor-pointer"
-            >
-              {isDeleting ? "Menghapus..." : "Hapus"}
-            </Button>
-          </div>
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
 }
 
 export interface DataTableActionsProps<T> {
@@ -361,7 +245,6 @@ export function DataTable<T>({
                   : "bg-[#F6F7FB] text-slate-500 font-bold text-xs uppercase tracking-wider",
               )}
             >
-              {/* Selectable Checkbox Header */}
               {selectable && (
                 <th scope="col" className="py-2.5 px-3 w-10 text-center">
                   <input
@@ -379,7 +262,6 @@ export function DataTable<T>({
                 </th>
               )}
 
-              {/* Numbering Header */}
               {showNumbering && (
                 <th
                   scope="col"
@@ -389,7 +271,6 @@ export function DataTable<T>({
                 </th>
               )}
 
-              {/* Dynamic Columns Header */}
               {effectiveColumns.map((col, idx) => (
                 <th
                   key={idx}
@@ -462,7 +343,9 @@ export function DataTable<T>({
                   className="py-12 text-center text-slate-500"
                 >
                   {emptyIcon && (
-                    <div className="mb-2.5 flex justify-center">{emptyIcon}</div>
+                    <div className="mb-2.5 flex justify-center">
+                      {emptyIcon}
+                    </div>
                   )}
                   <p className="text-sm font-semibold text-slate-700">
                     {emptyMessage}
@@ -488,7 +371,6 @@ export function DataTable<T>({
                       rowClassName,
                     )}
                   >
-                    {/* Selectable Checkbox */}
                     {selectable && (
                       <td
                         className="py-2.5 px-3 text-center align-middle"
@@ -507,14 +389,12 @@ export function DataTable<T>({
                       </td>
                     )}
 
-                    {/* Numbering Cell */}
                     {showNumbering && (
                       <td className="py-2.5 px-4 text-center font-bold text-xs text-slate-700 align-middle">
                         {numberStartIndex + rowIdx}
                       </td>
                     )}
 
-                    {/* Data Cells */}
                     {effectiveColumns.map((col, colIdx) => (
                       <td
                         key={colIdx}
@@ -529,7 +409,10 @@ export function DataTable<T>({
                         {col.cell
                           ? col.cell(row, rowIdx)
                           : col.accessorKey
-                            ? (getNestedValue(row, col.accessorKey as string) as React.ReactNode)
+                            ? (getNestedValue(
+                                row,
+                                col.accessorKey as string,
+                              ) as React.ReactNode)
                             : null}
                       </td>
                     ))}
@@ -549,4 +432,10 @@ export function DataTable<T>({
 DataTable.DeleteButton = DataTableDeleteButton;
 DataTable.Actions = DataTableActions;
 
-export { DataTablePagination, type DataTablePaginationProps, type RoleType };
+export {
+  DataTablePagination,
+  type DataTablePaginationProps,
+  type RoleType,
+  DataTableDeleteButton,
+  type DataTableDeleteButtonProps,
+};

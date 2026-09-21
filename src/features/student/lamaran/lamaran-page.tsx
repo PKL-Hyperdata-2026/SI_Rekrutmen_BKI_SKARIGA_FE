@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
-import { PageHeader, DateRangePicker } from "@/components/custom";
-import { DataTablePagination } from "@/components/custom/data-table-pagination";
+import { PageHeader, DateRangePicker, DataTablePagination } from "@/components/custom";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select,

@@ -199,7 +199,6 @@ export function DataTablePagination({
         className,
       )}
     >
-      {/* Mobile Pagination */}
       <div className="flex md:hidden items-center justify-center gap-2.5 w-full py-3 px-4">
         <Button
           type="button"
@@ -281,7 +280,6 @@ export function DataTablePagination({
         </Button>
       </div>
 
-      {/* Desktop Pagination */}
       <div className="hidden md:flex w-full items-center justify-between gap-4 px-4 py-3">
         <div className="flex flex-wrap items-center gap-4 text-xs font-medium text-slate-500">
           {showItemInfo && (

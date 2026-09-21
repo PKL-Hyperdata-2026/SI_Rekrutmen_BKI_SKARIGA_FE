@@ -2,9 +2,9 @@ import { useMemo } from "react";
 import { CheckCircle2, XCircle } from "lucide-react";
 import {
   DataTable,
+  DataTablePagination,
   type DataTableColumn,
 } from "@/components/custom/data-table";
-import { DataTablePagination } from "@/components/custom/data-table-pagination";
 import {
   Card,
   CardContent,

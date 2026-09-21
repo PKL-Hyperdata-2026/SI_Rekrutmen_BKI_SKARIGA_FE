@@ -2,9 +2,9 @@ import { useMemo, useCallback } from "react";
 import { Loader2, Check, X } from "lucide-react";
 import {
   DataTable,
+  DataTablePagination,
   type DataTableColumn,
 } from "@/components/custom/data-table";
-import { DataTablePagination } from "@/components/custom/data-table-pagination";
 import {
   Card,
   CardContent,

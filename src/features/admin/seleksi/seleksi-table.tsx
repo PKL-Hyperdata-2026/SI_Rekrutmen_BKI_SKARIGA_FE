@@ -4,8 +4,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { DataTable, type DataTableColumn } from "@/components/custom/data-table";
-import { DataTablePagination } from "@/components/custom/data-table-pagination";
+import {
+  DataTable,
+  DataTablePagination,
+  type DataTableColumn,
+} from "@/components/custom/data-table";
 import { getAvatarUrl } from "@/lib/utils";
 import type { RecruitmentSelectionItem } from "./types";
 
