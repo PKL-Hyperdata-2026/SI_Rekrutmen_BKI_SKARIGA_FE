@@ -1,3 +1,4 @@
+import { DashboardPage } from "./dashboard/dashboard-page";
 import { LowonganPage } from "./lowongan/lowongan-page";
 import { ReviewPage } from "./review/review-page";
 import { JadwalPage } from "./jadwal/jadwal-page";
@@ -7,7 +8,7 @@ import { PenempatanPage } from "./penempatan/penempatan-page";
 export const hrdRoute = [
   {
     path: "dashboard",
-    // element: <HRDDashboard />,
+    element: <DashboardPage />,
   },
   {
     path: "lowongan",
