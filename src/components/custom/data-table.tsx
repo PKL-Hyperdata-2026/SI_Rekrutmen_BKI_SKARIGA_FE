@@ -14,10 +14,16 @@ import {
   type RoleType,
 } from "./data-table-pagination";
 
-function getNestedValue(obj: any, path?: string): any {
-  if (!path || !obj) return null;
-  if (!path.includes(".")) return obj[path] ?? null;
-  return path.split(".").reduce((acc, part) => acc?.[part], obj) ?? null;
+type NestedRecord = Record<string, unknown>;
+
+function getNestedValue(obj: unknown, path?: string): React.ReactNode {
+  if (!path || obj === null || obj === undefined) return null;
+  const record = obj as NestedRecord;
+  if (!path.includes(".")) return record[path] as React.ReactNode ?? null;
+  return path.split(".").reduce<unknown>((acc, part) => {
+    if (acc === null || acc === undefined) return null;
+    return (acc as NestedRecord)[part] ?? null;
+  }, obj) as React.ReactNode;
 }
 
 export interface DataTableColumn<T> {
@@ -263,6 +269,7 @@ export interface DataTableProps<T> {
   onSelectRow?: (id: string | number, checked: boolean) => void;
   onRowClick?: (row: T, index: number) => void;
   getRowId?: (row: T, index: number) => string | number;
+  isRowSelectable?: (row: T, index: number) => boolean;
 }
 
 const roleThemeHeader: Record<RoleType, string> = {
@@ -272,7 +279,14 @@ const roleThemeHeader: Record<RoleType, string> = {
   default: "border-purple-200/80 bg-purple-50/60 text-purple-900",
 };
 
-export function DataTable<T extends Record<string, any>>({
+const roleThemeCheckbox: Record<RoleType, string> = {
+  admin: "accent-purple-700 focus-visible:outline-purple-700",
+  siswa: "accent-sky-600 focus-visible:outline-sky-600",
+  hrd: "accent-[#8D1D96] focus-visible:outline-[#8D1D96]",
+  default: "accent-purple-700 focus-visible:outline-purple-700",
+};
+
+export function DataTable<T>({
   columns,
   data,
   loading = false,
@@ -293,6 +307,7 @@ export function DataTable<T extends Record<string, any>>({
   onSelectRow,
   onRowClick,
   getRowId = (_, idx) => idx,
+  isRowSelectable,
 }: DataTableProps<T>) {
   const isPill = variant === "pill";
 
@@ -322,12 +337,18 @@ export function DataTable<T extends Record<string, any>>({
     ];
   }, [columns, actions]);
 
+  const selectableRows = data.filter((row, idx) =>
+    isRowSelectable ? isRowSelectable(row, idx) : true,
+  );
   const allSelected =
-    data.length > 0 &&
-    data.every((row, idx) => selectedIds.includes(getRowId(row, idx)));
+    selectableRows.length > 0 &&
+    selectableRows.every((row) =>
+      selectedIds.includes(getRowId(row, data.indexOf(row))),
+    );
   const someSelected =
-    data.some((row, idx) => selectedIds.includes(getRowId(row, idx))) &&
-    !allSelected;
+    selectableRows.some((row) =>
+      selectedIds.includes(getRowId(row, data.indexOf(row))),
+    ) && !allSelected;
 
   const totalCols = Math.max(
     1,
@@ -368,7 +389,10 @@ export function DataTable<T extends Record<string, any>>({
                       if (el) el.indeterminate = someSelected;
                     }}
                     onChange={(e) => onSelectAll?.(e.target.checked)}
-                    className="h-3.5 w-3.5 rounded border-slate-300 text-primary focus:ring-primary/20 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    className={cn(
+                      "size-4 shrink-0 cursor-pointer rounded border-slate-300 transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-40",
+                      roleThemeCheckbox[role] ?? roleThemeCheckbox.default,
+                    )}
                   />
                 </th>
               )}
@@ -470,6 +494,9 @@ export function DataTable<T extends Record<string, any>>({
               data.map((row, rowIdx) => {
                 const rowId = getRowId(row, rowIdx) ?? rowIdx;
                 const isSelected = selectedIds.includes(rowId);
+                const rowSelectable = isRowSelectable
+                  ? isRowSelectable(row, rowIdx)
+                  : true;
 
                 return (
                   <tr
@@ -492,11 +519,15 @@ export function DataTable<T extends Record<string, any>>({
                           type="checkbox"
                           aria-label={`Pilih baris ${numberStartIndex + rowIdx}`}
                           checked={isSelected}
+                          disabled={!rowSelectable}
                           onChange={(e) =>
                             onSelectRow?.(rowId, e.target.checked)
                           }
                           onClick={(e) => e.stopPropagation()}
-                          className="h-3.5 w-3.5 rounded border-slate-300 text-primary focus:ring-primary/20 cursor-pointer"
+                          className={cn(
+                            "size-4 shrink-0 cursor-pointer rounded border-slate-300 transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-40",
+                            roleThemeCheckbox[role] ?? roleThemeCheckbox.default,
+                          )}
                         />
                       </td>
                     )}
