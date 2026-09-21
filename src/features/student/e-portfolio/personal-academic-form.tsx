@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { User, Lock, Plus, Globe, Trash2, RotateCcw, Save, Loader2 } from "lucide-react";
-import { SectionCard } from "@/components/custom";
+import { SectionCard, CharCounter } from "@/components/custom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,8 +43,11 @@ export function PersonalAcademicForm({
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = form;
+
+  const watchedPhone = watch("phone") || "";
 
   const roleDisplay = useMemo(
     () => profileData?.role?.toUpperCase() || "SISWA",
@@ -214,11 +217,15 @@ export function PersonalAcademicForm({
             </div>
 
             <div>
-              <Label className="block text-xs font-bold text-slate-800 tracking-wider mb-1.5">
-                No . WhatsApp Aktif <span className="text-rose-500">*</span>
-              </Label>
+              <div className="flex items-center justify-between mb-1.5">
+                <Label className="block text-xs font-bold text-slate-800 tracking-wider">
+                  No . WhatsApp Aktif <span className="text-rose-500">*</span>
+                </Label>
+                <CharCounter length={watchedPhone.length} max={25} />
+              </div>
               <Input
                 type="text"
+                maxLength={25}
                 {...register("phone")}
                 placeholder="e.g +62 123-4567-890"
                 className="h-9 text-xs bg-white text-slate-800 focus-visible:border-primary"

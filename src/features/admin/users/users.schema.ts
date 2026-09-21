@@ -1,9 +1,17 @@
 import { z } from "zod";
 
 export const usersFormSchema = z.object({
-  full_name: z.string().trim().min(1, "Nama lengkap wajib diisi"),
-  email: z.string().trim().email("Format email tidak valid"),
-  phone: z.string().trim().optional(),
+  full_name: z
+    .string()
+    .trim()
+    .min(1, "Nama lengkap wajib diisi")
+    .max(255, "Nama lengkap maksimal 255 karakter"),
+  email: z
+    .string()
+    .trim()
+    .email("Format email tidak valid")
+    .max(255, "Email maksimal 255 karakter"),
+  phone: z.string().trim().max(20, "Nomor telepon maksimal 20 karakter").optional(),
   password: z.string().optional(),
   role: z.enum(["admin", "hrd", "siswa", "alumni"]),
   company_id: z.string().optional(),

@@ -313,12 +313,12 @@ export function AlumniForm({
                     <Lock className="h-2.5 w-2.5" /> Terkunci
                   </span>
                 ) : (
-                  <CharCounter length={watchedNis.length} max={30} />
+                  <CharCounter length={watchedNis.length} max={20} />
                 )}
               </label>
               <Input
                 {...register("nis")}
-                maxLength={30}
+                maxLength={20}
                 readOnly={isStudentLocked}
                 placeholder="cth. 212200881"
                 className={cn(
@@ -339,12 +339,12 @@ export function AlumniForm({
                     <Lock className="h-2.5 w-2.5" /> Terkunci
                   </span>
                 ) : (
-                  <CharCounter length={watchedFullName.length} max={150} />
+                  <CharCounter length={watchedFullName.length} max={255} />
                 )}
               </label>
               <Input
                 {...register("full_name")}
-                maxLength={150}
+                maxLength={255}
                 readOnly={isStudentLocked}
                 placeholder="cth. Bagas Setiawan"
                 className={cn(

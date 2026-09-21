@@ -349,6 +349,7 @@ export function useLowonganKerjaFormPage(customId?: string) {
     isLoadingOptions,
     errorMsg,
     register,
+    watch,
     setValue,
     companyId,
     deadline,

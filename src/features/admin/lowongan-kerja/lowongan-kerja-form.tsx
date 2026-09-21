@@ -1,5 +1,5 @@
 import { Controller } from "react-hook-form";
-import { PageHeader, RichTextEditor } from "@/components/custom";
+import { PageHeader, RichTextEditor, CharCounter } from "@/components/custom";
 import { Field, FieldGroup, FieldError } from "@/components/ui/field";
 import { CardContent } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
@@ -28,6 +28,7 @@ export function LowonganKerjaForm() {
     isLoadingOptions,
     errorMsg,
     register,
+    watch,
     setValue,
     companyId,
     deadline,
@@ -45,6 +46,9 @@ export function LowonganKerjaForm() {
     handleBack,
     getCompanies,
   } = useLowonganKerjaFormPage();
+
+  const watchedPosition = watch("position") ?? "";
+  const watchedWorkLocation = watch("workLocation") ?? "";
 
   return (
     <CardContent className="flex flex-col gap-5 sm:gap-6 min-w-0 max-w-full overflow-hidden theme-admin p-0">
@@ -137,18 +141,22 @@ export function LowonganKerjaForm() {
               </Field>
 
               <Field className="flex flex-col gap-1">
-                <Label className="text-xs text-slate-700 flex items-center gap-1 h-5">
-                  Posisi Pekerjaan
-                  <Badge
-                    variant="outline"
-                    className="border-none bg-transparent p-0 text-red-500 shadow-none text-sm"
-                  >
-                    *
-                  </Badge>
-                </Label>
+                <div className="flex items-center justify-between h-5">
+                  <Label className="text-xs text-slate-700 flex items-center gap-1">
+                    Posisi Pekerjaan
+                    <Badge
+                      variant="outline"
+                      className="border-none bg-transparent p-0 text-red-500 shadow-none text-sm"
+                    >
+                      *
+                    </Badge>
+                  </Label>
+                  <CharCounter length={watchedPosition.length} max={255} />
+                </div>
                 <Input
                   {...register("position")}
                   placeholder="cth. Customer Service"
+                  maxLength={255}
                   className={cn(
                     "h-10 w-full rounded-lg border bg-slate-50 px-3.5 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:bg-white focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all",
                     errors.position
@@ -333,18 +341,22 @@ export function LowonganKerjaForm() {
 
           <CardContent className="bg-white rounded-xl border border-slate-200 shadow-xs px-5 sm:px-6 py-5 sm:py-6 min-w-0 max-w-full space-y-2.5">
             <Field className="flex flex-col gap-1">
-              <Label className="text-xs text-slate-700 flex items-center gap-1 h-5">
-                Lokasi Kerja
-                <Badge
-                  variant="outline"
-                  className="border-none bg-transparent p-0 text-red-500 shadow-none text-sm"
-                >
-                  *
-                </Badge>
-              </Label>
+              <div className="flex items-center justify-between h-5">
+                <Label className="text-xs text-slate-700 flex items-center gap-1">
+                  Lokasi Kerja
+                  <Badge
+                    variant="outline"
+                    className="border-none bg-transparent p-0 text-red-500 shadow-none text-sm"
+                  >
+                    *
+                  </Badge>
+                </Label>
+                <CharCounter length={watchedWorkLocation.length} max={255} />
+              </div>
               <Input
                 {...register("workLocation")}
                 placeholder="cth. Surabaya"
+                maxLength={255}
                 className={cn(
                   "h-10 w-full rounded-lg border bg-slate-50 px-3.5 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:bg-white focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all",
                   errors.workLocation

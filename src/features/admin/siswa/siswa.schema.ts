@@ -111,12 +111,12 @@ export const siswaFormSchema = z.object({
     .string()
     .trim()
     .min(3, "NIS minimal 3 karakter")
-    .max(30, "NIS maksimal 30 karakter"),
+    .max(20, "NIS maksimal 20 karakter"),
   full_name: z
     .string()
     .trim()
     .min(2, "Nama lengkap minimal 2 karakter")
-    .max(150, "Nama lengkap maksimal 150 karakter"),
+    .max(255, "Nama lengkap maksimal 255 karakter"),
   email: z.string().trim().email("Format alamat email tidak valid"),
   phone: z.string().trim().optional().or(z.literal("")),
   password: z.string().optional().or(z.literal("")),

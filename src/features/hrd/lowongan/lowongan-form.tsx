@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Controller } from "react-hook-form";
 import { Send, BadgeCheck, Loader2, X } from "lucide-react";
-import { Modal } from "@/components/custom/modal";
+import { SearchableSelect, DatePicker, Modal, CharCounter } from "@/components/custom";
 import { Form } from "@/components/ui/form";
 import { Field, FieldGroup, FieldError } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
@@ -10,8 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { SearchableSelect } from "@/components/custom/searchable-select";
-import { DatePicker } from "@/components/custom/date-picker";
 import { cn } from "@/lib/utils";
 import type { useLowonganForm } from "./lowongan.form";
 import { loadLowonganDraft } from "./lowongan.form";
@@ -36,14 +34,6 @@ function RequiredBadge() {
     >
       *
     </Badge>
-  );
-}
-
-function CharCounter({ length, max }: { length: number; max: number }) {
-  return (
-    <span className="text-[10px] text-slate-400 font-medium tabular-nums">
-      {length}/{max}
-    </span>
   );
 }
 
@@ -607,14 +597,17 @@ export function LowonganForm({
         </div>
 
         {/* Preview Katalog Siswa */}
-        <div className="rounded-xl border border-slate-200 bg-[#F8F9FD] p-3.5 space-y-1">
+        <div className="rounded-xl border border-slate-200 bg-[#F8F9FD] p-3.5 space-y-1 overflow-hidden min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
             Pratinjau katalog siswa
           </p>
-          <p className="text-sm font-bold text-slate-900 leading-snug">
+          <p
+            title={watchedTitle || watchedPosition || "Judul lowongan"}
+            className="text-sm font-bold text-slate-900 leading-snug break-words [overflow-wrap:anywhere] line-clamp-2"
+          >
             {watchedTitle || watchedPosition || "Judul lowongan"}
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 break-words [overflow-wrap:anywhere] line-clamp-2">
             {watchedPosition ? `Posisi: ${watchedPosition}` : "Posisi: -"}
             {watchedWorkLocation ? ` • Lokasi: ${watchedWorkLocation}` : ""}
             {watchedDeadline ? ` • Batas: ${watchedDeadline}` : ""}

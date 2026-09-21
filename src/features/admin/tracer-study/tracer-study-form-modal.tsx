@@ -388,22 +388,30 @@ export function TracerFormModal({
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700">
-                    Kategori Perguruan Tinggi
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-semibold text-slate-700">
+                      Kategori Perguruan Tinggi
+                    </Label>
+                    <CharCounter length={companySector.length} max={255} />
+                  </div>
                   <Input
                     placeholder="Perguruan Tinggi Negeri / Swasta"
+                    maxLength={255}
                     {...register("company_sector")}
                     className="h-10 rounded-xl bg-white text-xs sm:text-sm"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-slate-700">
-                    Lokasi Kampus / Kota
-                  </Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-semibold text-slate-700">
+                      Lokasi Kampus / Kota
+                    </Label>
+                    <CharCounter length={jobLocation.length} max={255} />
+                  </div>
                   <Input
                     placeholder="Contoh: Malang, Jatim"
+                    maxLength={255}
                     {...register("job_location")}
                     className="h-10 rounded-xl bg-white text-xs sm:text-sm"
                   />
@@ -493,11 +501,11 @@ export function TracerFormModal({
                     <Label className="text-xs font-semibold text-slate-700">
                       Akun Instagram / Media Sosial
                     </Label>
-                    <CharCounter length={instagramHandle.length} max={100} />
+                    <CharCounter length={instagramHandle.length} max={255} />
                   </div>
                   <Input
                     placeholder="Contoh: @kedaikopis kariga"
-                    maxLength={100}
+                    maxLength={255}
                     {...register("instagram_handle")}
                     className="h-10 rounded-xl bg-white text-xs sm:text-sm"
                   />

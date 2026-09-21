@@ -2,7 +2,7 @@ import { useId } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { AsyncSearchableSelect } from "@/components/custom/async-searchable-select";
+import { AsyncSearchableSelect, CharCounter } from "@/components/custom";
 import { selectOptionsApi } from "@/api/select-options";
 import type { MajorFormSchemaType } from "./jurusan.schema";
 
@@ -23,6 +23,9 @@ export function MajorForm({ form, departmentFallbackLabel }: MajorFormProps) {
 
   const currentDepartmentId = watch("department_id");
   const isActive = watch("is_active");
+  const watchedCode = watch("code") ?? "";
+  const watchedName = watch("name") ?? "";
+  const watchedDescription = watch("description") ?? "";
 
   return (
     <div className="space-y-4 py-2">
@@ -46,12 +49,16 @@ export function MajorForm({ form, departmentFallbackLabel }: MajorFormProps) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-700">
-            Kode Jurusan <span className="text-rose-500">*</span>
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-700">
+              Kode Jurusan <span className="text-rose-500">*</span>
+            </label>
+            <CharCounter length={watchedCode.length} max={20} />
+          </div>
           <Input
             {...register("code")}
             placeholder="cth. RPL, TKJ, DKV"
+            maxLength={20}
             className="h-10 rounded-xl uppercase"
           />
           {errors.code && (
@@ -60,12 +67,16 @@ export function MajorForm({ form, departmentFallbackLabel }: MajorFormProps) {
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-bold text-slate-700">
-            Nama Program Keahlian <span className="text-rose-500">*</span>
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-700">
+              Nama Program Keahlian <span className="text-rose-500">*</span>
+            </label>
+            <CharCounter length={watchedName.length} max={255} />
+          </div>
           <Input
             {...register("name")}
             placeholder="cth. Rekayasa Perangkat Lunak"
+            maxLength={255}
             className="h-10 rounded-xl"
           />
           {errors.name && (
@@ -75,10 +86,14 @@ export function MajorForm({ form, departmentFallbackLabel }: MajorFormProps) {
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-xs font-bold text-slate-700">Deskripsi</label>
+        <div className="flex items-center justify-between">
+          <label className="text-xs font-bold text-slate-700">Deskripsi</label>
+          <CharCounter length={watchedDescription.length} max={1000} />
+        </div>
         <textarea
           {...register("description")}
           placeholder="Keterangan kurikulum keahlian..."
+          maxLength={1000}
           className="w-full rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-2xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary min-h-24"
         />
         {errors.description && (

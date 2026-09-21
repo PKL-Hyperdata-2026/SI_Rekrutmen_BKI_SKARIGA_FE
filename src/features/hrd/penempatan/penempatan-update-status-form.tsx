@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Modal } from "@/components/custom/modal";
+import { Modal, CharCounter } from "@/components/custom";
 import { Form } from "@/components/ui/form";
 import { Field, FieldError } from "@/components/ui/field";
 import { CardContent, CardDescription } from "@/components/ui/card";
@@ -74,6 +74,7 @@ export function PenempatanUpdateStatusForm({
 
   const period = watch("period");
   const workStatus = watch("workStatus");
+  const watchedNotes = watch("notes") ?? "";
 
   const workStatusOptions: WorkStatusOption[] = useMemo(
     () => [
@@ -421,12 +422,16 @@ export function PenempatanUpdateStatusForm({
         </Field>
 
         <Field className="flex flex-col gap-1.5">
-          <Label className="text-sm font-semibold text-[#1e1b4b] flex items-center gap-1">
-            Catatan Monitoring (Opsional)
-          </Label>
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-semibold text-[#1e1b4b] flex items-center gap-1">
+              Catatan Monitoring (Opsional)
+            </Label>
+            <CharCounter length={watchedNotes.length} max={1000} />
+          </div>
           <Textarea
             {...register("notes")}
             placeholder="Masukkan catatan evaluasi..."
+            maxLength={1000}
             rows={3}
             className={cn(
               "min-h-24 w-full rounded-lg border border-slate-200 bg-[#F8F9FD] px-3.5 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 focus:bg-white focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none",

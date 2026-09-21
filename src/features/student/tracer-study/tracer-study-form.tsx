@@ -10,7 +10,7 @@ import {
   Loader2,
   RefreshCw,
 } from "lucide-react";
-import { SectionCard } from "@/components/custom";
+import { SectionCard, CharCounter } from "@/components/custom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -68,6 +68,14 @@ export function TracerStudyForm({
   const businessFieldVal = watch("business_field");
   const minSalaryVal = watch("minimum_salary");
   const maxSalaryVal = watch("maximum_salary");
+
+  const companyName = watch("company_name") || "";
+  const jobTitle = watch("job_title") || "";
+  const businessName = watch("business_name") || "";
+  const businessAddress = watch("business_address") || "";
+  const instagramHandle = watch("instagram_handle") || "";
+  const universityName = watch("university_name") || "";
+  const studyProgram = watch("study_program") || "";
 
   useEffect(() => {
     reset(toTracerStudyDefaultValues(initialData));
@@ -213,14 +221,18 @@ export function TracerStudyForm({
             {currentCareerStatus === "bekerja" && (
               <div className="space-y-3.5 sm:space-y-4 pt-1">
                 <div>
-                  <Label className="block text-xs font-bold text-slate-800 tracking-wider mb-1.5">
-                    Tempat Kerja / Perusahaan Saat Ini{" "}
-                    <span className="text-rose-500">*</span>
-                  </Label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <Label className="block text-xs font-bold text-slate-800 tracking-wider">
+                      Tempat Kerja / Perusahaan Saat Ini{" "}
+                      <span className="text-rose-500">*</span>
+                    </Label>
+                    <CharCounter length={companyName.length} max={255} />
+                  </div>
                   <Input
                     type="text"
                     {...register("company_name")}
                     placeholder="e.g PT.HyperData"
+                    maxLength={255}
                     className="h-9 text-xs bg-white text-slate-800 focus-visible:border-primary"
                   />
                   {errors.company_name && (
@@ -232,13 +244,17 @@ export function TracerStudyForm({
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   <div>
-                    <Label className="block text-xs font-bold text-slate-800 tracking-wider mb-1.5">
-                      Jabatan / Posisi <span className="text-rose-500">*</span>
-                    </Label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <Label className="block text-xs font-bold text-slate-800 tracking-wider">
+                        Jabatan / Posisi <span className="text-rose-500">*</span>
+                      </Label>
+                      <CharCounter length={jobTitle.length} max={255} />
+                    </div>
                     <Input
                       type="text"
                       {...register("job_title")}
                       placeholder="e.g Staff IT"
+                      maxLength={255}
                       className="h-9 text-xs bg-white text-slate-800 focus-visible:border-primary"
                     />
                     {errors.job_title && (
@@ -336,13 +352,17 @@ export function TracerStudyForm({
             {currentCareerStatus === "wirausaha" && (
               <div className="space-y-3.5 sm:space-y-4 pt-1">
                 <div>
-                  <Label className="block text-xs font-bold text-slate-800 tracking-wider mb-1.5">
-                    Nama Wirausaha <span className="text-rose-500">*</span>
-                  </Label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <Label className="block text-xs font-bold text-slate-800 tracking-wider">
+                      Nama Wirausaha <span className="text-rose-500">*</span>
+                    </Label>
+                    <CharCounter length={businessName.length} max={255} />
+                  </div>
                   <Input
                     type="text"
                     {...register("business_name")}
                     placeholder="Warung Makan Haji Sanusi"
+                    maxLength={255}
                     className="h-9 text-xs bg-white text-slate-800 focus-visible:border-primary"
                   />
                   {errors.business_name && (
@@ -353,13 +373,17 @@ export function TracerStudyForm({
                 </div>
 
                 <div>
-                  <Label className="block text-xs font-bold text-slate-800 tracking-wider mb-1.5">
-                    Alamat Wirausaha <span className="text-rose-500">*</span>
-                  </Label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <Label className="block text-xs font-bold text-slate-800 tracking-wider">
+                      Alamat Wirausaha <span className="text-rose-500">*</span>
+                    </Label>
+                    <CharCounter length={businessAddress.length} max={255} />
+                  </div>
                   <Input
                     type="text"
                     {...register("business_address")}
                     placeholder="Jl. Doank, Gg. Jadian, RT 11/ RW 02"
+                    maxLength={255}
                     className="h-9 text-xs bg-white text-slate-800 focus-visible:border-primary"
                   />
                   {errors.business_address && (
@@ -371,13 +395,17 @@ export function TracerStudyForm({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <Label className="block text-xs font-bold text-slate-800 tracking-wider mb-1.5">
-                      Username Instagram
-                    </Label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <Label className="block text-xs font-bold text-slate-800 tracking-wider">
+                        Username Instagram
+                      </Label>
+                      <CharCounter length={instagramHandle.length} max={255} />
+                    </div>
                     <Input
                       type="text"
                       {...register("instagram_handle")}
                       placeholder="@warungmakan_hjsanusi"
+                      maxLength={255}
                       className="h-9 text-xs bg-white text-slate-800 focus-visible:border-primary"
                     />
                   </div>
@@ -452,14 +480,18 @@ export function TracerStudyForm({
             {currentCareerStatus === "lanjut_studi" && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-1">
                 <div>
-                  <Label className="block text-xs font-bold text-slate-800 tracking-wider mb-1.5">
-                    Nama Perguruan Tinggi/Kampus{" "}
-                    <span className="text-rose-500">*</span>
-                  </Label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <Label className="block text-xs font-bold text-slate-800 tracking-wider">
+                      Nama Perguruan Tinggi/Kampus{" "}
+                      <span className="text-rose-500">*</span>
+                    </Label>
+                    <CharCounter length={universityName.length} max={255} />
+                  </div>
                   <Input
                     type="text"
                     {...register("university_name")}
                     placeholder="e.g Universitas -"
+                    maxLength={255}
                     className="h-9 text-xs bg-white text-slate-800 focus-visible:border-primary"
                   />
                   {errors.university_name && (
@@ -470,13 +502,17 @@ export function TracerStudyForm({
                 </div>
 
                 <div>
-                  <Label className="block text-xs font-bold text-slate-800 tracking-wider mb-1.5">
-                    Program Studi <span className="text-rose-500">*</span>
-                  </Label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <Label className="block text-xs font-bold text-slate-800 tracking-wider">
+                      Program Studi <span className="text-rose-500">*</span>
+                    </Label>
+                    <CharCounter length={studyProgram.length} max={255} />
+                  </div>
                   <Input
                     type="text"
                     {...register("study_program")}
                     placeholder="e.g Teknik Informatika"
+                    maxLength={255}
                     className="h-9 text-xs bg-white text-slate-800 focus-visible:border-primary"
                   />
                   {errors.study_program && (

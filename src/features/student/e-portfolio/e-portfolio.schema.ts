@@ -10,7 +10,10 @@ export const studentProfileSchema = z.object({
   fullName: z.string().optional(),
   nis: z.string().optional(),
   email: z.string().optional(),
-  phone: z.string().min(1, "Nomor WhatsApp aktif wajib diisi"),
+  phone: z
+    .string()
+    .min(1, "Nomor WhatsApp aktif wajib diisi")
+    .max(25, "Nomor WhatsApp maksimal 25 karakter"),
   majorId: z.number().optional(),
   classId: z.number().optional(),
   graduationYear: z.number().nullable().optional(),

@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Box, Span, Paragraph } from "@/components/custom";
+import { Box, Span, Paragraph, CharCounter } from "@/components/custom";
 import { cn } from "@/lib/utils";
 import type { DepartmentFormSchemaType } from "./departemen.schema";
 import { useDepartmentFormFields } from "./departemen.form";
@@ -15,20 +15,29 @@ interface DepartmentFormProps {
 export function DepartmentForm({ form }: DepartmentFormProps) {
   const {
     register,
+    watch,
     formState: { errors },
   } = form;
+
+  const watchedCode = watch("code") ?? "";
+  const watchedName = watch("name") ?? "";
+  const watchedDescription = watch("description") ?? "";
 
   const { isActive, handleToggleActive } = useDepartmentFormFields(form);
 
   return (
     <Box className="space-y-3 sm:space-y-4 py-1 sm:py-2">
-      <Box className="space-y-1">
-        <Label className="text-xs font-semibold text-slate-700">
-          Kode Departemen <Span className="text-rose-500">*</Span>
-        </Label>
+      <Box className="space-y-1.5">
+        <Box className="flex items-center justify-between">
+          <Label className="text-xs font-semibold text-slate-700">
+            Kode Departemen <Span className="text-rose-500">*</Span>
+          </Label>
+          <CharCounter length={watchedCode.length} max={20} />
+        </Box>
         <Input
           {...register("code")}
           placeholder="cth. TIK"
+          maxLength={20}
           className={cn(
             "h-10 w-full rounded-lg border bg-slate-50/70 px-3.5 text-sm uppercase text-slate-800 placeholder:text-slate-400 placeholder:normal-case focus-visible:bg-white focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all shadow-2xs",
             errors.code
@@ -43,13 +52,17 @@ export function DepartmentForm({ form }: DepartmentFormProps) {
         )}
       </Box>
 
-      <Box className="space-y-1">
-        <Label className="text-xs font-semibold text-slate-700">
-          Nama Departemen <Span className="text-rose-500">*</Span>
-        </Label>
+      <Box className="space-y-1.5">
+        <Box className="flex items-center justify-between">
+          <Label className="text-xs font-semibold text-slate-700">
+            Nama Departemen <Span className="text-rose-500">*</Span>
+          </Label>
+          <CharCounter length={watchedName.length} max={255} />
+        </Box>
         <Input
           {...register("name")}
           placeholder="cth. Teknologi Informasi dan Komunikasi"
+          maxLength={255}
           className={cn(
             "h-10 w-full rounded-lg border bg-slate-50/70 px-3.5 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:bg-white focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all shadow-2xs",
             errors.name
@@ -64,14 +77,17 @@ export function DepartmentForm({ form }: DepartmentFormProps) {
         )}
       </Box>
 
-      <Box className="space-y-1">
-        <Label className="text-xs font-semibold text-slate-700">
-          Deskripsi
-        </Label>
+      <Box className="space-y-1.5">
+        <Box className="flex items-center justify-between">
+          <Label className="text-xs font-semibold text-slate-700">
+            Deskripsi
+          </Label>
+          <CharCounter length={watchedDescription.length} max={1000} />
+        </Box>
         <Textarea
           {...register("description")}
           placeholder="Keterangan lingkup bidang keahlian..."
-          rows={3}
+          maxLength={1000}
           className={cn(
             "min-h-18 sm:min-h-24 w-full rounded-lg border bg-slate-50/70 px-3.5 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:bg-white focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all shadow-2xs resize-none",
             errors.description
