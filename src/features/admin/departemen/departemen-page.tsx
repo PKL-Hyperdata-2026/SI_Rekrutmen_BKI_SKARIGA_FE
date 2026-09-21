@@ -1,5 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { PageHeader, StatCard, DataTable } from "@/components/custom";
+import { PageHeader, StatCard, DataTable, Box } from "@/components/custom";
 import {
   Building2,
   Search,
@@ -10,171 +9,44 @@ import {
   Pencil,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { FilterSelect } from "@/components/custom/filter-select";
 import { Modal } from "@/components/custom/modal";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { toast } from "@/components/custom/sonner";
-import { departemenApi } from "./departemen.api";
-import { useDepartmentForm, toCreateDepartmentPayload } from "./departemen.form";
+import { Form } from "@/components/ui/form";
 import { DepartmentForm } from "./departemen-form";
-import { buildDepartmentColumns } from "./departemen-table";
-import type { DepartmentItem } from "./departemen.schema";
+import {
+  useDepartemen,
+  statusFilterOptions,
+  getDepartmentRowId,
+} from "./departemen.page";
 
 export function DepartemenPage() {
-  const [departments, setDepartments] = useState<DepartmentItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingDept, setEditingDept] = useState<DepartmentItem | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-
-  const [deleteDept, setDeleteDept] = useState<DepartmentItem | null>(null);
-  const [deleting, setDeleting] = useState(false);
-
-  const form = useDepartmentForm(editingDept);
-
-  const fetchDepartments = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params: Record<string, string | number> = { per_page: 50 };
-      if (search) params.search = search;
-      if (statusFilter !== "all") params.is_active = statusFilter === "active" ? 1 : 0;
-
-      const res = await departemenApi.getDepartments(params);
-      setDepartments(res.data?.data?.data || []);
-    } catch {
-      setDepartments([]);
-      toast.error("Gagal memuat data departemen.");
-    } finally {
-      setLoading(false);
-    }
-  }, [search, statusFilter]);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      fetchDepartments();
-    }, 300);
-    return () => clearTimeout(timeout);
-  }, [fetchDepartments]);
-
-  const handleOpenCreate = () => {
-    setEditingDept(null);
-    form.reset({
-      code: "",
-      name: "",
-      description: "",
-      is_active: true,
-    });
-    setIsFormOpen(true);
-  };
-
-  const handleOpenEdit = useCallback((item: DepartmentItem) => {
-    setEditingDept(item);
-    form.reset({
-      code: item.code,
-      name: item.name,
-      description: item.description || "",
-      is_active: item.isActive,
-    });
-    setIsFormOpen(true);
-  }, [form]);
-
-  const handleSubmitForm = form.handleSubmit(async (values) => {
-    setSubmitting(true);
-    try {
-      const payload = toCreateDepartmentPayload(values);
-
-      if (editingDept) {
-        await departemenApi.updateDepartment(editingDept.id, payload);
-        toast.success("Data departemen berhasil diperbarui.");
-      } else {
-        await departemenApi.createDepartment(payload);
-        toast.success("Departemen baru berhasil ditambahkan.");
-      }
-
-      setIsFormOpen(false);
-      fetchDepartments();
-    } catch (err: unknown) {
-      const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message || "Terjadi kesalahan saat menyimpan data departemen.";
-      toast.error(msg);
-    } finally {
-      setSubmitting(false);
-    }
-  });
-
-  const handleToggleActive = useCallback(async (dept: DepartmentItem) => {
-    try {
-      await departemenApi.toggleDepartmentActive(dept.id);
-      setDepartments((prev) =>
-        prev.map((item) =>
-          item.id === dept.id ? { ...item, isActive: !item.isActive } : item
-        )
-      );
-      toast.success(`Status departemen ${dept.name} berhasil diubah.`);
-    } catch {
-      toast.error("Gagal mengubah status aktif departemen.");
-    }
-  }, []);
-
-  const handleDelete = async () => {
-    if (!deleteDept) return;
-    setDeleting(true);
-    try {
-      await departemenApi.deleteDepartment(deleteDept.id);
-      toast.success(`Departemen ${deleteDept.name} berhasil dihapus.`);
-      setDeleteDept(null);
-      fetchDepartments();
-    } catch (err: unknown) {
-      const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message || "Gagal menghapus data departemen.";
-      toast.error(msg);
-    } finally {
-      setDeleting(false);
-    }
-  };
-
-  const totalCount = departments.length;
-  const activeCount = useMemo(
-    () => departments.filter((d) => d.isActive).length,
-    [departments]
-  );
-  const totalMajorsCount = useMemo(
-    () => departments.reduce((acc, curr) => acc + (curr.majorsCount || 0), 0),
-    [departments]
-  );
-
-  const columns = useMemo(
-    () =>
-      buildDepartmentColumns({
-        onToggleActive: handleToggleActive,
-        onEdit: handleOpenEdit,
-        onDelete: (item) => setDeleteDept(item),
-      }),
-    [handleToggleActive, handleOpenEdit]
-  );
+  const {
+    departments,
+    loading,
+    search,
+    handleSearchChange,
+    statusFilter,
+    setStatusFilter,
+    isFormOpen,
+    setIsFormOpen,
+    submitting,
+    form,
+    handleOpenCreate,
+    handleSubmitForm,
+    totalCount,
+    activeCount,
+    totalMajorsCount,
+    columns,
+    isEditing,
+    modalTitle,
+    modalDescription,
+    modalConfirmText,
+  } = useDepartemen();
 
   return (
-    <div className="space-y-6">
+    <Box className="space-y-6">
       <PageHeader
         variant="admin"
         title="Data Departemen"
@@ -189,51 +61,62 @@ export function DepartemenPage() {
         </PageHeader.Button>
       </PageHeader>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <Box className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           icon={Layers}
           color="purple"
           label="Total Departemen"
           value={totalCount}
+          className="rounded-lg"
         />
         <StatCard
           icon={CheckCircle2}
           color="teal"
           label="Departemen Aktif"
           value={activeCount}
+          className="rounded-lg"
         />
         <StatCard
           icon={GraduationCap}
           color="sky"
           label="Total Jurusan"
           value={totalMajorsCount}
+          className="rounded-lg"
         />
-      </div>
+      </Box>
 
-      <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/90 shadow-xs flex flex-col md:flex-row gap-4 justify-between items-center">
-        <div className="relative w-full md:w-80">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input
-            placeholder="Cari kode, nama departemen..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9.5 pr-4 bg-slate-50 border-slate-200 rounded-xl h-10 text-xs placeholder:text-slate-400 shadow-2xs"
-          />
-        </div>
+      <Card
+        size="sm"
+        className="theme-admin rounded-lg border border-slate-100! bg-white py-2! sm:py-2.5! px-3! sm:px-3.5! shadow-xs ring-0!"
+      >
+        <CardContent className="flex flex-col md:flex-row gap-3 sm:gap-4 justify-between items-center p-0! px-0! py-0! w-full">
+          <Box className="relative w-full md:w-80">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Cari kode, nama departemen..."
+              value={search}
+              onChange={handleSearchChange}
+              className="pl-9.5 pr-4 bg-slate-50/70 border-slate-200 rounded-lg h-10 text-xs text-slate-800 placeholder:text-slate-400 focus-visible:bg-white focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all shadow-2xs"
+            />
+          </Box>
 
-        <div className="flex w-full md:w-auto items-center gap-3">
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full md:w-36 h-10 rounded-xl bg-slate-50 border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all" className="text-xs">Semua Status</SelectItem>
-              <SelectItem value="active" className="text-xs">Aktif</SelectItem>
-              <SelectItem value="inactive" className="text-xs">Nonaktif</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+          <Box className="flex w-full md:w-auto items-center gap-3">
+            <Badge
+              variant="outline"
+              className="relative flex items-center h-10 w-full sm:w-44 rounded-lg border-primary/30 bg-primary/5 hover:border-primary/50 transition-colors shadow-2xs cursor-pointer p-0 font-normal text-foreground [&>div]:w-full [&>div]:h-full"
+            >
+              <CheckCircle2 className="size-4 text-primary shrink-0 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+              <FilterSelect
+                role="admin"
+                value={statusFilter}
+                onValueChange={setStatusFilter}
+                options={statusFilterOptions}
+                className="w-full! h-full! pl-9.5! pr-3.5! rounded-lg! bg-transparent! text-foreground! border-none! shadow-none! text-xs! sm:text-[13px]! font-normal! hover:bg-transparent! [&_svg]:text-primary! [&_svg]:size-4! cursor-pointer gap-2! justify-between!"
+              />
+            </Badge>
+          </Box>
+        </CardContent>
+      </Card>
 
       <DataTable
         columns={columns}
@@ -242,7 +125,8 @@ export function DepartemenPage() {
         emptyMessage="Tidak ada departemen yang ditemukan"
         emptyDescription="Silakan tambahkan departemen baru atau sesuaikan kata kunci pencarian"
         emptyIcon={<Building2 className="h-8 w-8 text-slate-400" />}
-        getRowId={(dept) => String(dept.id)}
+        getRowId={getDepartmentRowId}
+        className="rounded-lg"
       />
 
       <Modal
@@ -250,48 +134,26 @@ export function DepartemenPage() {
         onOpenChange={setIsFormOpen}
         variant="admin"
         size="md"
-        headerIcon={editingDept ? <Pencil className="h-5 w-5" /> : <Building2 className="h-5 w-5" />}
-        title={editingDept ? "Edit Departemen" : "Tambah Departemen Baru"}
-        description={
-          editingDept
-            ? "Perbarui informasi dan deskripsi bidang keahlian departemen."
-            : "Lengkapi data departemen baru sebagai induk program keahlian/jurusan."
+        className="rounded-lg [&_[data-slot=dialog-description]]:!  w-auto **:data-[slot=dialog-description]:pr-10"
+        headerIcon={
+          isEditing ? (
+            <Pencil className="h-5 w-5" />
+          ) : (
+            <Building2 className="h-5 w-5" />
+          )
         }
-        confirmText={editingDept ? "Perbarui Departemen" : "Simpan Departemen"}
+        title={modalTitle}
+        description={modalDescription}
+        confirmText={modalConfirmText}
         cancelText="Batal"
         isLoading={submitting}
         onConfirm={handleSubmitForm}
       >
-        <form onSubmit={handleSubmitForm}>
+        <Form onSubmit={handleSubmitForm} className="space-y-0">
           <DepartmentForm form={form} />
-        </form>
+        </Form>
       </Modal>
-
-      <AlertDialog open={!!deleteDept} onOpenChange={(open) => !open && setDeleteDept(null)}>
-        <AlertDialogContent className="rounded-3xl p-6 sm:p-7 border-none shadow-xl bg-white">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="font-bold text-lg text-slate-900">
-              Hapus Departemen
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-xs sm:text-sm text-slate-500 leading-relaxed mt-1">
-              Apakah Anda yakin ingin menghapus data departemen <strong className="text-slate-900 font-semibold">{deleteDept?.name}</strong>? Tindakan ini tidak dapat dibatalkan jika masih memiliki jurusan terkait.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="mt-5 border-none bg-transparent p-0 flex-row justify-end gap-2.5">
-            <AlertDialogCancel className="h-10 rounded-xl px-5 border-slate-200 text-slate-700 hover:bg-slate-100 font-medium cursor-pointer">
-              Batal
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              disabled={deleting}
-              className="h-10 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl px-5 cursor-pointer shadow-sm"
-            >
-              {deleting ? "Menghapus..." : "Ya, Hapus Departemen"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+    </Box>
   );
 }
 

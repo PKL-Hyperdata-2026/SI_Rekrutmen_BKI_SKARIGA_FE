@@ -69,6 +69,7 @@ frontend/src/
 │   │   ├── metric-card.tsx
 │   │   ├── modal.tsx
 │   │   ├── page-header.tsx
+│   │   ├── paragraph.tsx
 │   │   ├── pill-table-header.tsx
 │   │   ├── searchable-select.tsx
 │   │   ├── section-card.tsx

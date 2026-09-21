@@ -1,7 +1,12 @@
 import type { UseFormReturn } from "react-hook-form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Box, Span, Paragraph } from "@/components/custom";
+import { cn } from "@/lib/utils";
 import type { DepartmentFormSchemaType } from "./departemen.schema";
+import { useDepartmentFormFields } from "./departemen.form";
 
 interface DepartmentFormProps {
   form: UseFormReturn<DepartmentFormSchemaType>;
@@ -10,67 +15,87 @@ interface DepartmentFormProps {
 export function DepartmentForm({ form }: DepartmentFormProps) {
   const {
     register,
-    watch,
-    setValue,
     formState: { errors },
   } = form;
 
-  const isActive = watch("is_active");
+  const { isActive, handleToggleActive } = useDepartmentFormFields(form);
 
   return (
-    <div className="space-y-4 py-2">
-      <div className="space-y-1.5">
-        <label className="text-xs font-bold text-slate-700">
-          Kode Departemen <span className="text-rose-500">*</span>
-        </label>
+    <Box className="space-y-4 py-2">
+      <Box className="space-y-1.5">
+        <Label className="text-xs font-semibold text-slate-700">
+          Kode Departemen <Span className="text-rose-500">*</Span>
+        </Label>
         <Input
           {...register("code")}
-          placeholder="cth. TIK, MESIN, ELEKTRO"
-          className="h-10 rounded-xl uppercase"
+          placeholder="cth. TIK"
+          className={cn(
+            "h-10 w-full rounded-lg border bg-slate-50/70 px-3.5 text-sm uppercase text-slate-800 placeholder:text-slate-400 placeholder:normal-case focus-visible:bg-white focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all shadow-2xs",
+            errors.code
+              ? "border-rose-500 bg-rose-50/20 focus-visible:border-rose-500 focus-visible:ring-rose-500/20"
+              : "border-slate-200",
+          )}
         />
         {errors.code && (
-          <p className="text-xs text-rose-500 font-medium">{errors.code.message}</p>
+          <Paragraph className="text-[11px] font-medium text-rose-500">
+            {errors.code.message}
+          </Paragraph>
         )}
-      </div>
+      </Box>
 
-      <div className="space-y-1.5">
-        <label className="text-xs font-bold text-slate-700">
-          Nama Departemen <span className="text-rose-500">*</span>
-        </label>
+      <Box className="space-y-1.5">
+        <Label className="text-xs font-semibold text-slate-700">
+          Nama Departemen <Span className="text-rose-500">*</Span>
+        </Label>
         <Input
           {...register("name")}
           placeholder="cth. Teknologi Informasi dan Komunikasi"
-          className="h-10 rounded-xl"
+          className={cn(
+            "h-10 w-full rounded-lg border bg-slate-50/70 px-3.5 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:bg-white focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all shadow-2xs",
+            errors.name
+              ? "border-rose-500 bg-rose-50/20 focus-visible:border-rose-500 focus-visible:ring-rose-500/20"
+              : "border-slate-200",
+          )}
         />
         {errors.name && (
-          <p className="text-xs text-rose-500 font-medium">{errors.name.message}</p>
+          <Paragraph className="text-[11px] font-medium text-rose-500">
+            {errors.name.message}
+          </Paragraph>
         )}
-      </div>
+      </Box>
 
-      <div className="space-y-1.5">
-        <label className="text-xs font-bold text-slate-700">Deskripsi</label>
-        <textarea
+      <Box className="space-y-1.5">
+        <Label className="text-xs font-semibold text-slate-700">
+          Deskripsi
+        </Label>
+        <Textarea
           {...register("description")}
           placeholder="Keterangan lingkup bidang keahlian..."
-          className="w-full rounded-xl border border-slate-200 bg-transparent px-3 py-2 text-sm shadow-2xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary min-h-24"
+          className={cn(
+            "min-h-24 w-full rounded-lg border bg-slate-50/70 px-3.5 py-2.5 text-sm text-slate-800 placeholder:text-slate-400 focus-visible:bg-white focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all shadow-2xs resize-none",
+            errors.description
+              ? "border-rose-500 bg-rose-50/20 focus-visible:border-rose-500 focus-visible:ring-rose-500/20"
+              : "border-slate-200",
+          )}
         />
         {errors.description && (
-          <p className="text-xs text-rose-500 font-medium">{errors.description.message}</p>
+          <Paragraph className="text-[11px] font-medium text-rose-500">
+            {errors.description.message}
+          </Paragraph>
         )}
-      </div>
+      </Box>
 
-      <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200">
-        <div className="space-y-0.5">
-          <div className="text-xs font-bold text-slate-800">Status Aktif</div>
-          <div className="text-xs text-slate-400">
+      <Box className="flex items-center justify-between p-3.5 rounded-lg bg-slate-50/70 border border-slate-200/90 transition-colors">
+        <Box className="space-y-0.5">
+          <Box className="text-xs font-semibold text-slate-800">
+            Status Aktif
+          </Box>
+          <Box className="text-xs text-slate-400">
             Departemen aktif dapat dipilih saat registrasi dan pemetaan jurusan.
-          </div>
-        </div>
-        <Switch
-          checked={isActive}
-          onCheckedChange={(checked) => setValue("is_active", checked)}
-        />
-      </div>
-    </div>
+          </Box>
+        </Box>
+        <Switch checked={isActive} onCheckedChange={handleToggleActive} />
+      </Box>
+    </Box>
   );
 }

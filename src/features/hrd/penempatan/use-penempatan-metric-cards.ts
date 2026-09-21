@@ -97,7 +97,7 @@ export function usePenempatanMetricCards(
           icon: "text-[#8D1D96]",
           value: "text-[#8D1D96]",
           container:
-            "bg-[#FDF2F8]/60 border-[#D069D7]/30 hover:border-[#8D1D96]/50 shadow-xs",
+            "hover:bg-[#FDF2F8]/60 hover:border-[#8D1D96]/50 hover:shadow-sm",
         },
       },
       {

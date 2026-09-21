@@ -22,3 +22,4 @@ export * from "./text-editor/heading-dropdown";
 export * from "./box";
 export * from "./span";
 export * from "./char-counter";
+export * from "./paragraph";
