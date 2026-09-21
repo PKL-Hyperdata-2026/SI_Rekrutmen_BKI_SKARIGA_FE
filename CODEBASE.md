@@ -1,6 +1,6 @@
 # Frontend Codebase Reference (React 19 + TypeScript + Vite)
 
-Deep, factual reference for AI agents and developers. **Last verified: 2026-09-19.**
+Deep, factual reference for AI agents and developers. **Last verified: 2026-09-21.**
 If you modify code that alters any architecture, feature modules, state slices, or routes documented here, update this file in the same change.
 Operational instructions & boundaries: [`AGENTS.md`](./AGENTS.md).
 
@@ -17,6 +17,7 @@ Operational instructions & boundaries: [`AGENTS.md`](./AGENTS.md).
 | State Management    | Redux Toolkit         | Central store (`src/store/index.ts`) & auth slice          |
 | Routing             | React Router v7       | Declarative routing with layout wrappers (`src/route.tsx`) |
 | HTTP Client         | Axios                 | Configured instance with interceptors (`src/api/axios.ts`) |
+| Real-time & Sockets | Laravel Echo & Pusher | WebSocket event subscription (`laravel-echo`, `pusher-js`) |
 | Forms & Validation  | React Hook Form + Zod | Schema-based form state and validation resolvers           |
 | Tables & Data       | TanStack React Table  | Headless datatables with sorting, pagination, & filtering  |
 | Rich Text Editor    | TipTap                | Modular rich text editor suite (`@tiptap/react`)           |
@@ -51,14 +52,16 @@ frontend/src/
 ├── assets/                                      # Static assets, logos, illustration SVGs
 ├── components/
 │   ├── custom/                                  # Global reusable composite components
+│   │   ├── table/                               # DataTable composite sub-components
+│   │   │   ├── data-table-delete.tsx
+│   │   │   ├── data-table-pagination.tsx
+│   │   │   └── pill-table-header.tsx
 │   │   ├── text-editor/                         # Rich text editor suite
 │   │   │   ├── heading-dropdown.tsx
-│   │   │   ├── rich-text-editor.tsx
 │   │   │   └── rich-text-toolbar.tsx
 │   │   ├── app-sidebar.tsx
 │   │   ├── async-searchable-select.tsx
-│   │   ├── box.tsx
-│   │   ├── data-table-pagination.tsx
+│   │   ├── char-counter.tsx
 │   │   ├── data-table.tsx
 │   │   ├── date-picker.tsx
 │   │   ├── date-range-picker.tsx
@@ -69,15 +72,14 @@ frontend/src/
 │   │   ├── metric-card.tsx
 │   │   ├── modal.tsx
 │   │   ├── page-header.tsx
-│   │   ├── paragraph.tsx
-│   │   ├── pill-table-header.tsx
+│   │   ├── primitives.tsx
+│   │   ├── rich-text-editor.tsx
 │   │   ├── searchable-select.tsx
 │   │   ├── section-card.tsx
 │   │   ├── sidebar-cutout.tsx
 │   │   ├── sidebar-icon.tsx
 │   │   ├── sidebar-menu-item.tsx
 │   │   ├── sonner.tsx
-│   │   ├── span.tsx
 │   │   ├── stat-card.tsx
 │   │   └── topbar.tsx
 │   └── ui/                                      # Shadcn UI / Radix UI primitives (button, card, dialog, input, etc.)
@@ -113,6 +115,7 @@ frontend/src/
 │   │   ├── validasi-presensi/                   # pages/validasi-presensi-page.tsx, components/, hooks/, types/
 │   │   └── route.tsx                            # Admin sub-routes
 │   └── hrd/                                     # Corporate HRD portal module
+│       ├── dashboard/                           # dashboard-page.tsx, metric-cards, status-lowongan, berkas, pelamar
 │       ├── lowongan/                            # lowongan-page.tsx, form, list, card, status-badge, api, schema, form, hooks (Production)
 │       ├── penempatan/                          # penempatan-page.tsx, form, table, metric-cards, update-form, api, schema, form, hooks (Production)
 │       ├── hasil/                               # pages/hasil-page.tsx (Placeholder stub view)
@@ -121,6 +124,8 @@ frontend/src/
 │       └── route.tsx                            # HRD sub-routes
 ├── hooks/                                       # Global reusable React hooks
 │   ├── use-app.ts
+│   ├── use-data-table-delete.ts
+│   ├── use-debounce.ts
 │   ├── use-heading-dropdown.ts
 │   ├── use-mobile.ts
 │   ├── use-notification.ts
