@@ -4,6 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
+import oxlint from 'eslint-plugin-oxlint'
 
 export default defineConfig([
   globalIgnores(['dist']),
@@ -19,4 +20,5 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  ...oxlint.configs['flat/recommended'],
 ])

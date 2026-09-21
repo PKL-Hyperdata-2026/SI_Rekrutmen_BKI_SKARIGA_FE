@@ -17,7 +17,7 @@ export type MetricCardColor =
   | "custom";
 
 const metricCardVariants = cva(
-  "relative flex flex-col justify-between rounded-xl p-4 sm:p-5 transition-all duration-200 text-left w-full select-none",
+  "relative flex flex-col justify-between rounded-xl p-4 sm:p-5 transition-all duration-200 motion-reduce:transition-none text-left w-full select-none",
   {
     variants: {
       color: {
@@ -38,7 +38,7 @@ const metricCardVariants = cva(
         false: "bg-white border border-slate-200/80 shadow-xs",
       },
       isClickable: {
-        true: "cursor-pointer active:scale-[0.99]",
+        true: "cursor-pointer active:scale-[0.99] motion-reduce:active:scale-100",
         false: "",
       },
     },
@@ -174,6 +174,7 @@ export interface MetricCardProps
   valueClassName?: string;
   iconClassName?: string;
   isActive?: boolean;
+  ariaPressed?: boolean;
   onClick?: () => void;
 }
 
@@ -189,6 +190,7 @@ export function MetricCard({
   valueClassName,
   iconClassName,
   isActive = false,
+  ariaPressed,
   onClick,
   className,
   ...props
@@ -208,6 +210,7 @@ export function MetricCard({
     <div
       role={isClickable ? "button" : undefined}
       tabIndex={isClickable ? 0 : undefined}
+      aria-pressed={isClickable ? (ariaPressed ?? isActive) : undefined}
       onClick={onClick}
       onKeyDown={
         isClickable

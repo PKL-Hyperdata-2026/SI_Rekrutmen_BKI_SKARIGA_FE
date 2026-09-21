@@ -120,7 +120,7 @@ frontend/src/
 │       ├── penempatan/                          # penempatan-page.tsx, form, table, metric-cards, update-form, api, schema, form, hooks (Production)
 │       ├── hasil/                               # hasil-page.tsx, hasil-table.tsx, hasil-metric-cards.tsx, hasil-modal.tsx, api, schema, form (Production)
 │       ├── jadwal/                              # pages/jadwal-page.tsx (Placeholder stub view)
-│       ├── review/                              # pages/review-page.tsx (Placeholder stub view)
+│       ├── review/                              # review-page.tsx, review.schema.ts, review.api.ts, review.status.ts, review.form.ts, use-review-page.ts, components (Production)
 │       └── route.tsx                            # HRD sub-routes
 ├── hooks/                                       # Global reusable React hooks
 │   ├── use-app.ts
