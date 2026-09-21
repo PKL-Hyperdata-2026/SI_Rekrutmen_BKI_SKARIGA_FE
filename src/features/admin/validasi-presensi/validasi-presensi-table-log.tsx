@@ -142,6 +142,31 @@ function useValidasiPresensiTableLogColumns({
         },
       },
       {
+        header: "VALIDATOR",
+        align: "center",
+        headerClassName:
+          "text-center whitespace-nowrap px-2 2xl:px-4 select-none",
+        className: "text-center whitespace-nowrap px-2 2xl:px-4 cursor-default",
+        cell: (row) => {
+          const isHrd = row.validation.validatedByRole === "hrd";
+          return (
+            <CardContent className="flex justify-center p-0 cursor-default">
+              <Badge
+                variant="outline"
+                className={cn(
+                  "rounded-full px-2.5 py-0.5 text-[11px] font-semibold inline-flex items-center shadow-none whitespace-nowrap cursor-default",
+                  isHrd
+                    ? "bg-purple-50 text-purple-700 border-purple-200"
+                    : "bg-teal-50 text-teal-700 border-teal-200",
+                )}
+              >
+                {isHrd ? "HRD Perusahaan" : "Panitia BKK"}
+              </Badge>
+            </CardContent>
+          );
+        },
+      },
+      {
         header: "TINDAK LANJUT SISTEM",
         align: "left",
         headerClassName:

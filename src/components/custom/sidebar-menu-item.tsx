@@ -77,7 +77,7 @@ export const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
           <TooltipTrigger asChild>{linkElement}</TooltipTrigger>
           <TooltipContent
             side="right"
-            sideOffset={14}
+            sideOffset={-10}
             className="text-xs font-semibold text-white bg-slate-900/95 border-slate-800 shadow-md py-1.5 px-3 rounded-lg"
           >
             {menu.name}

@@ -46,6 +46,7 @@ export const attendanceValidationSchema = z.object({
   status: z.string(),
   validatedAt: z.string().nullable().optional(),
   validatedByName: z.string().nullable().optional(),
+  validatedByRole: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
   systemAction: z.string().nullable().optional(),
 });

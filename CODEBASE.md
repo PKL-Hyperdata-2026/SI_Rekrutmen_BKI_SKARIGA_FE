@@ -118,7 +118,7 @@ frontend/src/
 │       ├── dashboard/                           # dashboard-page.tsx, metric-cards, status-lowongan, berkas, pelamar
 │       ├── lowongan/                            # lowongan-page.tsx, form, list, card, status-badge, api, schema, form, hooks (Production)
 │       ├── penempatan/                          # penempatan-page.tsx, form, table, metric-cards, update-form, api, schema, form, hooks (Production)
-│       ├── hasil/                               # pages/hasil-page.tsx (Placeholder stub view)
+│       ├── hasil/                               # hasil-page.tsx, hasil-table.tsx, hasil-metric-cards.tsx, hasil-modal.tsx, api, schema, form (Production)
 │       ├── jadwal/                              # pages/jadwal-page.tsx (Placeholder stub view)
 │       ├── review/                              # pages/review-page.tsx (Placeholder stub view)
 │       └── route.tsx                            # HRD sub-routes
