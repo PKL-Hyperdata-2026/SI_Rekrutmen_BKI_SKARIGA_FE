@@ -156,5 +156,3 @@ export function DepartemenPage() {
     </Box>
   );
 }
-
-export const DataDepartemenPage = DepartemenPage;

@@ -15,9 +15,11 @@ interface UseDepartmentFormModalProps {
   onSuccess: () => void;
 }
 
+const departmentFormResolver = zodResolver(departmentFormSchema);
+
 export function useDepartmentForm(department?: DepartmentItem | null) {
   return useForm<DepartmentFormSchemaType>({
-    resolver: zodResolver(departmentFormSchema),
+    resolver: departmentFormResolver,
     defaultValues: {
       code: department?.code || "",
       name: department?.name || "",

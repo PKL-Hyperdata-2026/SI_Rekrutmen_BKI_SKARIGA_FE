@@ -22,35 +22,20 @@ export interface UseDataTableDeleteReturn {
 }
 
 function formatPopoverTitle(title?: string, itemName?: string): string {
-  if (title && title.trim().length > 0) {
-    const trimmed = title.trim();
-    if (trimmed.endsWith("?")) {
-      return trimmed;
-    }
-    if (trimmed.endsWith(" ini")) {
-      return `${trimmed}?`;
-    }
-    if (trimmed.startsWith("Hapus ")) {
-      return `${trimmed} ini?`;
-    }
-    return `Hapus ${trimmed} ini?`;
+  const target = (title || itemName)?.trim();
+  if (!target) {
+    return "Hapus data ini?";
   }
-
-  if (itemName && itemName.trim().length > 0) {
-    const trimmed = itemName.trim();
-    if (trimmed.endsWith("?")) {
-      return trimmed;
-    }
-    if (trimmed.endsWith(" ini")) {
-      return `${trimmed}?`;
-    }
-    if (trimmed.startsWith("Hapus ")) {
-      return `${trimmed} ini?`;
-    }
-    return `Hapus ${trimmed} ini?`;
+  if (target.endsWith("?")) {
+    return target;
   }
-
-  return "Hapus data ini?";
+  if (target.endsWith(" ini")) {
+    return `${target}?`;
+  }
+  if (target.startsWith("Hapus ")) {
+    return `${target} ini?`;
+  }
+  return `Hapus ${target} ini?`;
 }
 
 export function useDataTableDelete(
@@ -62,6 +47,10 @@ export function useDataTableDelete(
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
+    if (!open) {
+      return;
+    }
+
     const handleCloseOthers = (e: Event) => {
       if (
         e instanceof CustomEvent &&
@@ -79,7 +68,7 @@ export function useDataTableDelete(
     return () => {
       window.removeEventListener(DATA_TABLE_DELETE_EVENT, handleCloseOthers);
     };
-  }, [id]);
+  }, [id, open]);
 
   const handleOpenChange = useCallback(
     (nextOpen: boolean) => {

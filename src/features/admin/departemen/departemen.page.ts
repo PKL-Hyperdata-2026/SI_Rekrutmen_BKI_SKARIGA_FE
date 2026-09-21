@@ -124,14 +124,17 @@ export function useDepartemen() {
   );
 
   const totalCount = departments.length;
-  const activeCount = useMemo(
-    () => departments.filter((d) => d.isActive).length,
-    [departments],
-  );
-  const totalMajorsCount = useMemo(
-    () => departments.reduce((acc, curr) => acc + (curr.majorsCount || 0), 0),
-    [departments],
-  );
+  const { activeCount, totalMajorsCount } = useMemo(() => {
+    let active = 0;
+    let majors = 0;
+    for (const d of departments) {
+      if (d.isActive) {
+        active++;
+      }
+      majors += d.majorsCount || 0;
+    }
+    return { activeCount: active, totalMajorsCount: majors };
+  }, [departments]);
 
   const columns = useMemo(
     () =>

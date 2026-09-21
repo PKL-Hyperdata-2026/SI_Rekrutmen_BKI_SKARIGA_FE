@@ -41,6 +41,8 @@ export function isApiCancel(error: unknown): boolean {
   return axios.isCancel(error);
 }
 
+const departmentItemArraySchema = departmentItemSchema.array();
+
 export const departemenApi = {
   getDepartments: async (
     params?: DepartmentQueryParams,
@@ -51,7 +53,7 @@ export const departemenApi = {
       { params, signal },
     );
     const rawItems = response.data?.data?.data ?? [];
-    const parsed = departmentItemSchema.array().safeParse(rawItems);
+    const parsed = departmentItemArraySchema.safeParse(rawItems);
     return parsed.success ? parsed.data : [];
   },
 
@@ -60,7 +62,7 @@ export const departemenApi = {
       ApiResponse<{ departments?: DepartmentItem[] }>
     >("/admin/departments/options");
     const rawItems = response.data?.data?.departments ?? [];
-    const parsed = departmentItemSchema.array().safeParse(rawItems);
+    const parsed = departmentItemArraySchema.safeParse(rawItems);
     return parsed.success ? parsed.data : [];
   },
 
