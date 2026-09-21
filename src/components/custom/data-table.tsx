@@ -227,7 +227,7 @@ export function DataTable<T>({
   return (
     <div
       className={cn(
-        "w-full bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden",
+        "w-full bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden cursor-default",
         className,
       )}
     >

@@ -22,6 +22,7 @@ export function buildDepartmentColumns(
     {
       header: "KODE",
       align: "left",
+      className: "whitespace-nowrap w-24",
       cell: (item) => (
         <Span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold border border-slate-200 bg-slate-50 text-slate-700 shadow-2xs">
           <Building2 className="h-3.5 w-3.5 text-slate-500" />
@@ -32,19 +33,14 @@ export function buildDepartmentColumns(
     {
       header: "NAMA DEPARTEMEN",
       align: "left",
+      className: "min-w-0 max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg",
       cell: (item) => (
-        <Box className="min-w-0 max-w-xs md:max-w-sm py-1">
-          <Box
-            className="font-bold text-slate-900 text-sm leading-snug truncate"
-            title={item.name}
-          >
+        <Box className="min-w-0 max-w-xs md:max-w-sm lg:max-w-md xl:max-w-lg py-1">
+          <Box className="font-bold text-slate-900 text-sm leading-snug truncate">
             {item.name}
           </Box>
           {item.description && (
-            <Box
-              className="text-xs text-slate-500 mt-0.5 truncate"
-              title={item.description}
-            >
+            <Box className="text-xs text-slate-500 mt-0.5 truncate">
               {item.description}
             </Box>
           )}
@@ -54,9 +50,10 @@ export function buildDepartmentColumns(
     {
       header: "KONSENTRASI JURUSAN",
       align: "center",
+      className: "whitespace-nowrap w-56",
       cell: (item) => (
         <Box className="flex items-center justify-center">
-          <Box className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-sky-50 border border-sky-200 text-xs font-semibold text-sky-700 shadow-2xs">
+          <Box className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-sky-50 border border-sky-200 text-xs font-semibold text-sky-700 shadow-2xs whitespace-nowrap shrink-0">
             <GraduationCap className="h-3.5 w-3.5 text-sky-600" />
             <Span>{item.majorsCount ?? 0} Program Keahlian</Span>
           </Box>
@@ -66,6 +63,7 @@ export function buildDepartmentColumns(
     {
       header: "STATUS",
       align: "center",
+      className: "whitespace-nowrap w-24",
       cell: (item) => (
         <Box className="flex items-center justify-center">
           <Switch
@@ -78,6 +76,7 @@ export function buildDepartmentColumns(
     {
       header: "AKSI",
       align: "center",
+      className: "whitespace-nowrap w-28",
       cell: (item) => (
         <Box className="flex items-center justify-center gap-2">
           <Button

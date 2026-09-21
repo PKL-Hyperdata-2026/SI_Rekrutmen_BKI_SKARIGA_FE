@@ -167,9 +167,9 @@ export function Topbar() {
   };
 
   return (
-    <div className="sticky top-0 z-30 pt-3 pb-1 px-4 lg:px-6 w-full bg-transparent transition-all pointer-events-none">
-      <header className="flex h-13 sm:h-14 shrink-0 items-center justify-between gap-3 rounded-xl bg-white px-3 sm:px-4 w-full shadow-md border border-slate-100 pointer-events-auto">
-        <div className="flex items-center flex-1 gap-2.5">
+    <div className="sticky top-0 z-30 pt-3 pb-1 px-3.5 sm:px-4 md:px-6 w-full max-w-full min-w-0 bg-transparent transition-all pointer-events-none">
+      <header className="flex h-13 sm:h-14 shrink-0 items-center justify-between gap-2 sm:gap-3 rounded-xl bg-white px-2.5 sm:px-4 w-full max-w-full shadow-md border border-slate-100 pointer-events-auto">
+        <div className="flex items-center flex-1 gap-2.5 min-w-0">
           <button
             onClick={toggleSidebar}
             aria-label="Buka Menu"
@@ -245,7 +245,7 @@ export function Topbar() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <button
             aria-label="Pesan"
             className="relative h-8 w-8 flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:text-primary hover:bg-slate-50 hover:border-slate-300 transition-colors shadow-2xs cursor-pointer shrink-0"
