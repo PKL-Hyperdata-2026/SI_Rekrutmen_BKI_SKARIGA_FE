@@ -2,10 +2,13 @@ import { EditorContent } from "@tiptap/react";
 import { cn } from "@/lib/utils";
 import { useRichTextEditor } from "@/hooks/use-rich-text-editor";
 import { RichTextToolbar } from "./text-editor/rich-text-toolbar";
-import {
-  type RichTextRole,
-  roleThemeClasses,
-} from "./text-editor/rich-text-theme";
+export type RichTextRole = "admin" | "siswa" | "hrd";
+
+export const roleThemeClasses: Record<RichTextRole, string> = {
+  admin: "theme-admin",
+  siswa: "theme-siswa",
+  hrd: "theme-hrd",
+};
 
 export interface RichTextEditorProps {
   value?: string;
@@ -132,5 +135,3 @@ export function RichTextContent({
 }
 
 RichTextEditor.Content = RichTextContent;
-
-export { type RichTextRole, roleThemeClasses };

@@ -20,6 +20,5 @@ export * from "./async-searchable-select";
 export * from "./rich-text-editor";
 export * from "./text-editor/rich-text-toolbar";
 export * from "./text-editor/heading-dropdown";
-export * from "./text-editor/rich-text-theme";
 export * from "./primitives";
 export * from "./char-counter";
