@@ -92,7 +92,7 @@ export function buildDepartmentColumns(
           <DataTableDeleteButton
             itemName={item.name}
             title="Hapus Departemen ini?"
-            description="Tindakan tidak dapat dibatalkan jika departemen memiliki jurusan terkait."
+            description="Tindakan tidak dapat dibatalkan."
             buttonTitle="Hapus Departemen"
             className="border-rose-200/80 bg-rose-50/70 text-rose-600 hover:bg-rose-100 hover:text-rose-700 shadow-2xs"
             onConfirm={() => handlers.onDelete(item)}

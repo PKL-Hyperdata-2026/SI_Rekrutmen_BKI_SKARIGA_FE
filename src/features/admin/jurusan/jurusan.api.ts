@@ -1,65 +1,114 @@
+import axios from "axios";
 import { api } from "@/api/axios";
-import type { MajorItem, MajorOptionsData } from "./jurusan.schema";
+import {
+  majorItemSchema,
+  majorOptionsDataSchema,
+  majorPaginatedResponseSchema,
+  type MajorItem,
+  type MajorOptionsData,
+  type MajorQueryParams,
+  type MajorPaginatedResponse,
+  type MajorPayload,
+} from "./jurusan.schema";
+
+interface ApiResponse<T> {
+  success: boolean;
+  message?: string;
+  data: T;
+}
+
+function isRecord(val: unknown): val is Record<string, unknown> {
+  return typeof val === "object" && val !== null;
+}
+
+export function extractApiErrorMessage(
+  error: unknown,
+  fallback: string,
+): string {
+  if (axios.isAxiosError(error) && isRecord(error.response?.data)) {
+    const message = error.response.data.message;
+    if (typeof message === "string") {
+      return message;
+    }
+  }
+  return fallback;
+}
+
+export function isApiCancel(error: unknown): boolean {
+  return axios.isCancel(error);
+}
 
 export const jurusanApi = {
-  getMajors: (params?: {
-    search?: string;
-    department_id?: string | number;
-    is_active?: string | number;
-    sort_by?: string;
-    sort_dir?: string;
-    per_page?: number;
-    page?: number;
-  }) =>
-    api.get<{
-      success: boolean;
-      message?: string;
-      data: {
-        data: MajorItem[];
-        current_page?: number;
-        last_page?: number;
-        total?: number;
-      };
-    }>("/admin/majors", { params }),
+  getMajors: async (
+    params?: MajorQueryParams,
+    signal?: AbortSignal,
+  ): Promise<MajorPaginatedResponse> => {
+    const response = await api.get<ApiResponse<MajorPaginatedResponse>>(
+      "/admin/majors",
+      { params, signal },
+    );
+    const parsed = majorPaginatedResponseSchema.safeParse(response.data?.data);
+    return parsed.success
+      ? parsed.data
+      : {
+          data: [],
+          current_page: 1,
+          last_page: 1,
+          total: 0,
+        };
+  },
 
-  getMajorOptions: () =>
-    api.get<{
-      success: boolean;
-      message?: string;
-      data: MajorOptionsData;
-    }>("/admin/majors/options"),
+  getMajorOptions: async (): Promise<MajorOptionsData> => {
+    const response = await api.get<ApiResponse<MajorOptionsData>>(
+      "/admin/majors/options",
+    );
+    const parsed = majorOptionsDataSchema.safeParse(response.data?.data);
+    return parsed.success ? parsed.data : { departments: [] };
+  },
 
-  getMajor: (id: number | string) =>
-    api.get<{
-      success: boolean;
-      message?: string;
-      data: MajorItem;
-    }>(`/admin/majors/${id}`),
+  getMajor: async (id: number | string): Promise<MajorItem> => {
+    const response = await api.get<ApiResponse<MajorItem>>(
+      `/admin/majors/${encodeURIComponent(String(id))}`,
+    );
+    const parsed = majorItemSchema.safeParse(response.data?.data);
+    return parsed.success ? parsed.data : response.data.data;
+  },
 
-  createMajor: (payload: Record<string, unknown>) =>
-    api.post<{
-      success: boolean;
-      message?: string;
-      data: MajorItem;
-    }>("/admin/majors", payload),
+  createMajor: async (payload: MajorPayload): Promise<MajorItem> => {
+    const response = await api.post<ApiResponse<MajorItem>>(
+      "/admin/majors",
+      payload,
+    );
+    const parsed = majorItemSchema.safeParse(response.data?.data);
+    return parsed.success ? parsed.data : response.data.data;
+  },
 
-  updateMajor: (id: number | string, payload: Record<string, unknown>) =>
-    api.put<{
-      success: boolean;
-      message?: string;
-      data: MajorItem;
-    }>(`/admin/majors/${id}`, payload),
+  updateMajor: async (
+    id: number | string,
+    payload: MajorPayload,
+  ): Promise<MajorItem> => {
+    const response = await api.put<ApiResponse<MajorItem>>(
+      `/admin/majors/${encodeURIComponent(String(id))}`,
+      payload,
+    );
+    const parsed = majorItemSchema.safeParse(response.data?.data);
+    return parsed.success ? parsed.data : response.data.data;
+  },
 
-  toggleMajorActive: (id: number | string) =>
-    api.patch<{
-      success: boolean;
-      message?: string;
-      data: MajorItem;
-    }>(`/admin/majors/${id}/toggle-active`),
+  toggleMajorActive: async (id: number | string): Promise<MajorItem> => {
+    const response = await api.patch<ApiResponse<MajorItem>>(
+      `/admin/majors/${encodeURIComponent(String(id))}/toggle-active`,
+    );
+    const parsed = majorItemSchema.safeParse(response.data?.data);
+    return parsed.success ? parsed.data : response.data.data;
+  },
 
-  deleteMajor: (id: number | string) =>
-    api.delete<{
-      success: boolean;
-      message?: string;
-    }>(`/admin/majors/${id}`),
+  deleteMajor: async (id: number | string): Promise<void> => {
+    await api.delete<ApiResponse<null>>(
+      `/admin/majors/${encodeURIComponent(String(id))}`,
+    );
+  },
+
+  isCancel: isApiCancel,
+  extractErrorMessage: extractApiErrorMessage,
 };

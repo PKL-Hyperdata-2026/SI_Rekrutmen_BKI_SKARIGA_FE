@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -7,9 +8,10 @@ export type StatCardColor = "purple" | "sky" | "teal" | "dark-purple" | "cyan" |
 
 export interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
   label: string;
-  value: string | number;
+  value?: string | number | null;
   icon: LucideIcon;
   color?: StatCardColor;
+  isLoading?: boolean;
 }
 
 const colorMap: Record<StatCardColor, { box: string; text: string }> = {
@@ -23,14 +25,42 @@ const colorMap: Record<StatCardColor, { box: string; text: string }> = {
   amber: { box: "bg-amber-600", text: "text-amber-600" },
 };
 
+export function StatCardSkeleton({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <Card
+      className={cn(
+        "rounded-xl border border-slate-100 bg-white p-3 shadow-xs cursor-default",
+        className
+      )}
+      {...props}
+    >
+      <CardContent className="p-0 flex items-center gap-3">
+        <Skeleton className="h-9 w-9 rounded-xl shrink-0" />
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <Skeleton className="h-5 w-16" />
+          <Skeleton className="h-3.5 w-24" />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export function StatCard({
   label,
   value,
   icon: Icon,
   color = "purple",
+  isLoading = false,
   className,
   ...props
 }: StatCardProps) {
+  if (isLoading || value === undefined || value === null) {
+    return <StatCardSkeleton className={className} {...props} />;
+  }
+
   const currentTheme = colorMap[color] || colorMap.purple;
 
   return (

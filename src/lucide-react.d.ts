@@ -99,6 +99,8 @@ declare module "lucide-react" {
   export const SlidersHorizontal: LucideIcon;
   export const Sparkles: LucideIcon;
   export const Store: LucideIcon;
+  export const ToggleLeft: LucideIcon;
+  export const ToggleRight: LucideIcon;
   export const Trash2: LucideIcon;
   export const TriangleAlert: LucideIcon;
   export const Upload: LucideIcon;

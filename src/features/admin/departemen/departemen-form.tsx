@@ -3,16 +3,56 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Box, Span, Paragraph, CharCounter } from "@/components/custom";
 import { cn } from "@/lib/utils";
 import type { DepartmentFormSchemaType } from "./departemen.schema";
 import { useDepartmentFormFields } from "./departemen.form";
 
-interface DepartmentFormProps {
-  form: UseFormReturn<DepartmentFormSchemaType>;
+export function DepartmentFormSkeleton() {
+  return (
+    <Box className="space-y-3 sm:space-y-4 py-1 sm:py-2">
+      <Box className="space-y-1.5">
+        <Box className="flex items-center justify-between">
+          <Skeleton className="h-4 w-28 rounded" />
+          <Skeleton className="h-3 w-8 rounded" />
+        </Box>
+        <Skeleton className="h-10 w-full rounded-lg" />
+      </Box>
+
+      <Box className="space-y-1.5">
+        <Box className="flex items-center justify-between">
+          <Skeleton className="h-4 w-32 rounded" />
+          <Skeleton className="h-3 w-8 rounded" />
+        </Box>
+        <Skeleton className="h-10 w-full rounded-lg" />
+      </Box>
+
+      <Box className="space-y-1.5">
+        <Box className="flex items-center justify-between">
+          <Skeleton className="h-4 w-20 rounded" />
+          <Skeleton className="h-3 w-8 rounded" />
+        </Box>
+        <Skeleton className="h-20 sm:h-24 w-full rounded-lg" />
+      </Box>
+
+      <Box className="flex items-center justify-between p-3 sm:p-3.5 rounded-xl bg-slate-50/70 border border-slate-200/90 gap-3 mb-2 sm:mb-0">
+        <Box className="space-y-1 min-w-0 flex-1">
+          <Skeleton className="h-4 w-24 rounded" />
+          <Skeleton className="h-3 w-56 rounded" />
+        </Box>
+        <Skeleton className="h-6 w-11 rounded-full shrink-0" />
+      </Box>
+    </Box>
+  );
 }
 
-export function DepartmentForm({ form }: DepartmentFormProps) {
+interface DepartmentFormProps {
+  form: UseFormReturn<DepartmentFormSchemaType>;
+  isLoading?: boolean;
+}
+
+export function DepartmentForm({ form, isLoading = false }: DepartmentFormProps) {
   const {
     register,
     watch,
@@ -24,6 +64,10 @@ export function DepartmentForm({ form }: DepartmentFormProps) {
   const watchedDescription = watch("description") ?? "";
 
   const { isActive, handleToggleActive } = useDepartmentFormFields(form);
+
+  if (isLoading) {
+    return <DepartmentFormSkeleton />;
+  }
 
   return (
     <Box className="space-y-3 sm:space-y-4 py-1 sm:py-2">

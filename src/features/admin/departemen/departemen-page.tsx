@@ -13,6 +13,9 @@ import {
   CheckCircle2,
   GraduationCap,
   Pencil,
+  SlidersHorizontal,
+  ToggleRight,
+  ToggleLeft,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -78,6 +81,7 @@ export function DepartemenPage() {
           color="purple"
           label="Total Departemen"
           value={totalCount}
+          isLoading={loading}
           className="rounded-xl"
         />
         <StatCard
@@ -85,6 +89,7 @@ export function DepartemenPage() {
           color="teal"
           label="Departemen Aktif"
           value={activeCount}
+          isLoading={loading}
           className="rounded-xl"
         />
         <StatCard
@@ -92,6 +97,7 @@ export function DepartemenPage() {
           color="sky"
           label="Total Jurusan"
           value={totalMajorsCount}
+          isLoading={loading}
           className="rounded-xl"
         />
       </Box>
@@ -116,12 +122,19 @@ export function DepartemenPage() {
               variant="outline"
               className="relative flex items-center h-10 w-full md:w-44 rounded-lg border-primary/30 bg-primary/5 hover:border-primary/50 transition-colors shadow-2xs cursor-pointer p-0 font-normal text-foreground [&>div]:w-full [&>div]:h-full"
             >
-              <CheckCircle2 className="size-4 text-primary shrink-0 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+              {statusFilter === "active" ? (
+                <ToggleRight className="size-4 text-primary shrink-0 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+              ) : statusFilter === "inactive" ? (
+                <ToggleLeft className="size-4 text-primary shrink-0 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+              ) : (
+                <SlidersHorizontal className="size-4 text-primary shrink-0 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+              )}
               <FilterSelect
                 role="admin"
                 value={statusFilter}
                 onValueChange={setStatusFilter}
                 options={statusFilterOptions}
+                placeholder="Semua Status"
                 className="w-full! h-full! pl-9.5! pr-3.5! rounded-lg! bg-transparent! text-foreground! border-none! shadow-none! text-xs! sm:text-[13px]! font-normal! hover:bg-transparent! [&_svg]:text-primary! [&_svg]:size-4! cursor-pointer gap-2! justify-between!"
               />
             </Badge>
