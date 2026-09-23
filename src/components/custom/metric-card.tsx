@@ -215,12 +215,13 @@ export function MetricCard({
       onKeyDown={
         isClickable
           ? (e) => {
-              if (e.key === "Enter" || e.key === " ") {
+              props.onKeyDown?.(e);
+              if (!e.defaultPrevented && (e.key === "Enter" || e.key === " ")) {
                 e.preventDefault();
                 onClick?.();
               }
             }
-          : undefined
+          : props.onKeyDown
       }
       className={cn(
         metricCardVariants({ color, isActive, isClickable }),
@@ -238,7 +239,10 @@ export function MetricCard({
         >
           {category}
         </span>
-        <Icon className={cn("size-4 sm:size-4.5 shrink-0", iconColorClass)} />
+        <Icon
+          className={cn("size-4 sm:size-4.5 shrink-0", iconColorClass)}
+          aria-hidden="true"
+        />
       </div>
 
       <div className="flex flex-col gap-0.5 mt-0.5">
@@ -263,13 +267,22 @@ export function MetricCard({
   );
 }
 
-export function MetricCardSkeleton({ className }: { className?: string }) {
+export type MetricCardSkeletonProps = React.HTMLAttributes<HTMLDivElement>;
+
+export function MetricCardSkeleton({
+  className,
+  ...props
+}: MetricCardSkeletonProps) {
   return (
     <div
+      role="status"
+      aria-busy="true"
+      aria-label="Memuat metrik"
       className={cn(
         "rounded-xl p-4 sm:p-5 bg-white border border-slate-100 shadow-xs flex flex-col justify-between gap-3 w-full",
         className,
       )}
+      {...props}
     >
       <div className="flex items-center justify-between">
         <Skeleton className="h-3 w-20 rounded" />

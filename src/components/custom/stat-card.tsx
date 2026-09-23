@@ -4,7 +4,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export type StatCardColor = "purple" | "sky" | "teal" | "dark-purple" | "cyan" | "blue" | "rose" | "amber";
+export type StatCardColor =
+  | "purple"
+  | "sky"
+  | "teal"
+  | "dark-purple"
+  | "cyan"
+  | "blue"
+  | "rose"
+  | "amber";
 
 export interface StatCardProps extends React.HTMLAttributes<HTMLDivElement> {
   label: string;
@@ -31,6 +39,9 @@ export function StatCardSkeleton({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <Card
+      role="status"
+      aria-busy="true"
+      aria-label="Memuat data"
       className={cn(
         "rounded-xl border border-slate-100 bg-white p-3 shadow-xs cursor-default",
         className
@@ -78,7 +89,7 @@ export function StatCard({
             currentTheme.box
           )}
         >
-          <Icon className="h-4 w-4" />
+          <Icon className="h-4 w-4" aria-hidden="true" />
         </div>
         <div className="min-w-0">
           <p className="text-base sm:text-lg font-bold text-slate-900 leading-tight">{value}</p>
