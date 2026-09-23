@@ -7,6 +7,7 @@ import { DashboardRedirector } from "./features/auth/dashboard-redirector";
 import { studentRoute } from "./features/student/route";
 import { adminRoute } from "./features/admin/route";
 import { hrdRoute } from "./features/hrd/route";
+import { UnauthorizedPage } from "./components/custom";
 
 export const router = createBrowserRouter([
   {
@@ -18,7 +19,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <DashboardRedirector />
+        element: <DashboardRedirector />,
       },
       {
         path: "/student",
@@ -37,7 +38,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/unauthorized",
-        // element: <ForbiddenPage />,
+        element: <UnauthorizedPage />,
       },
     ],
   },
@@ -46,7 +47,6 @@ export const router = createBrowserRouter([
     element: <Navigate to="/" replace />,
   },
 ]);
-
 // helper
 // function DashboardRedirector() {
 //   const { user } = useAppSelector((state) => state.auth);
