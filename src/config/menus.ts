@@ -17,6 +17,7 @@ import {
   UserCog,
   Network,
   type LucideIcon,
+  Shapes,
 } from "lucide-react";
 
 export interface MenuItem {
@@ -38,7 +39,7 @@ export const STUDENT_MENUS: MenuItem[] = [
 export const ADMIN_MENUS: MenuItem[] = [
   { name: "Dashboard", link: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Data Departemen", link: "/admin/departemen", icon: Network },
-  { name: "Data Jurusan", link: "/admin/jurusan", icon: GraduationCap },
+  { name: "Data Jurusan", link: "/admin/jurusan", icon: Shapes },
   { name: "Manajemen Pengguna", link: "/admin/users", icon: UserCog, superadminOnly: true },
   { name: "Data Siswa", link: "/admin/siswa", icon: Users },
   { name: "Data Alumni", link: "/admin/alumni", icon: GraduationCap },

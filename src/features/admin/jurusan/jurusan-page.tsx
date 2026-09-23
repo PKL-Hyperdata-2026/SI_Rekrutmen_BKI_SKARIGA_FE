@@ -8,15 +8,15 @@ import {
   Paragraph,
 } from "@/components/custom";
 import {
-  GraduationCap,
   Search,
   Plus,
-  Building2,
   CheckCircle2,
   SlidersHorizontal,
   ToggleRight,
   ToggleLeft,
   Pencil,
+  Shapes,
+  Network,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -85,7 +85,7 @@ export function JurusanPage() {
 
       <Box className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
-          icon={GraduationCap}
+          icon={Shapes}
           color="sky"
           label="Total Jurusan"
           value={totalCount}
@@ -99,7 +99,7 @@ export function JurusanPage() {
           isLoading={loading}
         />
         <StatCard
-          icon={Building2}
+          icon={Network}
           color="purple"
           label="Departemen Terkait"
           value={totalDeptCount}
@@ -127,7 +127,7 @@ export function JurusanPage() {
               variant="outline"
               className="relative flex items-center h-10 w-full sm:w-auto rounded-lg border-primary/30 bg-primary/5 hover:border-primary/50 transition-colors shadow-2xs cursor-pointer p-0 font-normal text-foreground [&>div]:w-full [&>div]:h-full"
             >
-              <Building2 className="size-4 text-primary shrink-0 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+              <Network className="size-4 text-primary shrink-0 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
               <FilterSelect
                 role="admin"
                 value={deptFilter}
@@ -162,72 +162,74 @@ export function JurusanPage() {
         </CardContent>
       </Card>
 
-      <Box className="flex flex-col gap-3 md:hidden w-full min-w-0">
-        {loading ? (
-          <>
-            <MajorCardSkeleton />
-            <MajorCardSkeleton />
-            <MajorCardSkeleton />
-          </>
-        ) : majors.length === 0 ? (
-          <Card className="p-8 text-center bg-white border border-slate-200/90 rounded-xl shadow-xs ring-0">
-            <CardContent className="p-0 flex flex-col items-center">
-              <Box className="mb-2.5 flex justify-center">
-                <GraduationCap className="h-8 w-8 text-slate-400" />
-              </Box>
-              <Paragraph className="text-sm font-semibold text-slate-700">
-                Tidak ada jurusan yang ditemukan
-              </Paragraph>
-              <Paragraph className="text-xs text-slate-400 mt-0.5">
-                Silakan tambahkan jurusan baru atau sesuaikan kata kunci
-                pencarian
-              </Paragraph>
-            </CardContent>
-          </Card>
-        ) : (
-          majors.map((major) => (
-            <MajorCard
-              key={major.id}
-              item={major}
-              onToggleActive={handleToggleActive}
-              onEdit={handleOpenEdit}
-              onDelete={handleDelete}
-            />
-          ))
-        )}
-      </Box>
+      <Box className="w-full flex flex-col gap-3">
+        <Box className="flex flex-col gap-3 md:hidden w-full min-w-0">
+          {loading ? (
+            <>
+              <MajorCardSkeleton />
+              <MajorCardSkeleton />
+              <MajorCardSkeleton />
+            </>
+          ) : majors.length === 0 ? (
+            <Card className="p-8 text-center bg-white border border-slate-200/90 rounded-xl shadow-xs ring-0">
+              <CardContent className="p-0 flex flex-col items-center">
+                <Box className="mb-2.5 flex justify-center">
+                  <Shapes className="h-8 w-8 text-slate-400" />
+                </Box>
+                <Paragraph className="text-sm font-semibold text-slate-700">
+                  Tidak ada jurusan yang ditemukan
+                </Paragraph>
+                <Paragraph className="text-xs text-slate-400 mt-0.5">
+                  Silakan tambahkan jurusan baru atau sesuaikan kata kunci
+                  pencarian
+                </Paragraph>
+              </CardContent>
+            </Card>
+          ) : (
+            majors.map((major) => (
+              <MajorCard
+                key={major.id}
+                item={major}
+                onToggleActive={handleToggleActive}
+                onEdit={handleOpenEdit}
+                onDelete={handleDelete}
+              />
+            ))
+          )}
+        </Box>
 
-      <Box className="hidden md:block w-full min-w-0">
-        <DataTable
-          role="admin"
-          columns={columns}
-          data={majors}
-          loading={loading}
-          emptyMessage="Tidak ada jurusan yang ditemukan"
-          emptyDescription="Silakan tambahkan jurusan baru atau sesuaikan kata kunci pencarian"
-          emptyIcon={<GraduationCap className="h-8 w-8 text-slate-400" />}
-          getRowId={getMajorRowId}
-          numberStartIndex={(currentPage - 1) * pageSize + 1}
-          className="rounded-lg"
-        />
-      </Box>
+        <Box className="hidden md:block w-full min-w-0">
+          <DataTable
+            role="admin"
+            columns={columns}
+            data={majors}
+            loading={loading}
+            emptyMessage="Tidak ada jurusan yang ditemukan"
+            emptyDescription="Silakan tambahkan jurusan baru atau sesuaikan kata kunci pencarian"
+            emptyIcon={<Shapes className="h-8 w-8 text-slate-400" />}
+            getRowId={getMajorRowId}
+            numberStartIndex={(currentPage - 1) * pageSize + 1}
+            className="rounded-lg"
+          />
+        </Box>
 
-      <Card className="bg-white rounded-lg border border-slate-200/90 shadow-xs overflow-hidden p-0 gap-0 ring-0 w-full max-w-full min-w-0">
-        <DataTablePagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          totalItems={totalItems}
-          pageSize={pageSize}
-          onPageChange={setCurrentPage}
-          onPageSizeChange={(newSize) => {
-            setPageSize(newSize);
-            setCurrentPage(1);
-          }}
-          pageSizeOptions={[10, 25, 50, 100]}
-          role="admin"
-          className="border-none"
-        />
-      </Card>
+        <Card className="bg-white rounded-lg border border-slate-200/90 shadow-xs overflow-hidden p-0 gap-0 ring-0 w-full max-w-full min-w-0">
+          <DataTablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={(newSize) => {
+              setPageSize(newSize);
+              setCurrentPage(1);
+            }}
+            pageSizeOptions={[10, 25, 50, 100]}
+            role="admin"
+            className="border-none"
+          />
+        </Card>
+      </Box>
 
       <Modal
         open={isFormOpen}
@@ -239,7 +241,7 @@ export function JurusanPage() {
           isEditing ? (
             <Pencil className="h-5 w-5" />
           ) : (
-            <GraduationCap className="h-5 w-5" />
+            <Shapes className="h-5 w-5" />
           )
         }
         title={modalTitle}

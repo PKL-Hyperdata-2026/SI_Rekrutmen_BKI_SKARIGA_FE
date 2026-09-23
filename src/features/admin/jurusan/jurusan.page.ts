@@ -44,6 +44,7 @@ export function useJurusan() {
   const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
+  const [activeItems, setActiveItems] = useState(0);
 
   const debouncedSearch = useDebounce(search, 400);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -76,10 +77,21 @@ export function useJurusan() {
       const items = resData?.data || [];
       const total = resData?.meta?.total ?? resData?.total ?? items.length;
       const lastPage = resData?.meta?.last_page ?? resData?.last_page ?? 1;
+      const resActiveCount =
+        resData?.meta?.active_count ?? resData?.active_count;
 
       setMajors(items);
       setTotalPages(lastPage);
       setTotalItems(total);
+      if (typeof resActiveCount === "number") {
+        setActiveItems(resActiveCount);
+      } else if (statusFilter === "inactive") {
+        setActiveItems(0);
+      } else if (statusFilter === "active") {
+        setActiveItems(total);
+      } else {
+        setActiveItems(items.filter((m) => m.isActive).length);
+      }
     } catch (err: unknown) {
       if (jurusanApi.isCancel(err)) {
         return;
@@ -87,6 +99,7 @@ export function useJurusan() {
       setMajors([]);
       setTotalPages(1);
       setTotalItems(0);
+      setActiveItems(0);
       toast.error(
         jurusanApi.extractErrorMessage(err, "Gagal memuat data jurusan."),
       );
@@ -148,6 +161,9 @@ export function useJurusan() {
           m.id === item.id ? { ...m, isActive: !m.isActive } : m,
         ),
       );
+      setActiveItems((prev) =>
+        item.isActive ? Math.max(0, prev - 1) : prev + 1,
+      );
     } catch (err: unknown) {
       toast.error(
         jurusanApi.extractErrorMessage(err, "Gagal mengubah status jurusan."),
@@ -172,10 +188,7 @@ export function useJurusan() {
   );
 
   const totalCount = totalItems;
-  const activeCount = useMemo(
-    () => majors.filter((m) => m.isActive).length,
-    [majors],
-  );
+  const activeCount = activeItems;
   const totalDeptCount = departmentOptions.length;
 
   const deptFilterOptions = useMemo<FilterSelectOption[]>(() => {

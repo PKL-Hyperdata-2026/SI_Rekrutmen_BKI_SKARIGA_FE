@@ -1,4 +1,4 @@
-import { Building2, GraduationCap, Pencil } from "lucide-react";
+import { Network, Pencil, Shapes } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,7 @@ export function MajorCard({
             variant="outline"
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border-slate-200 bg-slate-50 text-slate-700 shadow-2xs shrink-0"
           >
-            <GraduationCap className="h-3.5 w-3.5 text-slate-500" />
+            <Shapes className="h-3.5 w-3.5 text-slate-500" />
             <Span>{item.code}</Span>
           </Badge>
 
@@ -67,7 +67,7 @@ export function MajorCard({
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border-primary/20 bg-primary/5 text-primary shadow-2xs shrink-0"
             title={item.department?.name || undefined}
           >
-            <Building2 className="h-3.5 w-3.5 text-primary shrink-0" />
+            <Network className="h-3.5 w-3.5 text-primary shrink-0" />
             <Span>{item.department?.code || "-"}</Span>
           </Badge>
 

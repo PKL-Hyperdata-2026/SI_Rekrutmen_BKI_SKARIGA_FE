@@ -1,7 +1,7 @@
 import type { DataTableColumn } from "@/components/custom";
 import { DataTableDeleteButton } from "@/components/custom/data-table";
 import { Box, Span, Heading3, Paragraph } from "@/components/custom/primitives";
-import { Building2, GraduationCap, Pencil } from "lucide-react";
+import { Network, Pencil, Shapes } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import type { MajorItem } from "./jurusan.schema";
@@ -23,7 +23,7 @@ export function buildMajorColumns(
       className: "whitespace-nowrap w-24",
       cell: (item) => (
         <Span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold border border-slate-200 bg-slate-50 text-slate-700 shadow-2xs">
-          <GraduationCap className="h-3.5 w-3.5 text-slate-500" />
+          <Shapes className="h-3.5 w-3.5 text-slate-500" />
           {item.code}
         </Span>
       ),
@@ -57,7 +57,7 @@ export function buildMajorColumns(
               title={item.department.name}
               className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-800 shadow-2xs"
             >
-              <Building2 className="h-3.5 w-3.5 text-slate-500" />
+              <Network className="h-3.5 w-3.5 text-slate-500" />
               <Span>{item.department.code}</Span>
             </Span>
           ) : (

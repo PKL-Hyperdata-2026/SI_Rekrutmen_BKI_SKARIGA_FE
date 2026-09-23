@@ -1,4 +1,4 @@
-import { Building2, GraduationCap, Pencil } from "lucide-react";
+import { Network, Pencil, Shapes } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,7 @@ export function DepartmentCard({
             variant="outline"
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border-slate-200 bg-slate-50 text-slate-700 shadow-2xs shrink-0"
           >
-            <Building2 className="h-3.5 w-3.5 text-slate-500" />
+            <Network className="h-3.5 w-3.5 text-slate-500" />
             <Span>{item.code}</Span>
           </Badge>
 
@@ -63,7 +63,7 @@ export function DepartmentCard({
 
         <Box className="pt-2.5 flex items-center justify-between gap-2 border-t border-slate-100">
           <Box className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-50 border border-sky-200 text-xs font-semibold text-sky-700 shadow-2xs shrink-0">
-            <GraduationCap className="h-3.5 w-3.5 text-sky-600" />
+            <Shapes className="h-3.5 w-3.5 text-sky-600" />
             <Span>{item.majorsCount ?? 0} Program Keahlian</Span>
           </Box>
 

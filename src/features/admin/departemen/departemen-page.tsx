@@ -6,16 +6,15 @@ import {
   Paragraph,
 } from "@/components/custom";
 import {
-  Building2,
   Search,
   Plus,
-  Layers,
   CheckCircle2,
-  GraduationCap,
   Pencil,
   SlidersHorizontal,
   ToggleRight,
   ToggleLeft,
+  Network,
+  Shapes,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -77,7 +76,7 @@ export function DepartemenPage() {
 
       <Box className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 w-full min-w-0">
         <StatCard
-          icon={Layers}
+          icon={Network}
           color="purple"
           label="Total Departemen"
           value={totalCount}
@@ -93,7 +92,7 @@ export function DepartemenPage() {
           className="rounded-xl"
         />
         <StatCard
-          icon={GraduationCap}
+          icon={Shapes}
           color="sky"
           label="Total Jurusan"
           value={totalMajorsCount}
@@ -153,7 +152,7 @@ export function DepartemenPage() {
           <Card className="p-8 text-center bg-white border border-slate-200/90 rounded-xl shadow-xs ring-0">
             <CardContent className="p-0 flex flex-col items-center">
               <Box className="mb-2.5 flex justify-center">
-                <Building2 className="h-8 w-8 text-slate-400" />
+                <Network className="h-8 w-8 text-slate-400" />
               </Box>
               <Paragraph className="text-sm font-semibold text-slate-700">
                 Tidak ada departemen yang ditemukan
@@ -183,7 +182,7 @@ export function DepartemenPage() {
           loading={loading}
           emptyMessage="Tidak ada departemen yang ditemukan"
           emptyDescription="Silakan tambahkan departemen baru atau sesuaikan kata kunci pencarian"
-          emptyIcon={<Building2 className="h-8 w-8 text-slate-400" />}
+          emptyIcon={<Network className="h-8 w-8 text-slate-400" />}
           getRowId={getDepartmentRowId}
           className="rounded-xl"
         />
@@ -199,7 +198,7 @@ export function DepartemenPage() {
           isEditing ? (
             <Pencil className="h-5 w-5" />
           ) : (
-            <Building2 className="h-5 w-5" />
+            <Network className="h-5 w-5" />
           )
         }
         title={modalTitle}

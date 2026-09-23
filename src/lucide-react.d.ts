@@ -94,6 +94,7 @@ declare module "lucide-react" {
   export const SearchX: LucideIcon;
   export const Send: LucideIcon;
   export const SendHorizontal: LucideIcon;
+  export const Shapes: LucideIcon;
   export const ShieldCheck: LucideIcon;
   export const ShieldQuestion: LucideIcon;
   export const SlidersHorizontal: LucideIcon;

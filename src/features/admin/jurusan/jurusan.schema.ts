@@ -78,6 +78,7 @@ export const majorPaginatedResponseSchema = z.object({
   current_page: z.number().optional(),
   last_page: z.number().optional(),
   total: z.number().optional(),
+  active_count: z.number().optional(),
   meta: z
     .object({
       current_page: z.number().optional(),
@@ -86,6 +87,7 @@ export const majorPaginatedResponseSchema = z.object({
       per_page: z.number().optional(),
       to: z.number().nullable().optional(),
       total: z.number().optional(),
+      active_count: z.number().optional(),
     })
     .optional(),
 });
