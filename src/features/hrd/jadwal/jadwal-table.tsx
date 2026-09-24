@@ -27,13 +27,6 @@ export function JadwalTable({
   const columns = useMemo<DataTableColumn<JadwalItem>[]>(
     () => [
       {
-        header: "NO",
-        align: "center",
-        className: "text-center px-3 py-4 w-12 font-bold text-xs text-slate-700 tabular-nums",
-        headerClassName: "text-center px-3 select-none font-bold text-xs text-foreground tracking-wider w-12",
-        cell: (_, index) => index + 1,
-      },
-      {
         header: "AGENDA / TES",
         className: "min-w-[190px] px-4 py-3.5",
         headerClassName: "px-4 select-none font-bold text-xs text-foreground tracking-wider",

@@ -33,13 +33,6 @@ export function JadwalPesertaModal({
   const columns = useMemo<DataTableColumn<PesertaJadwalItem>[]>(
     () => [
       {
-        header: "NO",
-        align: "center",
-        className: "text-center px-3 py-3 w-12 font-bold text-xs text-slate-700 tabular-nums",
-        headerClassName: "text-center px-3 select-none font-bold text-xs text-foreground tracking-wider w-12",
-        cell: (_, index) => index + 1,
-      },
-      {
         header: "NAMA KANDIDAT",
         className: "min-w-[170px] px-3.5 py-3",
         headerClassName: "px-3.5 select-none font-bold text-xs text-foreground tracking-wider",
