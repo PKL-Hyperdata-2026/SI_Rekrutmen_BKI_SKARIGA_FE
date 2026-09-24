@@ -14,11 +14,12 @@ React 19, TypeScript 6, Vite 8, Tailwind CSS v4, Redux Toolkit, React Router v7,
 ## Commands Cheatsheet
 
 ```bash
-npm install                                # Install Node dependencies
-npm run dev                                # Start Vite development server
-npm run build                              # Typecheck (tsc -b) and bundle for production
-npm run lint                               # Run ESLint validation
-npm run preview                            # Preview production build locally
+bun install                                # Install dependencies
+bun run dev                                # Start Vite development server
+bun run build                              # Typecheck (tsc -b) and bundle for production
+bun run lint                               # Run ESLint validation
+bun run test                               # Run Vitest test suite
+bun run preview                            # Preview production build locally
 ```
 
 ## Critical Rules (READ FIRST)

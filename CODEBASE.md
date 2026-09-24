@@ -10,6 +10,7 @@ Operational instructions and boundaries: [`AGENTS.md`](./AGENTS.md).
 
 | Layer               | Technology            | Details                                                    |
 | ------------------- | --------------------- | ---------------------------------------------------------- |
+| Runtime & Package   | Bun 1.3+              | Fast JavaScript runtime, package manager (`bun.lock`)      |
 | Framework / Bundler | Vite 8 + React 19     | ESM-based frontend development server and builder          |
 | Language            | TypeScript 6          | Strict type checking (`tsc -b`)                            |
 | CSS & Styling       | Tailwind CSS v4       | Native CSS imports via `@tailwindcss/vite`, Geist font     |

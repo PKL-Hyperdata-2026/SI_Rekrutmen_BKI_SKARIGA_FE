@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from "vite-plus/test";
 import fs from "node:fs";
 import path from "node:path";
 
@@ -23,11 +23,11 @@ describe("Semantic Tokens in index.css", () => {
 
     const rootBlock = cssContent.slice(
       cssContent.indexOf(":root {"),
-      cssContent.indexOf("/* Color Palette Siswa / Alumni */")
+      cssContent.indexOf("/* Color Palette Siswa / Alumni */"),
     );
     const darkBlock = cssContent.slice(
       cssContent.indexOf(".dark {"),
-      cssContent.indexOf("@layer base {")
+      cssContent.indexOf("@layer base {"),
     );
 
     for (const state of states) {
