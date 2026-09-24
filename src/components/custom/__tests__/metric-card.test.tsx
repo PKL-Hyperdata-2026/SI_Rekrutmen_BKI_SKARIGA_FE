@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect, vi } from "vite-plus/test";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MetricCard, MetricCardSkeleton } from "../metric-card";
@@ -13,11 +13,13 @@ describe("MetricCard Component", () => {
         value={24}
         icon={Briefcase}
         color="purple"
-      />
+      />,
     );
 
     expect(screen.getByText("Rekrutmen")).toBeInTheDocument();
-    expect(screen.getByRole("heading", { level: 4, name: "Total Lowongan Aktif" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 4, name: "Total Lowongan Aktif" }),
+    ).toBeInTheDocument();
     expect(screen.getByText("24")).toBeInTheDocument();
     expect(container.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
   });
@@ -33,7 +35,7 @@ describe("MetricCard Component", () => {
         value="120"
         onClick={handleClick}
         isActive={true}
-      />
+      />,
     );
 
     const button = screen.getByRole("button", { name: /lamaran masuk/i });
@@ -51,17 +53,14 @@ describe("MetricCard Component", () => {
 
   it("renders MetricCardSkeleton with accessible role and attributes", () => {
     render(<MetricCardSkeleton />);
-    expect(screen.getByRole("status", { name: /memuat metrik/i })).toHaveAttribute("aria-busy", "true");
+    expect(screen.getByRole("status", { name: /memuat metrik/i })).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
   });
 
   it("renders in static presentation mode when onClick is omitted", () => {
-    render(
-      <MetricCard
-        category="Statistik"
-        title="Ringkasan Data"
-        value="50"
-      />
-    );
+    render(<MetricCard category="Statistik" title="Ringkasan Data" value="50" />);
 
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
@@ -71,7 +70,7 @@ describe("MetricCard Component", () => {
       <MetricCard.Grid data-testid="metric-grid">
         <MetricCard category="A" title="Card 1" value="1" />
         <MetricCard category="B" title="Card 2" value="2" />
-      </MetricCard.Grid>
+      </MetricCard.Grid>,
     );
 
     const grid = screen.getByTestId("metric-grid");

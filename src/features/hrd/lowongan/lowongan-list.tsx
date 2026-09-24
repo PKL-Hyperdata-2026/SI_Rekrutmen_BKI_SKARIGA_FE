@@ -29,6 +29,7 @@ import {
 import { Modal } from "@/components/custom/modal";
 import { DataTablePagination } from "@/components/custom/table/data-table-pagination";
 import { DatePicker } from "@/components/custom/date-picker";
+import { SlidingSegmentedControl } from "@/components/custom/sliding-segmented-control";
 import {
   type useLowonganList,
   type LowonganStatusFilter,
@@ -259,70 +260,26 @@ export function LowonganList({
             )}
           </div>
 
-          {/* Segmented Status Buttons */}
-          <div
-            role="group"
+          <SlidingSegmentedControl<LowonganStatusFilter>
+            options={STATUS_FILTER_OPTIONS}
+            value={statusFilter}
+            onChange={handleStatusFilterChange}
             aria-label="Filter status lowongan"
-            className="inline-flex items-center p-1 bg-slate-100/90 rounded-xl gap-1 shrink-0 self-start md:self-auto"
-          >
-            {STATUS_FILTER_OPTIONS.map((filter) => {
-              const isActive = statusFilter === filter.value;
-              return (
-                <button
-                  key={filter.value}
-                  type="button"
-                  aria-pressed={isActive}
-                  onClick={() => handleStatusFilterChange(filter.value)}
-                  className={cn(
-                    "h-8 px-3.5 rounded-lg text-xs font-semibold transition-all cursor-pointer",
-                    isActive
-                      ? "bg-white text-[#8D1D96] shadow-xs"
-                      : "text-slate-600 hover:text-slate-900"
-                  )}
-                >
-                  {filter.label}
-                </button>
-              );
-            })}
-          </div>
+            activeClassName="text-[#8D1D96] font-bold"
+            className="self-start md:self-auto overflow-x-auto max-w-full"
+          />
 
-          {/* View Mode Toggle */}
-          <div
-            role="group"
+          <SlidingSegmentedControl<LowonganViewMode>
+            options={[
+              { value: "card", label: <LayoutGrid className="size-4" /> },
+              { value: "list", label: <ListIcon className="size-4" /> },
+            ]}
+            value={viewMode}
+            onChange={handleViewModeChange}
             aria-label="Mode tampilan daftar"
-            className="inline-flex items-center p-1 bg-slate-100/90 rounded-xl gap-1 shrink-0 self-start md:self-auto"
-          >
-            <button
-              type="button"
-              aria-pressed={viewMode === "card"}
-              aria-label="Tampilan kartu"
-              title="Tampilan kartu"
-              onClick={() => handleViewModeChange("card")}
-              className={cn(
-                "h-8 w-9 inline-flex items-center justify-center rounded-lg transition-all cursor-pointer",
-                viewMode === "card"
-                  ? "bg-white text-[#8D1D96] shadow-xs"
-                  : "text-slate-500 hover:text-slate-900"
-              )}
-            >
-              <LayoutGrid className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              aria-pressed={viewMode === "list"}
-              aria-label="Tampilan daftar"
-              title="Tampilan daftar"
-              onClick={() => handleViewModeChange("list")}
-              className={cn(
-                "h-8 w-9 inline-flex items-center justify-center rounded-lg transition-all cursor-pointer",
-                viewMode === "list"
-                  ? "bg-white text-[#8D1D96] shadow-xs"
-                  : "text-slate-500 hover:text-slate-900"
-              )}
-            >
-              <ListIcon className="h-4 w-4" />
-            </button>
-          </div>
+            activeClassName="text-[#8D1D96]"
+            itemClassName="px-2.5 h-8 w-9"
+          />
         </div>
 
         {/* Row 2: Dropdowns for Jurusan & Target Pelamar + Reset Button */}

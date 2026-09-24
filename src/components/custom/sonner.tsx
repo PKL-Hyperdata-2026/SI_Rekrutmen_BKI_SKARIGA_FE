@@ -100,7 +100,7 @@ export function Toaster({
   return (
     <div
       className={cn(
-        "fixed z-50 flex flex-col gap-2.5 pointer-events-none p-4 w-full max-w-sm transition-all",
+        "fixed z-50 flex flex-col gap-2.5 pointer-events-none p-4 w-full max-w-sm",
         position === "top-center" && "top-4 left-1/2 -translate-x-1/2 items-center",
         position === "top-right" && "top-4 right-4 items-end",
         position === "bottom-right" && "bottom-4 right-4 items-end"
@@ -110,7 +110,7 @@ export function Toaster({
         <div
           key={t.id}
           className={cn(
-            "pointer-events-auto w-full relative overflow-hidden flex flex-col rounded-2xl border shadow-lg backdrop-blur-md transition-all duration-300 ease-out",
+            "pointer-events-auto w-full relative overflow-hidden flex flex-col rounded-2xl border shadow-lg backdrop-blur-md transition-[transform,opacity] duration-250 ease-[var(--ease-out)]",
             t.isExiting
               ? "opacity-0 -translate-y-5 scale-95 pointer-events-none"
               : "opacity-100 translate-y-0 scale-100 animate-in fade-in slide-in-from-top-3",

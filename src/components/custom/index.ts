@@ -24,3 +24,4 @@ export * from "./primitives";
 export * from "./char-counter";
 export * from "./global-loading";
 export * from "./unauthorized-page";
+export * from "./sliding-segmented-control";

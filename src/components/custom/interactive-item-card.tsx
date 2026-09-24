@@ -30,7 +30,7 @@ export function InteractiveItemCard({
   return (
     <div
       className={cn(
-        "flex items-center justify-between py-2 px-3 rounded-2xl border border-slate-200 bg-white shadow-xs hover:shadow-sm hover:-translate-y-0.5 transition-all duration-200 ease-out cursor-pointer",
+        "flex items-center justify-between py-2 px-3 rounded-2xl border border-slate-200 bg-white shadow-xs @media(hover:hover):hover:shadow-sm @media(hover:hover):hover:-translate-y-0.5 transition-[transform,box-shadow,border-color,background-color] duration-200 ease-[var(--ease-out)] motion-reduce:transform-none cursor-pointer",
         "hover:border-primary/40 hover:bg-primary/5",
         roleThemeClasses[role],
         className

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vite-plus/test";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
@@ -14,7 +14,7 @@ function renderJadwalPage() {
       <MemoryRouter>
         <JadwalPage />
       </MemoryRouter>
-    </Provider>
+    </Provider>,
   );
 }
 
@@ -41,17 +41,13 @@ describe("JadwalPage Integration", () => {
     renderJadwalPage();
 
     expect(
-      screen.getByRole("heading", { level: 1, name: "Kelola Agenda & Jadwal Tes" })
+      screen.getByRole("heading", { level: 1, name: "Kelola Agenda & Jadwal Tes" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Penjadwalan Seleksi")).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /buat agenda tes/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /buat agenda tes/i })).toBeInTheDocument();
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Psikotes & Akademik - Batch 1")
-      ).toBeInTheDocument();
+      expect(screen.getByText("Psikotes & Akademik - Batch 1")).toBeInTheDocument();
       expect(screen.getByText("Junior Mechanic Operator")).toBeInTheDocument();
       expect(screen.getByText("Peserta: 25 Peserta")).toBeInTheDocument();
     });
@@ -69,16 +65,12 @@ describe("JadwalPage Integration", () => {
     expect(
       await screen.findByRole("dialog", {
         name: /form buat agenda sesi tes baru/i,
-      })
+      }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(
-        "Tentukan Jadwal & alokasikan pelamar yang telah lolos berkas."
-      )
+      screen.getByText("Tentukan Jadwal & alokasikan pelamar yang telah lolos berkas."),
     ).toBeInTheDocument();
-    expect(
-      screen.getByPlaceholderText("e.g Psikotes - Batch 1")
-    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("e.g Psikotes - Batch 1")).toBeInTheDocument();
   });
 
   it("displays validation error when required fields are empty on submit", async () => {
@@ -95,13 +87,9 @@ describe("JadwalPage Integration", () => {
     const submitBtn = screen.getByRole("button", { name: /simpan data/i });
     await user.click(submitBtn);
 
-    expect(
-      await screen.findByText("Nama agenda wajib diisi.")
-    ).toBeInTheDocument();
+    expect(await screen.findByText("Nama agenda wajib diisi.")).toBeInTheDocument();
     expect(screen.getByText("Lowongan kerja wajib dipilih.")).toBeInTheDocument();
-    expect(
-      screen.getByText("Nilai minimum diterima wajib diisi.")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Nilai minimum diterima wajib diisi.")).toBeInTheDocument();
   });
 
   it("resets form inputs when reset button is clicked", async () => {
@@ -110,9 +98,7 @@ describe("JadwalPage Integration", () => {
 
     await user.click(screen.getByRole("button", { name: /buat agenda tes/i }));
 
-    const agendaInput = await screen.findByPlaceholderText(
-      "e.g Psikotes - Batch 1"
-    );
+    const agendaInput = await screen.findByPlaceholderText("e.g Psikotes - Batch 1");
     await user.type(agendaInput, "Agenda Draft");
     expect(agendaInput).toHaveValue("Agenda Draft");
 

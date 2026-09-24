@@ -17,7 +17,7 @@ export type MetricCardColor =
   | "custom";
 
 const metricCardVariants = cva(
-  "relative flex flex-col justify-between rounded-xl p-4 sm:p-5 transition-all duration-200 motion-reduce:transition-none text-left w-full select-none",
+  "relative flex flex-col justify-between rounded-xl p-4 sm:p-5 transition-[background-color,border-color,box-shadow,transform] duration-200 ease-[var(--ease-out)] motion-reduce:transition-none text-left w-full select-none",
   {
     variants: {
       color: {
