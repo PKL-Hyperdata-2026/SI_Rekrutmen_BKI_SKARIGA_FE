@@ -1,5 +1,6 @@
 declare module "lucide-react" {
   import * as React from "react";
+import LogOut from 'lucide-react';
 
   export type LucideProps = React.SVGProps<SVGSVGElement> & {
     size?: string | number;
@@ -117,6 +118,7 @@ declare module "lucide-react" {
   export const XIcon: LucideIcon;
   export const CheckSquare: LucideIcon;
   export const ChartColumn: LucideIcon;
+  export const LogOut: LucideIcon;
 
   const _default: Record<string, LucideIcon>;
   export default _default;

@@ -21,10 +21,9 @@ const metricCardVariants = cva(
   {
     variants: {
       color: {
-        purple: "hover:border-purple-400 hover:bg-[#F3F0FF]/50 hover:shadow-sm",
+        purple: "hover:border-purple-400 hover:bg-purple-50/50 hover:shadow-sm",
         amber: "hover:border-amber-400 hover:bg-amber-50/50 hover:shadow-sm",
-        emerald:
-          "hover:border-emerald-400 hover:bg-emerald-50/50 hover:shadow-sm",
+        emerald: "hover:border-emerald-400 hover:bg-emerald-50/50 hover:shadow-sm",
         blue: "hover:border-blue-400 hover:bg-blue-50/50 hover:shadow-sm",
         rose: "hover:border-rose-400 hover:bg-rose-50/50 hover:shadow-sm",
         cyan: "hover:border-cyan-400 hover:bg-cyan-50/50 hover:shadow-sm",
@@ -46,7 +45,7 @@ const metricCardVariants = cva(
       {
         color: "purple",
         isActive: true,
-        class: "bg-[#F3F0FF] border border-purple-500 shadow-xs",
+        class: "bg-purple-50/70 border border-purple-500 shadow-xs",
       },
       {
         color: "amber",
@@ -106,9 +105,9 @@ const colorTokens: Record<
   }
 > = {
   purple: {
-    category: "text-[#584D75]",
-    icon: "text-purple-600",
-    value: "text-purple-700",
+    category: "text-purple-500",
+    icon: "text-purple-500",
+    value: "text-purple-500",
   },
   amber: {
     category: "text-amber-500",

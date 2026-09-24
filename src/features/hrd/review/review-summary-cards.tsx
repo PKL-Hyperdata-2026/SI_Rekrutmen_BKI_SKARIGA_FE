@@ -77,11 +77,12 @@ export function ReviewSummaryCards({
 
   return (
     <MetricCard.Grid
-      className={cn("grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4", className)}
+      className={cn("grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 px-1", className)}
     >
       {CARDS.map((card) => {
         const count = getValue(summary, card.key);
         const isActive = activeFilter === card.key;
+        const className = "hover:border-[#8D1D96]/50 hover:shadow-sm";
         const customColor =
           card.key === "semua"
             ? {
@@ -89,8 +90,8 @@ export function ReviewSummaryCards({
                 icon: "text-[#8D1D96]",
                 value: "text-[#8D1D96]",
                 container: isActive
-                  ? "bg-[#FDF2F8] border-[#8D1D96] ring-2 ring-[#8D1D96]/20 shadow-xs"
-                  : "bg-[#FDF2F8]/60 border-[#D069D7]/30 hover:border-[#8D1D96]/50 shadow-xs",
+                  ? cn("bg-[#FDF2F8] border border-[#8D1D96] shadow-xs", className)
+                  : cn("bg-white border-slate-200/80", className),
               }
             : undefined;
 
