@@ -109,7 +109,9 @@ export function MainLayout() {
                 <Topbar />
               </div>
               <main className="p-3.5 sm:p-4 md:p-6 w-full max-w-full min-w-0 relative print:p-0 print:m-0">
-                <Outlet />
+                <div key={location.pathname} className="page-enter w-full min-w-0">
+                  <Outlet />
+                </div>
               </main>
             </ScrollArea>
           </SidebarInset>
