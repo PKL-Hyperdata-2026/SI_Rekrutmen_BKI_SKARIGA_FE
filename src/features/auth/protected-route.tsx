@@ -12,11 +12,15 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
   } = useAppSelector((state) => state.auth);
   const token = localStorage.getItem("access_token");
 
-  if (!token || !isAuthenticated) {
+  if (!token) {
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+  if (!isAuthenticated || !user) {
+    return null;
+  }
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/unauthorized" replace />;
   }
 

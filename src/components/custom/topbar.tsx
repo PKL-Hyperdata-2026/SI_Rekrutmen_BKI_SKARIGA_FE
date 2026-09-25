@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import {
-  Power,
+  LogOut,
   Search,
   Mail,
   Bell,
@@ -422,10 +422,10 @@ export function Topbar() {
             <AlertDialogTrigger asChild>
               <button
                 aria-label="Keluar / Logout"
-                title="Keluar dari sistem"
+                title="Log Out"
                 className="relative h-8 w-8 flex items-center justify-center rounded-lg text-destructive hover:bg-destructive/10 transition-colors cursor-pointer shrink-0"
               >
-                <Power className="h-4 w-4" strokeWidth={2.2} />
+                <LogOut className="h-4 w-4" strokeWidth={2.2} />
               </button>
             </AlertDialogTrigger>
             <AlertDialogContent>

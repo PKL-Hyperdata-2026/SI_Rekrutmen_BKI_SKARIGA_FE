@@ -1,5 +1,6 @@
 declare module "lucide-react" {
   import * as React from "react";
+import LogOut from 'lucide-react';
 
   export type LucideProps = React.SVGProps<SVGSVGElement> & {
     size?: string | number;
@@ -42,11 +43,13 @@ declare module "lucide-react" {
   export const Clock: LucideIcon;
   export const Clock3: LucideIcon;
   export const Download: LucideIcon;
+  export const Edit3: LucideIcon;
   export const ExternalLink: LucideIcon;
   export const Eye: LucideIcon;
   export const EyeOff: LucideIcon;
   export const FileCheck: LucideIcon;
   export const FileCode2: LucideIcon;
+  export const FileDown: LucideIcon;
   export const FilePlus: LucideIcon;
   export const FileQuestion: LucideIcon;
   export const FileSpreadsheet: LucideIcon;
@@ -72,6 +75,7 @@ declare module "lucide-react" {
   export const Medal: LucideIcon;
   export const Minus: LucideIcon;
   export const MoreHorizontalIcon: LucideIcon;
+  export const MoreVertical: LucideIcon;
   export const Network: LucideIcon;
   export const PanelLeft: LucideIcon;
   export const PanelLeftIcon: LucideIcon;
@@ -80,6 +84,7 @@ declare module "lucide-react" {
   export const Phone: LucideIcon;
   export const PieChart: LucideIcon;
   export const Plus: LucideIcon;
+  export const PlusCircle: LucideIcon;
   export const Power: LucideIcon;
   export const Printer: LucideIcon;
   export const RefreshCw: LucideIcon;
@@ -87,14 +92,20 @@ declare module "lucide-react" {
   export const RotateCw: LucideIcon;
   export const Save: LucideIcon;
   export const Search: LucideIcon;
+  export const SearchX: LucideIcon;
   export const Send: LucideIcon;
   export const SendHorizontal: LucideIcon;
+  export const Shapes: LucideIcon;
   export const ShieldCheck: LucideIcon;
   export const ShieldQuestion: LucideIcon;
   export const SlidersHorizontal: LucideIcon;
   export const Sparkles: LucideIcon;
+  export const SquarePlus: LucideIcon;
   export const Store: LucideIcon;
+  export const ToggleLeft: LucideIcon;
+  export const ToggleRight: LucideIcon;
   export const Trash2: LucideIcon;
+  export const TriangleAlert: LucideIcon;
   export const Upload: LucideIcon;
   export const UploadCloud: LucideIcon;
   export const User: LucideIcon;
@@ -107,6 +118,7 @@ declare module "lucide-react" {
   export const XIcon: LucideIcon;
   export const CheckSquare: LucideIcon;
   export const ChartColumn: LucideIcon;
+  export const LogOut: LucideIcon;
 
   const _default: Record<string, LucideIcon>;
   export default _default;

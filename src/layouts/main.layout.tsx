@@ -3,12 +3,10 @@ import { useAppDispatch, useAppSelector } from "@/hooks/use-app";
 import { logout, setCredentials } from "@/slices/authSlice";
 import { useEffect, useState, useRef } from "react";
 import { getMeApi } from "@/features/auth/login/login.api";
-import { Loader2 } from "lucide-react";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AppSidebar, Topbar } from "@/components/custom";
+import { AppSidebar, Topbar, GlobalLoading } from "@/components/custom";
 import { Toaster } from "@/components/custom/sonner";
-
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function MainLayout() {
@@ -16,10 +14,10 @@ export function MainLayout() {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const { user } = useAppSelector((state) => state.auth);
-  const [fetchingUser, setFetchingUser] = useState(!user && !!token);
+  const [fetchingUser, setFetchingUser] = useState(!!token);
 
   useEffect(() => {
-    if (token && !user) {
+    if (token) {
       getMeApi()
       .then((data) => {
         dispatch(setCredentials(data.user));
@@ -31,9 +29,26 @@ export function MainLayout() {
         setFetchingUser(false);
       });
     }
-  }, [token, user, dispatch]);
+  }, [token, dispatch]);
 
-  const themeClass = user?.role === "siswa" || user?.role === "alumni" ? "theme-siswa" : (user?.role === "admin" || user?.role === "superadmin") ? "theme-admin" : "theme-hrd";
+  const detectedRole =
+    user?.role ||
+    (location.pathname.startsWith("/admin")
+      ? "admin"
+      : location.pathname.startsWith("/hrd")
+        ? "hrd"
+        : location.pathname.startsWith("/student")
+          ? "siswa"
+          : undefined);
+
+  const themeClass =
+    detectedRole === "siswa" || detectedRole === "alumni"
+      ? "theme-siswa"
+      : detectedRole === "admin" || detectedRole === "superadmin"
+        ? "theme-admin"
+        : detectedRole === "hrd"
+          ? "theme-hrd"
+          : "theme-admin";
 
   useEffect(() => {
     if (!themeClass) return;
@@ -52,44 +67,56 @@ export function MainLayout() {
     }
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (!fetchingUser && user) {
+      const frameId = requestAnimationFrame(() => {
+        window.dispatchEvent(new Event("resize"));
+      });
+      const timer = setTimeout(() => {
+        window.dispatchEvent(new Event("resize"));
+      }, 150);
+      return () => {
+        cancelAnimationFrame(frameId);
+        clearTimeout(timer);
+      };
+    }
+  }, [fetchingUser, user]);
+
   if (!token) {
     return <Navigate to="/login" replace />;
   }
 
-  if (fetchingUser) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
   return (
-    <TooltipProvider>
-      <Toaster position="top-right" />
-      <SidebarProvider
-        style={
-          {
-            "--sidebar-width": "16rem",
-            "--sidebar-width-icon": "4.5rem",
-          } as React.CSSProperties
-        }
-        className="bg-slate-50 print:bg-white"
-      >
-        <div className="print:hidden">
-          <AppSidebar />
-        </div>
-        <SidebarInset className="w-full min-w-0 flex flex-col h-screen overflow-hidden bg-slate-50 print:h-auto print:overflow-visible print:bg-white print:m-0 print:p-0">
-          <ScrollArea ref={scrollAreaRef} className="h-full w-full min-w-0 print:h-auto print:overflow-visible [&>div>div]:!block [&>div>div]:w-full [&>div>div]:min-w-0">
-            <div className="print:hidden">
-              <Topbar />
-            </div>
-            <main className="p-3.5 sm:p-4 md:p-6 w-full max-w-full min-w-0 relative print:p-0 print:m-0">
-              <Outlet />
-            </main>
-          </ScrollArea>
-        </SidebarInset>
-      </SidebarProvider>
-    </TooltipProvider>
+    <>
+      <GlobalLoading show={fetchingUser} role={detectedRole} />
+      <TooltipProvider>
+        <Toaster position="top-right" />
+        <SidebarProvider
+          style={
+            {
+              "--sidebar-width": "16rem",
+              "--sidebar-width-icon": "4.5rem",
+            } as React.CSSProperties
+          }
+          className="bg-slate-50 print:bg-white"
+        >
+          <div className="print:hidden">
+            <AppSidebar key={user ? `${user.role}-${user.id}` : "sidebar-loading"} />
+          </div>
+          <SidebarInset className="w-full min-w-0 flex flex-col h-screen overflow-hidden bg-slate-50 print:h-auto print:overflow-visible print:bg-white print:m-0 print:p-0">
+            <ScrollArea ref={scrollAreaRef} className="h-full w-full min-w-0 print:h-auto print:overflow-visible [&>div>div]:block! [&>div>div]:w-full [&>div>div]:min-w-0">
+              <div className="print:hidden">
+                <Topbar />
+              </div>
+              <main className="p-3.5 sm:p-4 md:p-6 w-full max-w-full min-w-0 relative print:p-0 print:m-0">
+                <div key={location.pathname} className="page-enter w-full min-w-0">
+                  <Outlet />
+                </div>
+              </main>
+            </ScrollArea>
+          </SidebarInset>
+        </SidebarProvider>
+      </TooltipProvider>
+    </>
   );
 }

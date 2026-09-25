@@ -1,37 +1,38 @@
-# Frontend Codebase Reference (React 19 + TypeScript + Vite)
+# Frontend codebase reference (React 19 + TypeScript + Vite)
 
-Deep, factual reference for AI agents and developers. **Last verified: 2026-09-21.**
+Factual codebase reference for AI agents and developers. Last verified: 2026-09-24.
 If you modify code that alters any architecture, feature modules, state slices, or routes documented here, update this file in the same change.
-Operational instructions & boundaries: [`AGENTS.md`](./AGENTS.md).
+Operational instructions and boundaries: [`AGENTS.md`](./AGENTS.md).
 
-> **Staleness rule:** If this file is >4 weeks old, verify routes and features against `src/route.tsx` and `src/features/` before trusting it.
+> If this file is older than 4 weeks, verify routes and features against `src/route.tsx` and `src/features/` before relying on it.
 
 ## 1. Stack
 
 | Layer               | Technology            | Details                                                    |
 | ------------------- | --------------------- | ---------------------------------------------------------- |
-| Framework / Bundler | Vite 8 + React 19     | ESM-based frontend development server & builder            |
+| Runtime & Package   | Bun 1.3+              | Fast JavaScript runtime, package manager (`bun.lock`)      |
+| Framework / Bundler | Vite 8 + React 19     | ESM-based frontend development server and builder          |
 | Language            | TypeScript 6          | Strict type checking (`tsc -b`)                            |
 | CSS & Styling       | Tailwind CSS v4       | Native CSS imports via `@tailwindcss/vite`, Geist font     |
 | UI Primitives       | Shadcn UI / Radix UI  | Accessible UI components (`src/components/ui/`)            |
-| State Management    | Redux Toolkit         | Central store (`src/store/index.ts`) & auth slice          |
+| State Management    | Redux Toolkit         | Central store (`src/store/index.ts`) and auth slice        |
 | Routing             | React Router v7       | Declarative routing with layout wrappers (`src/route.tsx`) |
 | HTTP Client         | Axios                 | Configured instance with interceptors (`src/api/axios.ts`) |
 | Real-time & Sockets | Laravel Echo & Pusher | WebSocket event subscription (`laravel-echo`, `pusher-js`) |
 | Forms & Validation  | React Hook Form + Zod | Schema-based form state and validation resolvers           |
-| Tables & Data       | TanStack React Table  | Headless datatables with sorting, pagination, & filtering  |
+| Tables & Data       | TanStack React Table  | Headless datatables with sorting, pagination, and filtering|
 | Rich Text Editor    | TipTap                | Modular rich text editor suite (`@tiptap/react`)           |
 | Maps & Geo          | Leaflet & React-Leaflet | Coordinate and radius map views                          |
 | Visuals & Charts    | Recharts & Lucide     | Data visualization charts and feather icon suite           |
 
-## 2. Architecture (How Things Connect)
+## 2. Architecture (how things connect)
 
 ```text
 Application Mounting
   → src/main.tsx (Root DOM mounting)
       → Redux Provider (src/store/index.ts)
           → RouterProvider (src/route.tsx)
-              → Layout Wrappers (src/layouts/ - Sidebar, Topbar, Breadcrumbs)
+              → Layout Wrappers (src/layouts/, including Sidebar, Topbar, Breadcrumbs)
                   → Role-Guarded Feature Pages / Views (src/features/{role}/{feature}/)
                       → UI Components (src/components/ui/ + custom/)
                       → Custom Hooks (feature hooks or src/hooks/)
@@ -42,7 +43,7 @@ Application Mounting
 
 Route guards (`ProtectedRoute`, `DashboardRedirector`) live at the auth role root (`src/features/auth/`) and are consumed by `src/route.tsx`.
 
-## 3. Project Structure
+## 3. Project structure
 
 ```text
 frontend/src/
@@ -119,8 +120,8 @@ frontend/src/
 │       ├── lowongan/                            # lowongan-page.tsx, form, list, card, status-badge, api, schema, form, hooks (Production)
 │       ├── penempatan/                          # penempatan-page.tsx, form, table, metric-cards, update-form, api, schema, form, hooks (Production)
 │       ├── hasil/                               # hasil-page.tsx, hasil-table.tsx, hasil-metric-cards.tsx, hasil-modal.tsx, api, schema, form (Production)
-│       ├── jadwal/                              # pages/jadwal-page.tsx (Placeholder stub view)
-│       ├── review/                              # pages/review-page.tsx (Placeholder stub view)
+│       ├── jadwal/                              # jadwal-page.tsx, jadwal-table.tsx, jadwal-form-modal.tsx, jadwal-peserta-modal.tsx, api, schema, form, status (Production)
+│       ├── review/                              # review-page.tsx, review.schema.ts, review.api.ts, review.status.ts, review.form.ts, use-review-page.ts, components (Production)
 │       └── route.tsx                            # HRD sub-routes
 ├── hooks/                                       # Global reusable React hooks
 │   ├── use-app.ts
@@ -142,27 +143,27 @@ frontend/src/
 └── index.css                                    # Global styles, Tailwind v4 imports, CSS variables
 ```
 
-## 4. Feature Module Pattern
+## 4. Feature module pattern
 
-Features follow a **Role -> Feature Domain (kebab-case) -> Files** organization:
+Features follow a Role / Feature Domain (kebab-case) / Files organization:
 
-1. **Role Level (`src/features/{role}`):** Groups modules by user persona (`auth`, `student`, `admin`, `hrd`).
-2. **Feature Level (`src/features/{role}/{kebab-feature}`):** Dedicated folder per business capability.
-3. **Standard Flat Files Convention:**
+1. **Role level (`src/features/{role}`)**. Groups modules by user persona (`auth`, `student`, `admin`, `hrd`).
+2. **Feature level (`src/features/{role}/{kebab-feature}`)**. Dedicated folder per business capability.
+3. **Standard flat files convention**:
    - `kebab-feature.api.ts`: Axios request functions for endpoints. Uses central `api` from `src/api/axios.ts`.
-   - `kebab-feature.schema.ts`: Zod validation schemas & inferred TypeScript types.
-   - `kebab-feature.form.ts`: Hook(s) wrapping `useForm` + `zodResolver` + `defaultValues`, plus payload/defaults builders.
-   - `kebab-feature-form.tsx`: Presentational form component reading RHF context.
+   - `kebab-feature.schema.ts`: Zod validation schemas and inferred TypeScript types.
+   - `kebab-feature.form.ts`: Hooks wrapping `useForm` with `zodResolver` and default values, plus payload builders.
+   - `kebab-feature-form.tsx`: Presentational form component reading React Hook Form context.
    - `kebab-feature-table.tsx`: Column definitions, badges, and actions for DataTable.
    - `kebab-feature-card.tsx`: Presentational card for grid views.
-   - `kebab-feature-page.tsx`: Main container component hosting form/table instances and submit handlers.
-4. **Architectural Complexity Exceptions:**
+   - `kebab-feature-page.tsx`: Main container component hosting form or table instances and submit handlers.
+4. **Architectural complexity exceptions**:
    - Certain high-density features (`admin/validasi-presensi`, `admin/seleksi`, `admin/laporan`) encapsulate internal components and hooks inside subfolders (`components/`, `hooks/`, `pages/`, `types/`) to isolate domain logic.
-   - HRD stub modules (`review`, `jadwal`, `hasil`) currently render single placeholder views in `pages/` pending full implementation.
+   - HRD modules (`review`, `jadwal`, `hasil`, `lowongan`, `penempatan`) are fully implemented and production-ready.
 
 Routing stays at role level: `src/features/{role}/route.tsx` imports each page and exports an array (`studentRoute`, `adminRoute`, `hrdRoute`, `authRoute`) consumed by `src/route.tsx`.
 
-## 5. State Management & Redux Store
+## 5. State management and Redux store
 
 - Store entry point: `src/store/index.ts`.
 - Slices located in `src/slices/`.
@@ -174,9 +175,9 @@ Routing stays at role level: `src/features/{role}/route.tsx` imports each page a
 - Use `authSlice.ts` to manage:
   - `user`: Authenticated user entity with roles.
   - `isAuthenticated`: Boolean state flag.
-  - *Note:* Sanctum Bearer token is stored and managed via `localStorage` (key `access_token`), read/written directly by `src/api/axios.ts` interceptors.
+  - Sanctum Bearer token is stored in `localStorage` (key `access_token`), handled directly by `src/api/axios.ts` interceptors.
 
-## 6. API Client & Networking Layer
+## 6. API client and networking layer
 
 - Single Axios instance exported from `src/api/axios.ts`.
 - Base URL configured from environment variable `VITE_API_URL` (fallback `http://localhost:8000/api`).
@@ -184,22 +185,22 @@ Routing stays at role level: `src/features/{role}/route.tsx` imports each page a
 - Response Interceptor:
   - Passes successful responses through.
   - Handles `401 Unauthorized` by clearing `access_token` and redirecting to `/login`.
-  - Backend envelope is `{ success: boolean, message: string, data: {} }`. Access payload via `response.data.data`.
+  - Backend envelope format is `{ success: boolean, message: string, data: {} }`. Access payload via `response.data.data`.
 - Feature API modules (`*.api.ts`) wrap endpoints and return unwrapped payload data.
 
-## 7. Reusable Component Conventions
+## 7. Reusable component conventions
 
-- **Page Header (`src/components/custom/page-header.tsx`):** Universal top banner with role theming (`admin`, `student`, `alumni`, `hrd`, `auto`).
-- **Modal Boilerplate (`src/components/custom/modal.tsx`):** Dual-mode dialog wrapper over Radix UI primitives.
-- **DataTable (`src/components/custom/data-table.tsx`):** Generic table with loading skeleton, empty state, pagination, and typed columns.
-- **AsyncSearchableSelect (`src/components/custom/async-searchable-select.tsx`):** Server-side debounced searchable select with pagination.
-- **Rich Text Editor Suite (`src/components/custom/text-editor/`):** TipTap based rich text editor with toolbar and heading dropdown.
-- **Metric Cards & Stat Cards (`metric-card.tsx`, `stat-card.tsx`):** Analytical overview and KPI metric visual cards.
-- **Date Pickers (`date-picker.tsx`, `date-range-picker.tsx`):** Standard and range date picker components.
+- **Page Header (`src/components/custom/page-header.tsx`)**. Universal top banner with role theming (`admin`, `student`, `alumni`, `hrd`, `auto`).
+- **Modal boilerplate (`src/components/custom/modal.tsx`)**. Dual-mode dialog wrapper over Radix UI primitives.
+- **DataTable (`src/components/custom/data-table.tsx`)**. Generic table with loading skeleton, empty state, pagination, and typed columns.
+- **AsyncSearchableSelect (`src/components/custom/async-searchable-select.tsx`)**. Server-side debounced searchable select with pagination.
+- **Rich text editor suite (`src/components/custom/text-editor/`)**. TipTap based rich text editor with toolbar and heading dropdown.
+- **Metric and stat cards (`metric-card.tsx`, `stat-card.tsx`)**. Analytical overview and KPI metric visual cards.
+- **Date pickers (`date-picker.tsx`, `date-range-picker.tsx`)**. Standard and range date picker components.
 
-## 8. Async Selects (Server-Side Search + Pagination)
+## 8. Async selects (server-side search and pagination)
 
-All form dropdowns with potentially large datasets use `AsyncSearchableSelect` (`src/components/custom/async-searchable-select.tsx`) instead of loading full option lists on page open. Nothing is fetched until the select popover opens; typing searches server-side (debounced 500 ms); scrolling appends 20 rows/page.
+All form dropdowns with potentially large datasets use `AsyncSearchableSelect` (`src/components/custom/async-searchable-select.tsx`) instead of loading full option lists on page open. Nothing is fetched until the select popover opens; typing searches server-side (debounced 500 ms); scrolling appends 20 rows per page.
 
 ```text
 AsyncSearchableSelect (props: fetchPage, perPage=20, debounceMs=500, fallbackLabel, onOptionSelect, emptyOptionLabel?)
@@ -212,4 +213,4 @@ AsyncSearchableSelect (props: fetchPage, perPage=20, debounceMs=500, fallbackLab
 Request efficiency rules:
 - Search input debounces 500 ms. Opening the popover never searches, closing calls `onClose` to trigger `resetSearch()`.
 - Every new fetch aborts previous requests via `AbortController`.
-- Successful pages are cached in-memory per URL+params with 60 s TTL (`selectPageCache`, `clearSelectOptionsCache()`).
+- Successful pages are cached in memory per URL and params with 60 s TTL (`selectPageCache`, `clearSelectOptionsCache()`).

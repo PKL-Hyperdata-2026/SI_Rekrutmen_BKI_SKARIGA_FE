@@ -4,7 +4,7 @@ import {
   Span,
   type DataTableColumn,
 } from "@/components/custom";
-import { Building2, GraduationCap, Pencil } from "lucide-react";
+import { Network, Pencil, Shapes } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import type { DepartmentItem } from "./departemen.schema";
@@ -25,7 +25,7 @@ export function buildDepartmentColumns(
       className: "whitespace-nowrap w-24",
       cell: (item) => (
         <Span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold border border-slate-200 bg-slate-50 text-slate-700 shadow-2xs">
-          <Building2 className="h-3.5 w-3.5 text-slate-500" />
+          <Network className="h-3.5 w-3.5 text-slate-500" />
           {item.code}
         </Span>
       ),
@@ -54,7 +54,7 @@ export function buildDepartmentColumns(
       cell: (item) => (
         <Box className="flex items-center justify-center">
           <Box className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-sky-50 border border-sky-200 text-xs font-semibold text-sky-700 shadow-2xs whitespace-nowrap shrink-0">
-            <GraduationCap className="h-3.5 w-3.5 text-sky-600" />
+            <Shapes className="h-3.5 w-3.5 text-sky-600" />
             <Span>{item.majorsCount ?? 0} Program Keahlian</Span>
           </Box>
         </Box>
@@ -92,7 +92,7 @@ export function buildDepartmentColumns(
           <DataTableDeleteButton
             itemName={item.name}
             title="Hapus Departemen ini?"
-            description="Tindakan tidak dapat dibatalkan jika departemen memiliki jurusan terkait."
+            description="Tindakan tidak dapat dibatalkan."
             buttonTitle="Hapus Departemen"
             className="border-rose-200/80 bg-rose-50/70 text-rose-600 hover:bg-rose-100 hover:text-rose-700 shadow-2xs"
             onConfirm={() => handlers.onDelete(item)}

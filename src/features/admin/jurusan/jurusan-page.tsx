@@ -1,200 +1,74 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
-import { PageHeader, StatCard, DataTable } from "@/components/custom";
 import {
-  GraduationCap,
+  PageHeader,
+  StatCard,
+  DataTable,
+  DataTablePagination,
+  FilterSelect,
+  Box,
+  Paragraph,
+} from "@/components/custom";
+import {
   Search,
   Plus,
-  Building2,
   CheckCircle2,
+  SlidersHorizontal,
+  ToggleRight,
+  ToggleLeft,
   Pencil,
+  Shapes,
+  Network,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Form } from "@/components/ui/form";
 import { Modal } from "@/components/custom/modal";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { toast } from "@/components/custom/sonner";
-import { jurusanApi } from "./jurusan.api";
-import { useMajorForm, toCreateMajorPayload } from "./jurusan.form";
 import { MajorForm } from "./jurusan-form";
-import { buildMajorColumns } from "./jurusan-table";
-import type { MajorItem, DepartmentOption } from "./jurusan.schema";
+import { MajorCard, MajorCardSkeleton } from "./jurusan-mobile-card";
+import { useJurusan, getMajorRowId } from "./jurusan.page";
 
 export function JurusanPage() {
-  const [majors, setMajors] = useState<MajorItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [departmentOptions, setDepartmentOptions] = useState<DepartmentOption[]>([]);
-
-  const [search, setSearch] = useState("");
-  const [deptFilter, setDeptFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
-
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingMajor, setEditingMajor] = useState<MajorItem | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-
-  const [deleteMajor, setDeleteMajor] = useState<MajorItem | null>(null);
-  const [deleting, setDeleting] = useState(false);
-
-  const form = useMajorForm(editingMajor);
-
-  const fetchMajors = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params: Record<string, string | number> = { per_page: 50 };
-      if (search) params.search = search;
-      if (deptFilter !== "all") params.department_id = deptFilter;
-      if (statusFilter !== "all") params.is_active = statusFilter === "active" ? 1 : 0;
-
-      const res = await jurusanApi.getMajors(params);
-      setMajors(res.data?.data?.data || []);
-    } catch {
-      setMajors([]);
-      toast.error("Gagal memuat data jurusan.");
-    } finally {
-      setLoading(false);
-    }
-  }, [search, deptFilter, statusFilter]);
-
-  useEffect(() => {
-    let ignore = false;
-    jurusanApi
-      .getMajorOptions()
-      .then((res) => {
-        if (!ignore && res.data?.data?.departments) {
-          setDepartmentOptions(res.data.data.departments);
-        }
-      })
-      .catch(() => {});
-    return () => {
-      ignore = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      fetchMajors();
-    }, 300);
-    return () => clearTimeout(timeout);
-  }, [fetchMajors]);
-
-  const handleOpenCreate = () => {
-    setEditingMajor(null);
-    form.reset({
-      department_id: "",
-      code: "",
-      name: "",
-      description: "",
-      is_active: true,
-    });
-    setIsFormOpen(true);
-  };
-
-  const handleOpenEdit = useCallback((item: MajorItem) => {
-    setEditingMajor(item);
-    form.reset({
-      department_id: String(item.departmentId),
-      code: item.code,
-      name: item.name,
-      description: item.description || "",
-      is_active: item.isActive,
-    });
-    setIsFormOpen(true);
-  }, [form]);
-
-  const handleSubmitForm = form.handleSubmit(async (values) => {
-    setSubmitting(true);
-    try {
-      const payload = toCreateMajorPayload(values);
-
-      if (editingMajor) {
-        await jurusanApi.updateMajor(editingMajor.id, payload);
-        toast.success("Data jurusan berhasil diperbarui.");
-      } else {
-        await jurusanApi.createMajor(payload);
-        toast.success("Jurusan baru berhasil ditambahkan.");
-      }
-
-      setIsFormOpen(false);
-      fetchMajors();
-    } catch (err: unknown) {
-      const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message || "Terjadi kesalahan saat menyimpan data jurusan.";
-      toast.error(msg);
-    } finally {
-      setSubmitting(false);
-    }
-  });
-
-  const handleToggleActive = useCallback(async (major: MajorItem) => {
-    try {
-      await jurusanApi.toggleMajorActive(major.id);
-      setMajors((prev) =>
-        prev.map((item) =>
-          item.id === major.id ? { ...item, isActive: !item.isActive } : item
-        )
-      );
-      toast.success(`Status jurusan ${major.name} berhasil diubah.`);
-    } catch {
-      toast.error("Gagal mengubah status aktif jurusan.");
-    }
-  }, []);
-
-  const handleDelete = async () => {
-    if (!deleteMajor) return;
-    setDeleting(true);
-    try {
-      await jurusanApi.deleteMajor(deleteMajor.id);
-      toast.success(`Jurusan ${deleteMajor.name} berhasil dihapus.`);
-      setDeleteMajor(null);
-      fetchMajors();
-    } catch (err: unknown) {
-      const msg =
-        (err as { response?: { data?: { message?: string } } })?.response?.data
-          ?.message || "Gagal menghapus data jurusan.";
-      toast.error(msg);
-    } finally {
-      setDeleting(false);
-    }
-  };
-
-  const totalCount = majors.length;
-  const activeCount = useMemo(
-    () => majors.filter((m) => m.isActive).length,
-    [majors]
-  );
-  const totalDeptCount = useMemo(
-    () => new Set(majors.map((m) => String(m.departmentId))).size,
-    [majors]
-  );
-
-  const columns = useMemo(
-    () =>
-      buildMajorColumns({
-        onToggleActive: handleToggleActive,
-        onEdit: handleOpenEdit,
-        onDelete: (item) => setDeleteMajor(item),
-      }),
-    [handleToggleActive, handleOpenEdit]
-  );
+  const {
+    majors,
+    loading,
+    search,
+    handleSearchChange,
+    deptFilter,
+    setDeptFilter,
+    statusFilter,
+    setStatusFilter,
+    currentPage,
+    setCurrentPage,
+    pageSize,
+    setPageSize,
+    totalPages,
+    totalItems,
+    departmentOptions,
+    loadingOptions,
+    isFormOpen,
+    setIsFormOpen,
+    isEditing,
+    modalTitle,
+    modalDescription,
+    modalConfirmText,
+    departmentFallbackLabel,
+    submitting,
+    form,
+    handleOpenCreate,
+    handleSubmitForm,
+    handleToggleActive,
+    handleOpenEdit,
+    handleDelete,
+    totalCount,
+    activeCount,
+    totalDeptCount,
+    deptFilterOptions,
+    statusFilterOptions,
+    columns,
+  } = useJurusan();
 
   return (
-    <div className="space-y-6">
+    <Box className="space-y-6 theme-admin w-full min-w-0">
       <PageHeader
         variant="admin"
         title="Data Jurusan"
@@ -209,131 +83,183 @@ export function JurusanPage() {
         </PageHeader.Button>
       </PageHeader>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <Box className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
-          icon={GraduationCap}
+          icon={Shapes}
           color="sky"
           label="Total Jurusan"
           value={totalCount}
+          isLoading={loading}
         />
         <StatCard
           icon={CheckCircle2}
           color="teal"
           label="Jurusan Aktif"
           value={activeCount}
+          isLoading={loading}
         />
         <StatCard
-          icon={Building2}
+          icon={Network}
           color="purple"
           label="Departemen Terkait"
           value={totalDeptCount}
+          isLoading={loading}
         />
-      </div>
+      </Box>
 
-      <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200/90 shadow-xs flex flex-col md:flex-row gap-4 justify-between items-center">
-        <div className="relative w-full md:w-80">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input
-            placeholder="Cari kode, nama jurusan..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9.5 pr-4 bg-slate-50 border-slate-200 rounded-xl h-10 text-xs placeholder:text-slate-400 shadow-2xs"
+      <Card
+        size="sm"
+        className="theme-admin rounded-lg border border-slate-100! bg-white py-2! sm:py-2.5! px-3! sm:px-3.5! shadow-xs ring-0! w-full min-w-0 max-w-full"
+      >
+        <CardContent className="flex flex-col md:flex-row gap-3 sm:gap-4 justify-between items-center p-0! px-0! py-0! w-full min-w-0">
+          <Box className="relative w-full md:w-80 min-w-0">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Input
+              placeholder="Cari jurusan atau kode..."
+              value={search}
+              onChange={handleSearchChange}
+              className="pl-9.5 pr-4 bg-slate-50/70 border-slate-200 rounded-lg h-10 text-xs text-slate-800 placeholder:text-slate-400 focus-visible:bg-white focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all shadow-2xs w-full"
+            />
+          </Box>
+
+          <Box className="flex flex-wrap w-full md:w-auto items-center gap-2 sm:gap-3 min-w-0">
+            <Badge
+              variant="outline"
+              className="relative flex items-center h-10 w-full sm:w-auto rounded-lg border-primary/30 bg-primary/5 hover:border-primary/50 transition-colors shadow-2xs cursor-pointer p-0 font-normal text-foreground [&>div]:w-full [&>div]:h-full"
+            >
+              <Network className="size-4 text-primary shrink-0 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+              <FilterSelect
+                role="admin"
+                value={deptFilter}
+                onValueChange={setDeptFilter}
+                options={deptFilterOptions}
+                placeholder="Semua Departemen"
+                className="w-full! h-full! pl-9.5! pr-3.5! rounded-lg! bg-transparent! text-foreground! border-none! shadow-none! text-xs! sm:text-[13px]! font-normal! hover:bg-transparent! [&_svg]:text-primary! [&_svg]:size-4! cursor-pointer gap-2! justify-between!"
+              />
+            </Badge>
+
+            <Badge
+              variant="outline"
+              className="relative flex items-center h-10 w-full sm:w-44 rounded-lg border-primary/30 bg-primary/5 hover:border-primary/50 transition-colors shadow-2xs cursor-pointer p-0 font-normal text-foreground [&>div]:w-full [&>div]:h-full"
+            >
+              {statusFilter === "active" ? (
+                <ToggleRight className="size-4 text-primary shrink-0 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+              ) : statusFilter === "inactive" ? (
+                <ToggleLeft className="size-4 text-primary shrink-0 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+              ) : (
+                <SlidersHorizontal className="size-4 text-primary shrink-0 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+              )}
+              <FilterSelect
+                role="admin"
+                value={statusFilter}
+                onValueChange={setStatusFilter}
+                options={statusFilterOptions}
+                placeholder="Semua Status"
+                className="w-full! h-full! pl-9.5! pr-3.5! rounded-lg! bg-transparent! text-foreground! border-none! shadow-none! text-xs! sm:text-[13px]! font-normal! hover:bg-transparent! [&_svg]:text-primary! [&_svg]:size-4! cursor-pointer gap-2! justify-between!"
+              />
+            </Badge>
+          </Box>
+        </CardContent>
+      </Card>
+
+      <Box className="w-full flex flex-col gap-3">
+        <Box className="flex flex-col gap-3 md:hidden w-full min-w-0">
+          {loading ? (
+            <>
+              <MajorCardSkeleton />
+              <MajorCardSkeleton />
+              <MajorCardSkeleton />
+            </>
+          ) : majors.length === 0 ? (
+            <Card className="p-8 text-center bg-white border border-slate-200/90 rounded-xl shadow-xs ring-0">
+              <CardContent className="p-0 flex flex-col items-center">
+                <Box className="mb-2.5 flex justify-center">
+                  <Shapes className="h-8 w-8 text-slate-400" />
+                </Box>
+                <Paragraph className="text-sm font-semibold text-slate-700">
+                  Tidak ada jurusan yang ditemukan
+                </Paragraph>
+                <Paragraph className="text-xs text-slate-400 mt-0.5">
+                  Silakan tambahkan jurusan baru atau sesuaikan kata kunci
+                  pencarian
+                </Paragraph>
+              </CardContent>
+            </Card>
+          ) : (
+            majors.map((major) => (
+              <MajorCard
+                key={major.id}
+                item={major}
+                onToggleActive={handleToggleActive}
+                onEdit={handleOpenEdit}
+                onDelete={handleDelete}
+              />
+            ))
+          )}
+        </Box>
+
+        <Box className="hidden md:block w-full min-w-0">
+          <DataTable
+            role="admin"
+            columns={columns}
+            data={majors}
+            loading={loading}
+            emptyMessage="Tidak ada jurusan yang ditemukan"
+            emptyDescription="Silakan tambahkan jurusan baru atau sesuaikan kata kunci pencarian"
+            emptyIcon={<Shapes className="h-8 w-8 text-slate-400" />}
+            getRowId={getMajorRowId}
+            numberStartIndex={(currentPage - 1) * pageSize + 1}
+            className="rounded-lg"
           />
-        </div>
+        </Box>
 
-        <div className="flex w-full md:w-auto items-center gap-3">
-          <Select value={deptFilter} onValueChange={setDeptFilter}>
-            <SelectTrigger className="w-full md:w-56 h-10 rounded-xl bg-slate-50 border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer">
-              <SelectValue placeholder="Semua Departemen" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all" className="text-xs">Semua Departemen</SelectItem>
-              {departmentOptions.map((d) => (
-                <SelectItem key={d.id} value={String(d.id)} className="text-xs">
-                  {d.name} ({d.code})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full md:w-36 h-10 rounded-xl bg-slate-50 border-slate-200 text-xs font-semibold text-slate-700 shadow-2xs cursor-pointer">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all" className="text-xs">Semua Status</SelectItem>
-              <SelectItem value="active" className="text-xs">Aktif</SelectItem>
-              <SelectItem value="inactive" className="text-xs">Nonaktif</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <DataTable
-        columns={columns}
-        data={majors}
-        loading={loading}
-        emptyMessage="Tidak ada jurusan yang ditemukan"
-        emptyDescription="Silakan tambahkan jurusan baru atau sesuaikan kata kunci pencarian"
-        emptyIcon={<GraduationCap className="h-8 w-8 text-slate-400" />}
-        getRowId={(major) => String(major.id)}
-      />
+        <Card className="bg-white rounded-lg border border-slate-200/90 shadow-xs overflow-hidden p-0 gap-0 ring-0 w-full max-w-full min-w-0">
+          <DataTablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            onPageChange={setCurrentPage}
+            onPageSizeChange={(newSize) => {
+              setPageSize(newSize);
+              setCurrentPage(1);
+            }}
+            pageSizeOptions={[10, 25, 50, 100]}
+            role="admin"
+            className="border-none"
+          />
+        </Card>
+      </Box>
 
       <Modal
         open={isFormOpen}
         onOpenChange={setIsFormOpen}
         variant="admin"
         size="md"
-        headerIcon={editingMajor ? <Pencil className="h-5 w-5" /> : <GraduationCap className="h-5 w-5" />}
-        title={editingMajor ? "Edit Jurusan" : "Tambah Jurusan Baru"}
-        description={
-          editingMajor
-            ? "Perbarui informasi dan induk departemen program keahlian."
-            : "Lengkapi data jurusan baru dan pilih departemen induk keahlian."
+        className="rounded-lg"
+        headerIcon={
+          isEditing ? (
+            <Pencil className="h-5 w-5" />
+          ) : (
+            <Shapes className="h-5 w-5" />
+          )
         }
-        confirmText={editingMajor ? "Perbarui Jurusan" : "Simpan Jurusan"}
+        title={modalTitle}
+        description={modalDescription}
+        confirmText={modalConfirmText}
         cancelText="Batal"
         isLoading={submitting}
         onConfirm={handleSubmitForm}
       >
-        <form onSubmit={handleSubmitForm}>
+        <Form onSubmit={handleSubmitForm} className="space-y-0">
           <MajorForm
             form={form}
-            departmentFallbackLabel={
-              editingMajor?.department
-                ? `${editingMajor.department.name} (${editingMajor.department.code})`
-                : undefined
-            }
+            departmentOptions={departmentOptions}
+            departmentFallbackLabel={departmentFallbackLabel}
+            isLoading={loadingOptions && departmentOptions.length === 0}
           />
-        </form>
+        </Form>
       </Modal>
-
-      <AlertDialog open={!!deleteMajor} onOpenChange={(open) => !open && setDeleteMajor(null)}>
-        <AlertDialogContent className="rounded-3xl p-6 sm:p-7 border-none shadow-xl bg-white">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="font-bold text-lg text-slate-900">
-              Hapus Jurusan
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-xs sm:text-sm text-slate-500 leading-relaxed mt-1">
-              Apakah Anda yakin ingin menghapus data jurusan <strong className="text-slate-900 font-semibold">{deleteMajor?.name}</strong>? Tindakan ini tidak dapat dibatalkan jika masih digunakan oleh data siswa/alumni atau lowongan kerja.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="mt-5 border-none bg-transparent p-0 flex-row justify-end gap-2.5">
-            <AlertDialogCancel className="h-10 rounded-xl px-5 border-slate-200 text-slate-700 hover:bg-slate-100 font-medium cursor-pointer">
-              Batal
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              disabled={deleting}
-              className="h-10 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-xl px-5 cursor-pointer shadow-sm"
-            >
-              {deleting ? "Menghapus..." : "Ya, Hapus Jurusan"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+    </Box>
   );
 }
-
-export const DataJurusanPage = JurusanPage;

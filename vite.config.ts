@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig, loadEnv, type PluginOption } from 'vite-plus'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       tailwindcss()
-    ],
+    ] as PluginOption[],
     define: {
       __BUNDLED_DEV__: "false",
       __SERVER_FORWARD_CONSOLE__: '{"enabled": false}',
@@ -31,7 +31,7 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: {
-        "@": path.resolve(__dirname, "./src"),
+        "@": path.resolve(import.meta.dirname, "./src"),
       },
     },
   };

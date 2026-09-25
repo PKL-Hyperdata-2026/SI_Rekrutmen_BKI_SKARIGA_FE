@@ -3,6 +3,7 @@ import { toast } from '@/components/custom/sonner';
 import { useAppSelector } from '@/hooks/use-app';
 import { LaporanHeader } from './components/laporan-header';
 import { LaporanFilterBar } from './components/laporan-filter-bar';
+import { SlidingSegmentedControl } from '@/components/custom';
 import { TabRekrutmen } from './components/tab-rekrutmen';
 import { TabAbsensi } from './components/tab-absensi';
 import { TabKeterserapan } from './components/tab-keterserapan';
@@ -206,25 +207,17 @@ export function LaporanPage() {
         <LaporanHeader onPrint={handlePrintPDF} />
 
         {/* Tab Nav Switcher */}
-        <div className="flex items-center gap-2 rounded-xl bg-white p-1.5 border border-slate-200/80 shadow-sm">
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.key;
-            return (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => handleTabChange(tab.key)}
-                className={`flex-1 rounded-lg py-2.5 text-xs font-semibold transition-all cursor-pointer ${
-                  isActive
-                    ? 'bg-gradient-to-r from-sidebar-strip to-sidebar-gradient-from text-white shadow-xs'
-                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-                }`}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+        <SlidingSegmentedControl<ReportTabType>
+          options={tabs.map((tab) => ({ value: tab.key, label: tab.label }))}
+          value={activeTab}
+          onChange={handleTabChange}
+          aria-label="Navigasi tab laporan"
+          className="w-full bg-slate-100/90 dark:bg-slate-800/80 p-1.5 rounded-xl border border-slate-200/80 shadow-xs"
+          itemClassName="flex-1 py-2.5 h-auto text-xs font-semibold"
+          pillClassName="bg-gradient-to-r from-sidebar-strip to-sidebar-gradient-from shadow-xs"
+          activeClassName="text-white font-bold"
+          inactiveClassName="text-slate-500 hover:text-slate-900"
+        />
 
         {/* Filter Bar */}
         {activeTab === 'rekrutmen' && (

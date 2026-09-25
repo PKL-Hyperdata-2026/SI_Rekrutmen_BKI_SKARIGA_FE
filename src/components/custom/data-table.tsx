@@ -153,6 +153,7 @@ export interface DataTableProps<T> {
   onSelectRow?: (id: string | number, checked: boolean) => void;
   onRowClick?: (row: T, index: number) => void;
   getRowId?: (row: T, index: number) => string | number;
+  isRowSelectable?: (row: T, index: number) => boolean;
 }
 
 const roleThemeHeader: Record<RoleType, string> = {
@@ -162,6 +163,12 @@ const roleThemeHeader: Record<RoleType, string> = {
   default: "border-purple-200/80 bg-purple-50/60 text-purple-900",
 };
 
+const roleThemeCheckbox: Record<RoleType, string> = {
+  admin: "accent-purple-700 focus-visible:outline-purple-700",
+  siswa: "accent-sky-600 focus-visible:outline-sky-600",
+  hrd: "accent-[#8D1D96] focus-visible:outline-[#8D1D96]",
+  default: "accent-purple-700 focus-visible:outline-purple-700",
+};
 export function DataTable<T>({
   columns,
   data,
@@ -183,6 +190,7 @@ export function DataTable<T>({
   onSelectRow,
   onRowClick,
   getRowId = (_, idx) => idx,
+  isRowSelectable,
 }: DataTableProps<T>) {
   const isPill = variant === "pill";
 
@@ -212,12 +220,18 @@ export function DataTable<T>({
     ];
   }, [columns, actions]);
 
+  const selectableRows = data.filter((row, idx) =>
+    isRowSelectable ? isRowSelectable(row, idx) : true,
+  );
   const allSelected =
-    data.length > 0 &&
-    data.every((row, idx) => selectedIds.includes(getRowId(row, idx)));
+    selectableRows.length > 0 &&
+    selectableRows.every((row) =>
+      selectedIds.includes(getRowId(row, data.indexOf(row))),
+    );
   const someSelected =
-    data.some((row, idx) => selectedIds.includes(getRowId(row, idx))) &&
-    !allSelected;
+    selectableRows.some((row) =>
+      selectedIds.includes(getRowId(row, data.indexOf(row))),
+    ) && !allSelected;
 
   const totalCols = Math.max(
     1,
@@ -257,7 +271,10 @@ export function DataTable<T>({
                       if (el) el.indeterminate = someSelected;
                     }}
                     onChange={(e) => onSelectAll?.(e.target.checked)}
-                    className="h-3.5 w-3.5 rounded border-slate-300 text-primary focus:ring-primary/20 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    className={cn(
+                      "size-4 shrink-0 cursor-pointer rounded border-slate-300 transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-40",
+                      roleThemeCheckbox[role] ?? roleThemeCheckbox.default,
+                    )}
                   />
                 </th>
               )}
@@ -359,6 +376,9 @@ export function DataTable<T>({
               data.map((row, rowIdx) => {
                 const rowId = getRowId(row, rowIdx) ?? rowIdx;
                 const isSelected = selectedIds.includes(rowId);
+                const rowSelectable = isRowSelectable
+                  ? isRowSelectable(row, rowIdx)
+                  : true;
 
                 return (
                   <tr
@@ -380,11 +400,15 @@ export function DataTable<T>({
                           type="checkbox"
                           aria-label={`Pilih baris ${numberStartIndex + rowIdx}`}
                           checked={isSelected}
+                          disabled={!rowSelectable}
                           onChange={(e) =>
                             onSelectRow?.(rowId, e.target.checked)
                           }
                           onClick={(e) => e.stopPropagation()}
-                          className="h-3.5 w-3.5 rounded border-slate-300 text-primary focus:ring-primary/20 cursor-pointer"
+                          className={cn(
+                            "size-4 shrink-0 cursor-pointer rounded border-slate-300 transition-all hover:scale-105 disabled:cursor-not-allowed disabled:opacity-40",
+                            roleThemeCheckbox[role] ?? roleThemeCheckbox.default,
+                          )}
                         />
                       </td>
                     )}

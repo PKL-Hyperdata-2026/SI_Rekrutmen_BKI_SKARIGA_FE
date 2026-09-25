@@ -1,4 +1,5 @@
 import { EditorContent } from "@tiptap/react";
+import DOMPurify from "dompurify";
 import { cn } from "@/lib/utils";
 import { useRichTextEditor } from "@/hooks/use-rich-text-editor";
 import { RichTextToolbar } from "./text-editor/rich-text-toolbar";
@@ -116,7 +117,7 @@ export function RichTextContent({
           "[&_code]:bg-slate-100 [&_code]:px-1 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_code]:break-all",
           className,
         )}
-        dangerouslySetInnerHTML={{ __html: content }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
       />
     );
   }

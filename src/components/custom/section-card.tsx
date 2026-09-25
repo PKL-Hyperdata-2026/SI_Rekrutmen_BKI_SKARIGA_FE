@@ -9,6 +9,7 @@ export interface SectionCardProps
   action?: React.ReactNode;
   headerClassName?: string;
   bodyClassName?: string;
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 }
 
 export function SectionCard({
@@ -17,10 +18,13 @@ export function SectionCard({
   action,
   headerClassName,
   bodyClassName,
+  headingLevel = 3,
   className,
   children,
   ...props
 }: SectionCardProps) {
+  const HeadingTag = `h${headingLevel}` as const;
+
   return (
     <Card
       className={cn(
@@ -38,7 +42,7 @@ export function SectionCard({
         >
           <div>
             {typeof title === "string" ? (
-              <h3 className="text-base sm:text-lg font-bold text-slate-900">{title}</h3>
+              <HeadingTag className="text-base sm:text-lg font-bold text-slate-900">{title}</HeadingTag>
             ) : (
               title
             )}

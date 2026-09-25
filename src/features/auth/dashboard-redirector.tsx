@@ -3,9 +3,14 @@ import { Navigate } from "react-router";
 
 export function DashboardRedirector() {
   const { user } = useAppSelector((state) => state.auth);
+  const token = localStorage.getItem("access_token");
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
 
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return null;
   }
 
   switch (user.role) {

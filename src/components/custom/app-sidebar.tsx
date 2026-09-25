@@ -122,7 +122,7 @@ export function AppSidebar() {
       collapsible="icon"
       side="left"
       variant="sidebar"
-      className="border-none border-r-0 shadow-none bg-transparent p-0 overflow-x-hidden [&>[data-slot=sidebar-inner]]:bg-transparent"
+      className="border-none border-r-0 shadow-none bg-transparent p-0 overflow-x-hidden *:data-[slot=sidebar-inner]:bg-transparent"
     >
       <div ref={sidebarContainerRef} className="relative h-full w-full">
         {/* SVG ClipPath Definition for True Vector Cutout */}
@@ -140,7 +140,7 @@ export function AppSidebar() {
         <div
           data-sidebar-gradient="true"
           className={cn(
-            "absolute inset-0 md:top-2 md:bottom-2 md:left-2 md:right-0 z-0 rounded-none rounded-r-2xl md:rounded-2xl pointer-events-none transition-opacity duration-300 ease-in-out bg-gradient-to-b from-sidebar-gradient-from to-sidebar-gradient-to border-y-0 border-l-0 md:border md:border-r-0 border-white/20",
+            "absolute inset-0 md:top-2 md:bottom-2 md:left-2 md:right-0 z-0 rounded-none rounded-r-2xl md:rounded-2xl pointer-events-none transition-opacity duration-300 ease-in-out bg-linear-to-b from-sidebar-gradient-from to-sidebar-gradient-to border-y-0 border-l-0 md:border md:border-r-0 border-white/20",
             isCollapsed ? "opacity-0 pointer-events-none" : "opacity-100"
           )}
           style={

@@ -242,24 +242,28 @@ export function UsersPage() {
           value={users.length}
           icon={Users}
           color="blue"
+          isLoading={loading}
         />
         <StatCard
           label="Administrator BKI"
           value={adminCount}
           icon={UserCheck}
           color="sky"
+          isLoading={loading}
         />
         <StatCard
           label="HRD Industri Mitra"
           value={hrdCount}
           icon={Building2}
           color="teal"
+          isLoading={loading}
         />
         <StatCard
           label="Siswa Terdaftar"
           value={siswaCount}
           icon={Users}
           color="amber"
+          isLoading={loading}
         />
       </div>
 

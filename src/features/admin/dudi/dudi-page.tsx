@@ -220,18 +220,21 @@ export function DudiPage() {
           value={companies.length}
           icon={Building2}
           color="blue"
+          isLoading={loading}
         />
         <StatCard
           label="Mitra Aktif Kerjasama"
           value={activeCount}
           icon={CheckCircle2}
           color="teal"
+          isLoading={loading}
         />
         <StatCard
           label="Non-Aktif / Kadaluarsa"
           value={inactiveCount}
           icon={XCircle}
           color="amber"
+          isLoading={loading}
         />
       </div>
 
