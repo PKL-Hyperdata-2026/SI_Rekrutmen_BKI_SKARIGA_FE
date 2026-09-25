@@ -24,11 +24,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22
-          cache: npm
+          bun-version: latest
 
       - name: Verify required build variables are configured
         env:
@@ -50,11 +49,11 @@ jobs:
           fi
 
       - name: Install dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
       - name: Lint
         continue-on-error: true
-        run: npm run lint
+        run: bun run lint
 
       - name: Type-check and build
         env:
@@ -64,7 +63,7 @@ jobs:
           VITE_REVERB_HOST: ${{ vars.VITE_REVERB_HOST || secrets.VITE_REVERB_HOST }}
           VITE_REVERB_PORT: ${{ vars.VITE_REVERB_PORT || secrets.VITE_REVERB_PORT }}
           VITE_REVERB_SCHEME: ${{ vars.VITE_REVERB_SCHEME || secrets.VITE_REVERB_SCHEME }}
-        run: npm run build
+        run: bun run build
 
       - name: Upload build output
         uses: actions/upload-artifact@v4
