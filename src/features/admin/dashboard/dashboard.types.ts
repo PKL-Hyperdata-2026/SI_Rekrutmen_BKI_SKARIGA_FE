@@ -18,7 +18,6 @@ export interface DepartmentDistribution {
   code: string;
   count: number;
   percentage: number;
-  color: string;
 }
 
 export interface AdminDashboardData {

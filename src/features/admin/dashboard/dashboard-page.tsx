@@ -64,7 +64,7 @@ export function DashboardPage() {
       <PageHeader
         variant="admin"
         title="Dashboard BKI SKARIGA"
-        description="Temukan peluang karir terbaik dari industri mitra resmi SKARIGA."
+        description="Pantau ringkasan statistik rekrutmen, tren pelamar, dan keterserapan kerja alumni SKARIGA."
       >
         <PageHeader.Button
           variant="primary"

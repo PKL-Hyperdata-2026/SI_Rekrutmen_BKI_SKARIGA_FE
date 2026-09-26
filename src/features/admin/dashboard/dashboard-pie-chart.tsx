@@ -7,15 +7,30 @@ export interface DashboardPieChartProps {
   totalPlaced: number;
 }
 
-const DEPARTMENT_BADGE_CLASSES: Record<string, string> = {
-  TIK: "bg-purple-600",
-  MESIN: "bg-rose-500",
-  OTOMOTIF: "bg-sky-500",
-  ELEKTRO: "bg-emerald-500",
+const DEPARTMENT_COLORS: Record<string, { bgClass: string; hex: string }> = {
+  TIK: { bgClass: "bg-purple-600", hex: "#7c3aed" },
+  MESIN: { bgClass: "bg-rose-500", hex: "#f43f5e" },
+  OTOMOTIF: { bgClass: "bg-sky-500", hex: "#0ea5e9" },
+  ELEKTRO: { bgClass: "bg-emerald-500", hex: "#10b981" },
 };
 
+const FALLBACK_COLORS = [
+  { bgClass: "bg-amber-500", hex: "#f59e0b" },
+  { bgClass: "bg-indigo-500", hex: "#6366f1" },
+  { bgClass: "bg-pink-500", hex: "#ec4899" },
+  { bgClass: "bg-teal-500", hex: "#14b8a6" },
+];
+
+function getDepartmentColor(code: string, index: number = 0) {
+  const normalized = code.toUpperCase();
+  if (DEPARTMENT_COLORS[normalized]) {
+    return DEPARTMENT_COLORS[normalized];
+  }
+  return FALLBACK_COLORS[index % FALLBACK_COLORS.length];
+}
+
 interface PieTooltipPayload {
-  payload: DepartmentDistribution;
+  payload: DepartmentDistribution & { fillColor?: string };
 }
 
 interface CustomPieTooltipProps {
@@ -26,18 +41,21 @@ interface CustomPieTooltipProps {
 function CustomPieTooltip({ active, payload }: CustomPieTooltipProps) {
   if (!active || !payload || !payload.length) return null;
   const item = payload[0].payload;
-  const bgClass = DEPARTMENT_BADGE_CLASSES[item.code] || "bg-slate-800";
+  const isEmpty = item.code === "-";
+  const color = getDepartmentColor(item.code);
 
   return (
     <div
       className={cn(
         "relative z-50 rounded-xl px-3 py-2 text-white shadow-xl pointer-events-none transition-all duration-150 border border-white/20",
-        bgClass
+        isEmpty ? "bg-slate-700" : color.bgClass
       )}
     >
-      <p className="text-xs font-bold text-white tracking-tight">{item.name}</p>
+      <p className="text-xs font-bold text-white tracking-tight">
+        {isEmpty ? "Belum Ada Data" : item.name}
+      </p>
       <p className="text-xs font-medium text-white/90 mt-0.5">
-        {item.count} kandidat ({item.percentage}%)
+        {isEmpty ? "Belum ada data penempatan" : `${item.count} kandidat (${item.percentage}%)`}
       </p>
     </div>
   );
@@ -54,7 +72,7 @@ export function DashboardPieChart({ data, totalPlaced }: DashboardPieChartProps)
             code: "-",
             count: 1,
             percentage: 100,
-            color: "#E2E8F0",
+            fillColor: "#e2e8f0",
           },
         ];
 
@@ -83,9 +101,12 @@ export function DashboardPieChart({ data, totalPlaced }: DashboardPieChartProps)
               dataKey="count"
               stroke="transparent"
             >
-              {displayData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
+              {displayData.map((entry, index) => {
+                const color = "fillColor" in entry && entry.fillColor
+                  ? entry.fillColor
+                  : getDepartmentColor(entry.code, index).hex;
+                return <Cell key={`cell-${index}`} fill={color} />;
+              })}
             </Pie>
             <Tooltip
               content={<CustomPieTooltip />}
@@ -96,27 +117,27 @@ export function DashboardPieChart({ data, totalPlaced }: DashboardPieChartProps)
       </div>
 
       <div className="grid grid-cols-2 gap-2 pt-3 border-t border-slate-100 place-items-center">
-        {data.map((dept) => (
-          <div
-            key={dept.code}
-            className="flex items-center justify-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition-colors w-full text-center"
-          >
-            <span
-              className={cn(
-                "h-2.5 w-2.5 rounded-full shrink-0",
-                DEPARTMENT_BADGE_CLASSES[dept.code] || "bg-slate-400"
-              )}
-            />
-            <div className="flex flex-col items-start min-w-0">
-              <span className="text-xs font-semibold text-slate-700 truncate max-w-full" title={dept.name}>
-                {dept.code}
-              </span>
-              <span className="text-xs text-slate-400 font-medium">
-                {dept.count} ({dept.percentage}%)
-              </span>
+        {data.map((dept, index) => {
+          const color = getDepartmentColor(dept.code, index);
+          return (
+            <div
+              key={dept.code}
+              className="flex items-center justify-center gap-2.5 p-2 rounded-xl hover:bg-slate-50 transition-colors w-full text-center"
+            >
+              <span
+                className={cn("h-2.5 w-2.5 rounded-full shrink-0", color.bgClass)}
+              />
+              <div className="flex flex-col items-start min-w-0">
+                <span className="text-xs font-semibold text-slate-700 truncate max-w-full" title={dept.name}>
+                  {dept.code}
+                </span>
+                <span className="text-xs text-slate-400 font-medium">
+                  {dept.count} ({dept.percentage}%)
+                </span>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
