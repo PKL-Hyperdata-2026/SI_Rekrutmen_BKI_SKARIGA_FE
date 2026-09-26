@@ -1,0 +1,34 @@
+export interface DashboardMetrics {
+  activeStudents: number;
+  totalAlumni: number;
+  activeVacancies: number;
+  applicantsThisMonth: number;
+  placedWorkers: number;
+  absorptionRate: number;
+}
+
+export interface AcademicYearOption {
+  value: string;
+  label: string;
+}
+
+export interface ChartPoint {
+  month: string;
+  melamar: number;
+  diterima: number;
+}
+
+export interface DepartmentDistribution {
+  name: string;
+  code: string;
+  count: number;
+  percentage: number;
+  color: string;
+}
+
+export interface AdminDashboardData {
+  metrics: DashboardMetrics;
+  academicYearOptions: AcademicYearOption[];
+  recruitmentChart: ChartPoint[];
+  departmentDistribution: DepartmentDistribution[];
+}

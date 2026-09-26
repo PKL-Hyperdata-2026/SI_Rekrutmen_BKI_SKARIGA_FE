@@ -1,21 +1,10 @@
+import { useEffect, useState, useCallback } from "react";
 import {
   PageHeader,
   StatCard,
   SectionCard,
-  PillTableHeader,
-  InteractiveItemCard,
   FilterSelect,
 } from "@/components/custom";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   FilePlus,
   Printer,
@@ -23,8 +12,10 @@ import {
   UserPlus,
   Briefcase,
   ClipboardCheck,
-  PieChart,
-  BadgeCheck,
+  PieChart as PieChartIcon,
+  AlertCircle,
+  RefreshCw,
+  Loader2,
 } from "lucide-react";
 import {
   AreaChart,
@@ -36,90 +27,51 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { useNavigate } from "react-router-dom";
-
-const chartData = [
-  { month: "Jun", melamar: 68, diterima: 30, kehadiran: 64, baseline: 0 },
-  { month: "Jul", melamar: 26, diterima: 52, kehadiran: 66, baseline: 0 },
-  { month: "Aug", melamar: 36, diterima: 80, kehadiran: 35, baseline: 0 },
-  { month: "Sept", melamar: 51, diterima: 34, kehadiran: 12, baseline: 0 },
-  { month: "Oct", melamar: 83, diterima: 47, kehadiran: 85, baseline: 0 },
-  { month: "Nov", melamar: 0, diterima: 0, kehadiran: 0, baseline: 0 },
-];
-
-const realtimeAttendance = [
-  {
-    name: "Pikeu Pinky Pie",
-    event: "Tes Interview • PT Es Kul Kul",
-    status: "Hadir GPS",
-    time: "08.14 WIB",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face",
-  },
-  {
-    name: "Pikeu Pinky Pie",
-    event: "Tes Interview • PT Es Kul Kul",
-    status: "Hadir GPS",
-    time: "08.14 WIB",
-    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=100&h=100&fit=crop&crop=face",
-  },
-  {
-    name: "Pikeu Pinky Pie",
-    event: "Tes Interview • PT Es Kul Kul",
-    status: "Hadir GPS",
-    time: "08.14 WIB",
-    avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop&crop=face",
-  },
-  {
-    name: "Pikeu Pinky Pie",
-    event: "Tes Interview • PT Es Kul Kul",
-    status: "Hadir GPS",
-    time: "08.14 WIB",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-  },
-  {
-    name: "Pikeu Pinky Pie",
-    event: "Tes Interview • PT Es Kul Kul",
-    status: "Hadir GPS",
-    time: "08.14 WIB",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
-  },
-  {
-    name: "Pikeu Pinky Pie",
-    event: "Tes Interview • PT Es Kul Kul",
-    status: "Hadir GPS",
-    time: "08.14 WIB",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face",
-  },
-  {
-    name: "Pikeu Pinky Pie",
-    event: "Tes Interview • PT Es Kul Kul",
-    status: "Hadir GPS",
-    time: "08.14 WIB",
-    avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100&h=100&fit=crop&crop=face",
-  },
-];
-
-const placementData = [
-  {
-    name: "Aldi Taher Juicyyy",
-    majorYear: "RPL • 2025",
-    company: "PT Aldi's Burger",
-    position: "Burger Developer",
-    date: "10 Feb 2026",
-    status: "Lolos 6 Bulan (Bertahan)",
-  },
-];
-
-const tableColumns = [
-  { label: "Nama Alumni", align: "left" as const },
-  { label: "Perusahaan & Posisi", align: "left" as const },
-  { label: "Tgl Masuk", align: "left" as const },
-  { label: "Status Evaluasi", align: "center" as const },
-  { label: "Aksi", align: "center" as const },
-];
+import { Button } from "@/components/ui/button";
+import { dashboardApi } from "./dashboard.api";
+import { DashboardPieChart } from "./dashboard-pie-chart";
+import type { AdminDashboardData } from "./dashboard.types";
 
 export function DashboardPage() {
   const navigate = useNavigate();
-  
+  const [data, setData] = useState<AdminDashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedYear, setSelectedYear] = useState<string>("");
+
+  const fetchDashboard = useCallback(async (year?: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await dashboardApi.getDashboard(year);
+      setData(result);
+      if (!selectedYear && result.academicYearOptions.length > 0) {
+        setSelectedYear(result.academicYearOptions[0].value);
+      }
+    } catch (err: unknown) {
+      const apiError = err as { response?: { data?: { message?: string } } };
+      setError(apiError?.response?.data?.message || "Gagal memuat data dashboard.");
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedYear]);
+
+  useEffect(() => {
+    fetchDashboard();
+  }, [fetchDashboard]);
+
+  const handleYearChange = (year: string) => {
+    setSelectedYear(year);
+    fetchDashboard(year);
+  };
+
+  const metrics = data?.metrics;
+  const chartData = data?.recruitmentChart || [];
+  const departmentData = data?.departmentDistribution || [];
+  const yearOptions = data?.academicYearOptions || [
+    { value: "2026/2027", label: "T.A 2026/2027" },
+  ];
+
   return (
     <div className="space-y-5 sm:space-y-6">
       <PageHeader
@@ -130,56 +82,114 @@ export function DashboardPage() {
         <PageHeader.Button
           variant="primary"
           icon={<FilePlus className="h-4 w-4" />}
-          onClick={() => navigate("/admin/lowongan")}
+          onClick={() => navigate("/admin/lowongan/create")}
         >
           Buat Lowongan
         </PageHeader.Button>
         <PageHeader.Button
           variant="glass"
           icon={<Printer className="h-4 w-4" />}
+          onClick={() => navigate("/admin/laporan")}
         >
           Cetak Laporan
         </PageHeader.Button>
       </PageHeader>
 
+      {error ? (
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-between text-rose-700 text-xs sm:text-sm">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => fetchDashboard(selectedYear)}
+            className="h-8 gap-1.5 border-rose-200 hover:bg-rose-100 text-rose-700 cursor-pointer"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            Coba Lagi
+          </Button>
+        </div>
+      ) : null}
+
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <StatCard label="Siswa XII TA 2026" value="491" icon={GraduationCap} color="purple" />
-        <StatCard label="Alumni Terdata" value="1.340" icon={UserPlus} color="sky" />
-        <StatCard label="Lowongan Aktif" value="52" icon={Briefcase} color="teal" />
-        <StatCard label="Pelamar Bulan Ini" value="608" icon={FilePlus} color="dark-purple" />
-        <StatCard label="Diterima Kerja" value="195" icon={ClipboardCheck} color="cyan" />
-        <StatCard label="Keterserapan" value="84.2%" icon={PieChart} color="blue" />
+        <StatCard
+          label="Siswa XII Aktif"
+          value={(metrics?.activeStudents ?? 0).toLocaleString("id-ID")}
+          icon={GraduationCap}
+          color="purple"
+          isLoading={loading}
+        />
+        <StatCard
+          label="Alumni Terdata"
+          value={(metrics?.totalAlumni ?? 0).toLocaleString("id-ID")}
+          icon={UserPlus}
+          color="sky"
+          isLoading={loading}
+        />
+        <StatCard
+          label="Lowongan Aktif"
+          value={(metrics?.activeVacancies ?? 0).toLocaleString("id-ID")}
+          icon={Briefcase}
+          color="teal"
+          isLoading={loading}
+        />
+        <StatCard
+          label="Pelamar Bulan Ini"
+          value={(metrics?.applicantsThisMonth ?? 0).toLocaleString("id-ID")}
+          icon={FilePlus}
+          color="dark-purple"
+          isLoading={loading}
+        />
+        <StatCard
+          label="Diterima Kerja"
+          value={(metrics?.placedWorkers ?? 0).toLocaleString("id-ID")}
+          icon={ClipboardCheck}
+          color="cyan"
+          isLoading={loading}
+        />
+        <StatCard
+          label="Keterserapan"
+          value={`${metrics?.absorptionRate ?? 0}%`}
+          icon={PieChartIcon}
+          color="blue"
+          isLoading={loading}
+        />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-6 items-stretch">
-        <div className="lg:col-span-2 flex flex-col gap-5 sm:gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-stretch">
+        <div className="lg:col-span-8 flex flex-col">
           <SectionCard
             title="Grafik Keaktifan Pelamar & Rekrutmen"
-            subtitle="Tren pendaftaran, kehadiran tes, dan kelulusan 6 bulan terakhir"
+            subtitle="Tren pendaftaran dan kelulusan diterima kerja 6 bulan terakhir"
             action={
               <FilterSelect
                 role="admin"
-                defaultValue="2026/2027"
-                options={[
-                  { value: "2026/2027", label: "T.A 2026/2027" },
-                  { value: "2025/2026", label: "T.A 2025/2026" },
-                  { value: "2024/2025", label: "T.A 2024/2025" },
-                ]}
+                value={selectedYear}
+                options={yearOptions}
+                onValueChange={handleYearChange}
               />
             }
+            className="h-full flex flex-col justify-between"
           >
-            <div className="flex items-center justify-end gap-6 mb-3 text-xs">
+            <div className="flex items-center justify-end gap-4 sm:gap-6 mb-3 text-xs flex-wrap">
               <div className="flex items-center gap-2 font-medium text-slate-800">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#FA8272] inline-block shadow-2xs" />
+                <span className="h-2.5 w-2.5 rounded-full bg-rose-500 inline-block shadow-2xs" />
                 Melamar Lowongan
               </div>
               <div className="flex items-center gap-2 font-medium text-slate-800">
-                <span className="h-2.5 w-2.5 rounded-full bg-primary inline-block shadow-2xs" />
+                <span className="h-2.5 w-2.5 rounded-full bg-purple-600 inline-block shadow-2xs" />
                 Diterima Kerja
               </div>
             </div>
 
-            <div className="h-60 w-full pt-1">
+            <div className="h-68 w-full pt-1 relative">
+              {loading ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-xs rounded-2xl z-10">
+                  <Loader2 className="h-6 w-6 text-primary animate-spin" />
+                </div>
+              ) : null}
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart
                   data={chartData}
@@ -187,16 +197,12 @@ export function DashboardPage() {
                 >
                   <defs>
                     <linearGradient id="gradMelamar" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#FA8272" stopOpacity={0.35} />
-                      <stop offset="95%" stopColor="#FA8272" stopOpacity={0.02} />
+                      <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.35} />
+                      <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.02} />
                     </linearGradient>
                     <linearGradient id="gradDiterima" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#7C3AED" stopOpacity={0.35} />
-                      <stop offset="95%" stopColor="#7C3AED" stopOpacity={0.02} />
-                    </linearGradient>
-                    <linearGradient id="gradKehadiran" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#38BDF8" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#38BDF8" stopOpacity={0.02} />
+                      <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.35} />
+                      <stop offset="95%" stopColor="#7c3aed" stopOpacity={0.02} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -210,8 +216,8 @@ export function DashboardPage() {
                     className="text-xs fill-slate-400"
                     tickLine={false}
                     axisLine={false}
-                    domain={[0, 100]}
-                    ticks={[0, 20, 40, 60, 80, 100]}
+                    allowDecimals={false}
+                    domain={[0, "auto"]}
                   />
                   <Tooltip
                     contentStyle={{
@@ -224,127 +230,47 @@ export function DashboardPage() {
                     }}
                   />
                   <Area
-                    type="linear"
-                    dataKey="baseline"
-                    stroke="#f59e0b"
-                    strokeWidth={1.5}
-                    fillOpacity={0}
-                    dot={{ r: 3.5, fill: "#fff", stroke: "#f59e0b", strokeWidth: 1.5 }}
-                  />
-                  <Area
-                    type="natural"
-                    dataKey="kehadiran"
-                    name="Kehadiran Tes"
-                    stroke="#38BDF8"
-                    strokeWidth={1.8}
-                    fill="url(#gradKehadiran)"
-                    fillOpacity={1}
-                    dot={{ r: 3.5, fill: "#fff", stroke: "#38BDF8", strokeWidth: 1.5 }}
-                  />
-                  <Area
-                    type="natural"
+                    type="monotone"
                     dataKey="melamar"
                     name="Melamar Lowongan"
-                    stroke="#FA8272"
+                    stroke="#f43f5e"
                     strokeWidth={1.8}
                     fill="url(#gradMelamar)"
                     fillOpacity={1}
-                    dot={{ r: 3.5, fill: "#fff", stroke: "#FA8272", strokeWidth: 1.5 }}
+                    dot={{ r: 3.5, fill: "#fff", stroke: "#f43f5e", strokeWidth: 1.5 }}
                   />
                   <Area
-                    type="natural"
+                    type="monotone"
                     dataKey="diterima"
                     name="Diterima Kerja"
-                    stroke="#7C3AED"
+                    stroke="#7c3aed"
                     strokeWidth={1.8}
                     fill="url(#gradDiterima)"
                     fillOpacity={1}
-                    dot={{ r: 3.5, fill: "#fff", stroke: "#7C3AED", strokeWidth: 1.5 }}
+                    dot={{ r: 3.5, fill: "#fff", stroke: "#7c3aed", strokeWidth: 1.5 }}
                   />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
           </SectionCard>
-
-          <SectionCard
-            title="Monitoring Penempatan Kerja (3/6/12)"
-            subtitle="Evaluasi daya tahan kerja alumni di Industri Mitra"
-            action={
-              <Button variant="link" size="sm" className="h-auto p-0 text-xs font-semibold text-sky-600 hover:text-sky-700 hover:underline cursor-pointer">
-                Lihat Semua (3)
-              </Button>
-            }
-            className="flex-1 flex flex-col justify-between"
-          >
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-none hover:bg-transparent">
-                    <TableHead colSpan={5} className="p-0 pb-2">
-                      <PillTableHeader columns={tableColumns} role="admin" />
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {placementData.map((item, idx) => (
-                    <TableRow key={idx} className="border-none hover:bg-slate-50/60 transition-colors">
-                      <TableCell className="py-4 px-5">
-                        <div className="font-bold text-xs sm:text-sm text-slate-900">{item.name}</div>
-                        <div className="text-xs text-slate-400 font-medium mt-0.5">{item.majorYear}</div>
-                      </TableCell>
-                      <TableCell className="py-4 px-5">
-                        <div className="font-bold text-xs sm:text-sm text-slate-900">{item.company}</div>
-                        <div className="text-xs text-slate-400 font-medium mt-0.5">{item.position}</div>
-                      </TableCell>
-                      <TableCell className="py-4 px-5 text-xs sm:text-sm font-semibold text-slate-800">{item.date}</TableCell>
-                      <TableCell className="py-4 px-5 text-center">
-                        <Badge variant="outline" className="border-emerald-200 text-emerald-700 bg-emerald-50 text-xs font-semibold px-3 py-1 rounded-full">
-                          {item.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="py-4 px-5 text-center">
-                        <Button size="sm" className="bg-[var(--accent)] hover:bg-[var(--sidebar-strip)] text-white rounded-full h-8 px-4 text-xs font-semibold shadow-xs transition-all active:scale-[0.98] cursor-pointer">
-                          Detail
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </SectionCard>
         </div>
 
-        <div className="lg:col-span-1 flex flex-col">
+        <div className="lg:col-span-4 flex flex-col">
           <SectionCard
-            title="Absensi Realtime"
-            action={
-              <Badge variant="outline" className="border-primary/30 text-primary bg-primary/10 text-xs font-bold px-2.5 py-0.5 rounded-full">
-                LIVE
-              </Badge>
-            }
-            className="h-full"
+            title="Keterserapan Departemen"
+            subtitle="Distribusi kandidat diterima kerja"
+            className="h-full flex flex-col justify-between"
           >
-            <div className="space-y-2">
-              {realtimeAttendance.map((user, idx) => (
-                <InteractiveItemCard
-                  key={idx}
-                  role="admin"
-                  avatar={user.avatar}
-                  title={user.name}
-                  subtitle={user.event}
-                  status={user.status}
-                  time={user.time}
-                />
-              ))}
-            </div>
-
-            <div className="pt-4 mt-auto">
-              <Button className="w-full bg-[var(--sidebar-gradient-to)] hover:bg-[var(--sidebar-strip)] text-white font-bold text-xs sm:text-sm py-3 h-11 rounded-2xl flex items-center justify-center gap-2 shadow-xs transition-all active:scale-[0.98] cursor-pointer">
-                <BadgeCheck className="h-4 w-4" />
-                Validasi
-              </Button>
-            </div>
+            {loading ? (
+              <div className="h-68 w-full flex items-center justify-center">
+                <Loader2 className="h-6 w-6 text-primary animate-spin" />
+              </div>
+            ) : (
+              <DashboardPieChart
+                data={departmentData}
+                totalPlaced={metrics?.placedWorkers ?? 0}
+              />
+            )}
           </SectionCard>
         </div>
       </div>
