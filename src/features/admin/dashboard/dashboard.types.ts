@@ -7,11 +7,6 @@ export interface DashboardMetrics {
   absorptionRate: number;
 }
 
-export interface AcademicYearOption {
-  value: string;
-  label: string;
-}
-
 export interface ChartPoint {
   month: string;
   melamar: number;
@@ -28,7 +23,6 @@ export interface DepartmentDistribution {
 
 export interface AdminDashboardData {
   metrics: DashboardMetrics;
-  academicYearOptions: AcademicYearOption[];
   recruitmentChart: ChartPoint[];
   departmentDistribution: DepartmentDistribution[];
 }

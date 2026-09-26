@@ -3,8 +3,8 @@ import {
   PageHeader,
   StatCard,
   SectionCard,
-  FilterSelect,
 } from "@/components/custom";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   FilePlus,
   Printer,
@@ -15,7 +15,6 @@ import {
   PieChart as PieChartIcon,
   AlertCircle,
   RefreshCw,
-  Loader2,
 } from "lucide-react";
 import {
   AreaChart,
@@ -37,40 +36,28 @@ export function DashboardPage() {
   const [data, setData] = useState<AdminDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedYear, setSelectedYear] = useState<string>("");
 
-  const fetchDashboard = useCallback(async (year?: string) => {
+  const fetchDashboard = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const result = await dashboardApi.getDashboard(year);
+      const result = await dashboardApi.getDashboard();
       setData(result);
-      if (!selectedYear && result.academicYearOptions.length > 0) {
-        setSelectedYear(result.academicYearOptions[0].value);
-      }
     } catch (err: unknown) {
       const apiError = err as { response?: { data?: { message?: string } } };
       setError(apiError?.response?.data?.message || "Gagal memuat data dashboard.");
     } finally {
       setLoading(false);
     }
-  }, [selectedYear]);
+  }, []);
 
   useEffect(() => {
     fetchDashboard();
   }, [fetchDashboard]);
 
-  const handleYearChange = (year: string) => {
-    setSelectedYear(year);
-    fetchDashboard(year);
-  };
-
   const metrics = data?.metrics;
   const chartData = data?.recruitmentChart || [];
   const departmentData = data?.departmentDistribution || [];
-  const yearOptions = data?.academicYearOptions || [
-    { value: "2026/2027", label: "T.A 2026/2027" },
-  ];
 
   return (
     <div className="space-y-5 sm:space-y-6">
@@ -82,7 +69,7 @@ export function DashboardPage() {
         <PageHeader.Button
           variant="primary"
           icon={<FilePlus className="h-4 w-4" />}
-          onClick={() => navigate("/admin/lowongan/create")}
+          onClick={() => navigate("/admin/lowongan")}
         >
           Buat Lowongan
         </PageHeader.Button>
@@ -104,7 +91,7 @@ export function DashboardPage() {
           <Button
             size="sm"
             variant="outline"
-            onClick={() => fetchDashboard(selectedYear)}
+            onClick={() => fetchDashboard()}
             className="h-8 gap-1.5 border-rose-200 hover:bg-rose-100 text-rose-700 cursor-pointer"
           >
             <RefreshCw className="h-3.5 w-3.5" />
@@ -115,7 +102,7 @@ export function DashboardPage() {
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         <StatCard
-          label="Siswa XII Aktif"
+          label="Siswa Aktif"
           value={(metrics?.activeStudents ?? 0).toLocaleString("id-ID")}
           icon={GraduationCap}
           color="purple"
@@ -163,31 +150,47 @@ export function DashboardPage() {
           <SectionCard
             title="Grafik Keaktifan Pelamar & Rekrutmen"
             subtitle="Tren pendaftaran dan kelulusan diterima kerja 6 bulan terakhir"
-            action={
-              <FilterSelect
-                role="admin"
-                value={selectedYear}
-                options={yearOptions}
-                onValueChange={handleYearChange}
-              />
-            }
             className="h-full flex flex-col justify-between"
           >
             <div className="flex items-center justify-end gap-4 sm:gap-6 mb-3 text-xs flex-wrap">
-              <div className="flex items-center gap-2 font-medium text-slate-800">
-                <span className="h-2.5 w-2.5 rounded-full bg-rose-500 inline-block shadow-2xs" />
-                Melamar Lowongan
-              </div>
-              <div className="flex items-center gap-2 font-medium text-slate-800">
-                <span className="h-2.5 w-2.5 rounded-full bg-purple-600 inline-block shadow-2xs" />
-                Diterima Kerja
-              </div>
+              {loading ? (
+                <div className="flex items-center gap-4">
+                  <Skeleton className="h-3.5 w-28 rounded-full" />
+                  <Skeleton className="h-3.5 w-24 rounded-full" />
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 font-medium text-slate-800">
+                    <span className="h-2.5 w-2.5 rounded-full bg-rose-500 inline-block shadow-2xs" />
+                    Melamar Lowongan
+                  </div>
+                  <div className="flex items-center gap-2 font-medium text-slate-800">
+                    <span className="h-2.5 w-2.5 rounded-full bg-purple-600 inline-block shadow-2xs" />
+                    Diterima Kerja
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="h-68 w-full pt-1 relative">
               {loading ? (
-                <div className="absolute inset-0 flex items-center justify-center bg-white/60 backdrop-blur-xs rounded-2xl z-10">
-                  <Loader2 className="h-6 w-6 text-primary animate-spin" />
+                <div className="absolute inset-0 z-10 bg-white/60 backdrop-blur-xs rounded-2xl flex flex-col justify-between p-3 pointer-events-none">
+                  <div className="flex items-end justify-between gap-3 h-48 w-full px-2">
+                    <Skeleton className="flex-1 h-24 rounded-t-lg bg-slate-200/60" />
+                    <Skeleton className="flex-1 h-36 rounded-t-lg bg-slate-200/60" />
+                    <Skeleton className="flex-1 h-20 rounded-t-lg bg-slate-200/60" />
+                    <Skeleton className="flex-1 h-44 rounded-t-lg bg-slate-200/60" />
+                    <Skeleton className="flex-1 h-32 rounded-t-lg bg-slate-200/60" />
+                    <Skeleton className="flex-1 h-48 rounded-t-lg bg-slate-200/60" />
+                  </div>
+                  <div className="flex justify-between px-2 pt-2 border-t border-slate-100/60">
+                    <Skeleton className="h-3 w-8 rounded bg-slate-200/60" />
+                    <Skeleton className="h-3 w-8 rounded bg-slate-200/60" />
+                    <Skeleton className="h-3 w-8 rounded bg-slate-200/60" />
+                    <Skeleton className="h-3 w-8 rounded bg-slate-200/60" />
+                    <Skeleton className="h-3 w-8 rounded bg-slate-200/60" />
+                    <Skeleton className="h-3 w-8 rounded bg-slate-200/60" />
+                  </div>
                 </div>
               ) : null}
               <ResponsiveContainer width="100%" height="100%">
@@ -262,8 +265,44 @@ export function DashboardPage() {
             className="h-full flex flex-col justify-between"
           >
             {loading ? (
-              <div className="h-68 w-full flex items-center justify-center">
-                <Loader2 className="h-6 w-6 text-primary animate-spin" />
+              <div className="h-68 w-full flex flex-col items-center justify-center gap-4 py-2">
+                <div className="relative flex items-center justify-center">
+                  <Skeleton className="h-36 w-36 rounded-full" />
+                  <div className="absolute h-20 w-20 rounded-full bg-white flex flex-col items-center justify-center gap-1.5 shadow-xs">
+                    <Skeleton className="h-4 w-10 rounded" />
+                    <Skeleton className="h-2.5 w-14 rounded" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 w-full px-2">
+                  <div className="flex items-center gap-2 p-1.5 rounded-lg border border-slate-100">
+                    <Skeleton className="h-2.5 w-2.5 rounded-full shrink-0" />
+                    <div className="space-y-1 flex-1">
+                      <Skeleton className="h-3 w-12 rounded" />
+                      <Skeleton className="h-2.5 w-8 rounded" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 p-1.5 rounded-lg border border-slate-100">
+                    <Skeleton className="h-2.5 w-2.5 rounded-full shrink-0" />
+                    <div className="space-y-1 flex-1">
+                      <Skeleton className="h-3 w-12 rounded" />
+                      <Skeleton className="h-2.5 w-8 rounded" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 p-1.5 rounded-lg border border-slate-100">
+                    <Skeleton className="h-2.5 w-2.5 rounded-full shrink-0" />
+                    <div className="space-y-1 flex-1">
+                      <Skeleton className="h-3 w-12 rounded" />
+                      <Skeleton className="h-2.5 w-8 rounded" />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 p-1.5 rounded-lg border border-slate-100">
+                    <Skeleton className="h-2.5 w-2.5 rounded-full shrink-0" />
+                    <div className="space-y-1 flex-1">
+                      <Skeleton className="h-3 w-12 rounded" />
+                      <Skeleton className="h-2.5 w-8 rounded" />
+                    </div>
+                  </div>
+                </div>
               </div>
             ) : (
               <DashboardPieChart
