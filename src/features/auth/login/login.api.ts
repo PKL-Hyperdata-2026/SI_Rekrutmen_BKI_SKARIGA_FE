@@ -18,3 +18,8 @@ export const getMeApi = async () => {
   const response = await api.get<{ user: User }>("/me");
   return response.data;
 };
+
+export const logoutApi = async () => {
+  const response = await api.post<{ message: string }>("/logout");
+  return response.data;
+};

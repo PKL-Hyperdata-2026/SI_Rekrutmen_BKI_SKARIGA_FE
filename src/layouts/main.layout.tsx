@@ -2,7 +2,7 @@ import { Outlet, Navigate, useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/hooks/use-app";
 import { logout, setCredentials } from "@/slices/authSlice";
 import { useEffect, useState, useRef } from "react";
-import { getMeApi } from "@/features/auth/login/login.api";
+import { getMeApi, logoutApi } from "@/features/auth/login/login.api";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppSidebar, Topbar, GlobalLoading } from "@/components/custom";
@@ -19,15 +19,16 @@ export function MainLayout() {
   useEffect(() => {
     if (token) {
       getMeApi()
-      .then((data) => {
-        dispatch(setCredentials(data.user));
-      })
-      .catch(() => {
-        dispatch(logout());
-      })
-      .finally(() => {
-        setFetchingUser(false);
-      });
+        .then((data) => {
+          dispatch(setCredentials(data.user));
+        })
+        .catch(() => {
+          logoutApi().catch(() => undefined);
+          dispatch(logout());
+        })
+        .finally(() => {
+          setFetchingUser(false);
+        });
     }
   }, [token, dispatch]);
 
@@ -60,7 +61,9 @@ export function MainLayout() {
 
   useEffect(() => {
     if (scrollAreaRef.current) {
-      const viewport = scrollAreaRef.current.querySelector('[data-slot="scroll-area-viewport"]');
+      const viewport = scrollAreaRef.current.querySelector(
+        '[data-slot="scroll-area-viewport"]',
+      );
       if (viewport) {
         viewport.scrollTo({ top: 0, behavior: "instant" });
       }
@@ -101,15 +104,23 @@ export function MainLayout() {
           className="bg-slate-50 print:bg-white"
         >
           <div className="print:hidden">
-            <AppSidebar key={user ? `${user.role}-${user.id}` : "sidebar-loading"} />
+            <AppSidebar
+              key={user ? `${user.role}-${user.id}` : "sidebar-loading"}
+            />
           </div>
           <SidebarInset className="w-full min-w-0 flex flex-col h-screen overflow-hidden bg-slate-50 print:h-auto print:overflow-visible print:bg-white print:m-0 print:p-0">
-            <ScrollArea ref={scrollAreaRef} className="h-full w-full min-w-0 print:h-auto print:overflow-visible [&>div>div]:block! [&>div>div]:w-full [&>div>div]:min-w-0">
+            <ScrollArea
+              ref={scrollAreaRef}
+              className="h-full w-full min-w-0 print:h-auto print:overflow-visible [&>div>div]:block! [&>div>div]:w-full [&>div>div]:min-w-0"
+            >
               <div className="print:hidden">
                 <Topbar />
               </div>
               <main className="p-3.5 sm:p-4 md:p-6 w-full max-w-full min-w-0 relative print:p-0 print:m-0">
-                <div key={location.pathname} className="page-enter w-full min-w-0">
+                <div
+                  key={location.pathname}
+                  className="page-enter w-full min-w-0"
+                >
                   <Outlet />
                 </div>
               </main>

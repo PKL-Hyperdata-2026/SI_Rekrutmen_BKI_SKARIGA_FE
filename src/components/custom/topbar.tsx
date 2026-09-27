@@ -25,7 +25,11 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { useAppSelector, useAppDispatch } from "@/hooks/use-app";
 import { useNavigate } from "react-router-dom";
 import { logout } from "@/slices/authSlice";
-import { useNotification, type NotificationItem } from "@/hooks/use-notification";
+import { logoutApi } from "@/features/auth/login/login.api";
+import {
+  useNotification,
+  type NotificationItem,
+} from "@/hooks/use-notification";
 import {
   Popover,
   PopoverContent,
@@ -46,7 +50,9 @@ import { getAvatarUrl, cn } from "@/lib/utils";
 
 function formatRelativeTime(dateString: string): string {
   try {
-    const diff = Math.floor((Date.now() - new Date(dateString).getTime()) / 1000);
+    const diff = Math.floor(
+      (Date.now() - new Date(dateString).getTime()) / 1000,
+    );
     if (diff < 60) return "Baru saja";
     if (diff < 3600) return `${Math.floor(diff / 60)} mnt lalu`;
     if (diff < 86400) return `${Math.floor(diff / 3600)} jam lalu`;
@@ -124,6 +130,7 @@ export function Topbar() {
   } = useNotification(user?.rawId ?? user?.id);
 
   const handleLogout = () => {
+    logoutApi().catch(() => undefined);
     dispatch(logout());
     navigate("/login");
   };
@@ -141,24 +148,50 @@ export function Topbar() {
 
     switch (n.type) {
       case "job_vacancy":
-        navigate(isStudentRole ? "/student/lowongan" : isHrdRole ? "/hrd/lowongan" : "/admin/lowongan");
+        navigate(
+          isStudentRole
+            ? "/student/lowongan"
+            : isHrdRole
+              ? "/hrd/lowongan"
+              : "/admin/lowongan",
+        );
         break;
       case "job_application":
       case "application":
-        navigate(isHrdRole ? "/hrd/review" : isStudentRole ? "/student/lamaran" : "/admin/seleksi");
+        navigate(
+          isHrdRole
+            ? "/hrd/review"
+            : isStudentRole
+              ? "/student/lamaran"
+              : "/admin/seleksi",
+        );
         break;
       case "test_schedule":
       case "test_schedule_update":
       case "test_reminder":
-        navigate(isStudentRole ? "/student/lamaran" : isHrdRole ? "/hrd/jadwal" : "/admin/seleksi");
+        navigate(
+          isStudentRole
+            ? "/student/lamaran"
+            : isHrdRole
+              ? "/hrd/jadwal"
+              : "/admin/seleksi",
+        );
         break;
       case "attendance_validated":
       case "attendance_rejected":
-        navigate(isStudentRole ? "/student/lamaran" : "/admin/validasi-presensi");
+        navigate(
+          isStudentRole ? "/student/lamaran" : "/admin/validasi-presensi",
+        );
         break;
       case "job_placement":
       case "job_placement_update":
-        navigate(isStudentRole ? "/student/tracer" : isHrdRole ? "/hrd/penempatan" : "/admin/tracer");
+        navigate(
+          isStudentRole
+            ? "/student/tracer"
+            : isHrdRole
+              ? "/hrd/penempatan"
+              : "/admin/tracer",
+        );
         break;
       default:
         break;
@@ -176,7 +209,10 @@ export function Topbar() {
           >
             <PanelLeft className="h-4 w-4" strokeWidth={2} />
           </button>
-          <div ref={searchContainerRef} className="relative w-full max-w-lg hidden md:block">
+          <div
+            ref={searchContainerRef}
+            className="relative w-full max-w-lg hidden md:block"
+          >
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-400" />
             <Input
               type="text"
@@ -233,7 +269,9 @@ export function Topbar() {
                         }}
                         className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 hover:text-primary hover:bg-slate-50 rounded-lg transition-colors text-left cursor-pointer"
                       >
-                        {Icon && <Icon className="h-4 w-4 text-slate-400 shrink-0" />}
+                        {Icon && (
+                          <Icon className="h-4 w-4 text-slate-400 shrink-0" />
+                        )}
                         <span>{m.name}</span>
                       </button>
                     );
@@ -273,7 +311,9 @@ export function Topbar() {
             >
               <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50/70">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-slate-900">Notifikasi</span>
+                  <span className="text-xs font-bold text-slate-900">
+                    Notifikasi
+                  </span>
                   {unreadCount > 0 && (
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-primary/10 text-primary">
                       {unreadCount} Baru
@@ -289,7 +329,12 @@ export function Topbar() {
                     aria-label="Muat ulang notifikasi"
                     className="p-1 rounded-md text-slate-400 hover:text-primary hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-50"
                   >
-                    <RotateCw className={cn("h-3 w-3", loading && "animate-spin text-primary")} />
+                    <RotateCw
+                      className={cn(
+                        "h-3 w-3",
+                        loading && "animate-spin text-primary",
+                      )}
+                    />
                   </button>
                   {unreadCount > 0 && (
                     <button
@@ -338,7 +383,9 @@ export function Topbar() {
                     <div className="h-10 w-10 mx-auto rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mb-2.5">
                       <Bell className="h-5 w-5" />
                     </div>
-                    <p className="text-xs font-bold text-slate-700">Belum ada notifikasi</p>
+                    <p className="text-xs font-bold text-slate-700">
+                      Belum ada notifikasi
+                    </p>
                     <p className="text-[11px] text-slate-400 mt-0.5">
                       Pemberitahuan lowongan dan seleksi akan muncul di sini.
                     </p>
@@ -354,7 +401,7 @@ export function Topbar() {
                         onClick={() => handleNotificationClick(item)}
                         className={cn(
                           "flex gap-3 px-4 py-3 transition-colors cursor-pointer hover:bg-slate-50/80",
-                          !isRead && "bg-sky-50/30"
+                          !isRead && "bg-sky-50/30",
                         )}
                       >
                         <div className="h-8 w-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
@@ -367,7 +414,7 @@ export function Topbar() {
                                 "text-xs leading-snug truncate",
                                 isRead
                                   ? "font-medium text-slate-700"
-                                  : "font-bold text-slate-900"
+                                  : "font-bold text-slate-900",
                               )}
                             >
                               {item.title}
