@@ -103,7 +103,7 @@ frontend/src/
 │   │   └── route.tsx                            # Student sub-routes
 │   ├── admin/                                   # Administrator portal module (admin, superadmin)
 │   │   ├── alumni/                              # alumni-page.tsx, alumni-table.tsx, alumni-form.tsx, alumni-detail-modal.tsx, api, schema, form
-│   │   ├── dashboard/                           # dashboard-page.tsx
+│   │   ├── dashboard/                           # dashboard-page.tsx, dashboard-pie-chart.tsx, dashboard.api.ts, dashboard.types.ts
 │   │   ├── departemen/                          # departemen-page.tsx, departemen-table.tsx, departemen-form.tsx, api, schema, form
 │   │   ├── dudi/                                # dudi-page.tsx, dudi-table.tsx, dudi-form.tsx, api, schema, form
 │   │   ├── jurusan/                             # jurusan-page.tsx, jurusan-table.tsx, jurusan-form.tsx, api, schema, form
