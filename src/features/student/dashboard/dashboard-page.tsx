@@ -1,52 +1,73 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { AlertCircle, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useStudentDashboard } from "./use-student-dashboard";
+import { DashboardHero } from "./dashboard-hero";
+import { DashboardKpiCards } from "./dashboard-kpi-cards";
+import { DashboardChart } from "./dashboard-chart";
+import { DashboardScheduleCard } from "./dashboard-schedule-card";
 
 export function StudentDashboard() {
+  const {
+    loading,
+    error,
+    refresh,
+    firstName,
+    greetingTime,
+    totalVacancies,
+    schedules,
+    isAlumni,
+  } = useStudentDashboard();
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-2xl font-bold tracking-tight text-slate-800">Dashboard</h3>
-        <p className="text-slate-500">Selamat datang di portal siswa & alumni.</p>
-      </div>
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-        {[1, 2, 3, 4].map((i) => (
-          <Card key={i} className="border-slate-100 shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-slate-600">Statistik {i}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-8 w-1/2 mt-1 rounded" />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4 border-slate-100 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-slate-800">Aktivitas Terbaru</CardTitle>
-          </CardHeader>
-          <CardContent className="pl-6 pr-6">
-            <Skeleton className="h-[250px] w-full rounded-xl" />
-          </CardContent>
-        </Card>
-        <Card className="col-span-3 border-slate-100 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-slate-800">Pemberitahuan</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="flex items-center">
-                  <Skeleton className="h-10 w-10 rounded-full" />
-                  <div className="ml-4 space-y-2 w-full">
-                    <Skeleton className="h-3 w-3/4" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+    <div className="flex flex-col justify-between gap-3 sm:gap-3.5 xl:gap-4 lg:h-[calc(100vh-7.8rem)] w-full min-w-0 overflow-visible pt-1 sm:pt-2">
+      {/* Error Banner if API fails */}
+      {error && (
+        <div className="p-3 sm:p-3.5 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-between text-rose-700 text-xs sm:text-sm shrink-0">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={refresh}
+            className="h-7 text-xs gap-1.5 border-rose-200 hover:bg-rose-100 text-rose-700 cursor-pointer"
+          >
+            <RefreshCw className="h-3 w-3" />
+            Coba Lagi
+          </Button>
+        </div>
+      )}
+
+      {/* Row 1: Hero Banner */}
+      <DashboardHero
+        greetingTime={greetingTime}
+        firstName={firstName}
+        totalVacancies={totalVacancies}
+      />
+
+      {/* Row 2: KPI Cards (2 cards for student, 3 cards for alumni) */}
+      <DashboardKpiCards
+        totalVacancies={totalVacancies}
+        totalSchedules={schedules.length}
+        isAlumni={isAlumni}
+        isLoading={loading}
+      />
+
+      {/* Row 3: Bottom Analytics & Upcoming Schedule */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 xl:gap-4 flex-1 min-h-0">
+        {/* Left: 6-Month Vacancy & Application Trend Chart */}
+        <div className="lg:col-span-8 flex flex-col h-full min-h-0">
+          <DashboardChart isLoading={loading} />
+        </div>
+
+        {/* Right: Upcoming Recruitment Schedule */}
+        <div className="lg:col-span-4 flex flex-col h-full min-h-0">
+          <DashboardScheduleCard
+            schedule={schedules[0] || null}
+            isLoading={loading}
+          />
+        </div>
       </div>
     </div>
   );
