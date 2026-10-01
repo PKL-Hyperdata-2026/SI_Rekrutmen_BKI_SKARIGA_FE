@@ -3,7 +3,7 @@ import { CardContent } from "@/components/ui/card";
 import { LowonganKerjaFilter } from "./lowongan-kerja-filter";
 import { LowonganKerjaTable } from "./lowongan-kerja-table";
 import { LowonganKerjaDetail } from "./lowongan-kerja-detail";
-import { useLowonganKerja } from "./lowongan-kerja.page";
+import { useLowonganKerja } from "./use-lowongan-kerja";
 import { Store } from "lucide-react";
 
 export function LowonganKerjaPage() {

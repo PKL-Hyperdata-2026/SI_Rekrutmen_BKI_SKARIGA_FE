@@ -23,12 +23,15 @@ import { FilterSelect } from "@/components/custom/filter-select";
 import { Modal } from "@/components/custom/modal";
 import { Form } from "@/components/ui/form";
 import { DepartmentForm } from "./departemen-form";
-import { DepartmentCard, DepartmentCardSkeleton } from "./departemen-mobile-card";
+import {
+  DepartmentCard,
+  DepartmentCardSkeleton,
+} from "./departemen-mobile-card";
 import {
   useDepartemen,
   statusFilterOptions,
   getDepartmentRowId,
-} from "./departemen.page";
+} from "./use-departemen";
 
 export function DepartemenPage() {
   const {
@@ -158,7 +161,8 @@ export function DepartemenPage() {
                 Tidak ada departemen yang ditemukan
               </Paragraph>
               <Paragraph className="text-xs text-slate-400 mt-0.5">
-                Silakan tambahkan departemen baru atau sesuaikan kata kunci pencarian
+                Silakan tambahkan departemen baru atau sesuaikan kata kunci
+                pencarian
               </Paragraph>
             </CardContent>
           </Card>
