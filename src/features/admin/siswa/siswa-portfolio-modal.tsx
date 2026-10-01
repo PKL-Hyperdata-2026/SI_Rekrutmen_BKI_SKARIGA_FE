@@ -66,7 +66,9 @@ const CATEGORY_COLORS: Record<
   },
 };
 
-function parseSocialMedia(raw: unknown): Array<{ platform: string; username: string; url?: string }> {
+function parseSocialMedia(
+  raw: unknown,
+): Array<{ platform: string; username: string; url?: string }> {
   if (!raw) return [];
   if (Array.isArray(raw)) {
     return raw
@@ -97,7 +99,8 @@ export function SiswaPortfolioModal({
 }: SiswaPortfolioModalProps) {
   const [detailStudent, setDetailStudent] = useState<SiswaItem | null>(null);
   const [loading, setLoading] = useState(false);
-  const [previewDocument, setPreviewDocument] = useState<SiswaPortfolioItem | null>(null);
+  const [previewDocument, setPreviewDocument] =
+    useState<SiswaPortfolioItem | null>(null);
 
   useEffect(() => {
     if (!open || !student?.id) {
@@ -112,8 +115,8 @@ export function SiswaPortfolioModal({
     siswaApi
       .getStudent(student.id)
       .then((res) => {
-        if (!ignore && res.data?.data) {
-          setDetailStudent(res.data.data);
+        if (!ignore && res) {
+          setDetailStudent(res);
         }
       })
       .catch(() => {
@@ -136,7 +139,7 @@ export function SiswaPortfolioModal({
   const portfolios = activeData?.portfolios || [];
   const socialList = useMemo(
     () => parseSocialMedia(activeData?.socialMedia),
-    [activeData?.socialMedia]
+    [activeData?.socialMedia],
   );
 
   return (
@@ -173,7 +176,9 @@ export function SiswaPortfolioModal({
                       className="rounded-2xl"
                     />
                     <AvatarFallback className="rounded-2xl font-bold text-base bg-blue-100 text-blue-700">
-                      {activeData?.fullName ? activeData.fullName.charAt(0) : "S"}
+                      {activeData?.fullName
+                        ? activeData.fullName.charAt(0)
+                        : "S"}
                     </AvatarFallback>
                   </Avatar>
                   <div className="min-w-0">
@@ -202,7 +207,9 @@ export function SiswaPortfolioModal({
                       {activeData?.email && (
                         <span className="inline-flex items-center gap-1">
                           <Mail className="h-3 w-3 text-slate-400 shrink-0" />
-                          <span className="truncate max-w-44">{activeData.email}</span>
+                          <span className="truncate max-w-44">
+                            {activeData.email}
+                          </span>
                         </span>
                       )}
                       {activeData?.phone && (
@@ -288,7 +295,8 @@ export function SiswaPortfolioModal({
                   Belum Ada Dokumen E-Portfolio
                 </h5>
                 <p className="text-xs text-slate-500 max-w-sm mt-1 leading-relaxed">
-                  Siswa ini belum mengunggah dokumen curriculum vitae (CV), sertifikat PKL, atau berkas pendukung lainnya ke portal karir.
+                  Siswa ini belum mengunggah dokumen curriculum vitae (CV),
+                  sertifikat PKL, atau berkas pendukung lainnya ke portal karir.
                 </p>
               </div>
             ) : (
@@ -305,9 +313,13 @@ export function SiswaPortfolioModal({
                   const formattedDate = item.createdAt
                     ? (() => {
                         try {
-                          return format(new Date(item.createdAt), "d MMMM yyyy", {
-                            locale: idLocale,
-                          });
+                          return format(
+                            new Date(item.createdAt),
+                            "d MMMM yyyy",
+                            {
+                              locale: idLocale,
+                            },
+                          );
                         } catch {
                           return item.createdAt;
                         }
@@ -331,7 +343,9 @@ export function SiswaPortfolioModal({
                               {item.category?.name || catConfig.label}
                             </span>
                             <h5 className="text-xs font-bold text-slate-900 truncate">
-                              {item.title || item.category?.name || "Dokumen Lampiran"}
+                              {item.title ||
+                                item.category?.name ||
+                                "Dokumen Lampiran"}
                             </h5>
                           </div>
 
@@ -348,9 +362,20 @@ export function SiswaPortfolioModal({
                                 <span>Diunggah {formattedDate}</span>
                               </span>
                             )}
-                            <span className="inline-flex items-center gap-1 text-emerald-600 font-semibold truncate max-w-[200px]" title={item.fileName || item.originalFilename || "Berkas Dokumen"}>
+                            <span
+                              className="inline-flex items-center gap-1 text-emerald-600 font-semibold truncate max-w-[200px]"
+                              title={
+                                item.fileName ||
+                                item.originalFilename ||
+                                "Berkas Dokumen"
+                              }
+                            >
                               <CheckCircle2 className="h-3 w-3 shrink-0" />
-                              <span className="truncate">{item.fileName || item.originalFilename || "Format PDF"}</span>
+                              <span className="truncate">
+                                {item.fileName ||
+                                  item.originalFilename ||
+                                  "Format PDF"}
+                              </span>
                             </span>
                           </div>
                         </div>
@@ -413,10 +438,13 @@ export function SiswaPortfolioModal({
           <div className="bg-slate-900 px-6 py-4 text-white flex items-center justify-between shrink-0">
             <div className="min-w-0 pr-4">
               <DialogTitle className="text-sm font-bold text-white truncate">
-                {previewDocument?.title || previewDocument?.category?.name || "Preview Dokumen"}
+                {previewDocument?.title ||
+                  previewDocument?.category?.name ||
+                  "Preview Dokumen"}
               </DialogTitle>
               <DialogDescription className="text-xs text-slate-400 truncate mt-0.5">
-                {previewDocument?.category?.name || "E-Portofolio"} • {activeData?.fullName}
+                {previewDocument?.category?.name || "E-Portofolio"} •{" "}
+                {activeData?.fullName}
               </DialogDescription>
             </div>
 

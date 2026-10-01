@@ -1,4 +1,6 @@
 import { api } from "@/api/axios";
+import { unwrap } from "@/api/unwrap";
+import type { ApiResponse } from "@/api/unwrap";
 import type {
   StudentProfileData,
   PortfolioFormOptions,
@@ -14,41 +16,51 @@ export interface UpdateProfilePayload {
 }
 
 export const portfolioApi = {
-  getProfile: () =>
-    api.get<{ success: boolean; message?: string; data: StudentProfileData }>(
-      "/siswa/portfolio/profile"
-    ),
+  getProfile: async (): Promise<StudentProfileData> => {
+    const res = await api.get<ApiResponse<StudentProfileData>>(
+      "/siswa/portfolio/profile",
+    );
+    return unwrap(res);
+  },
 
-  getOptions: () =>
-    api.get<{ success: boolean; message?: string; data: PortfolioFormOptions }>(
-      "/siswa/portfolio/options"
-    ),
+  getOptions: async (): Promise<PortfolioFormOptions> => {
+    const res = await api.get<ApiResponse<PortfolioFormOptions>>(
+      "/siswa/portfolio/options",
+    );
+    return unwrap(res);
+  },
 
-  updateProfile: (payload: UpdateProfilePayload) =>
-    api.put<{
-      success: boolean;
-      message?: string;
-      data: StudentProfileData;
-    }>("/siswa/portfolio/profile", payload),
+  updateProfile: async (
+    payload: UpdateProfilePayload,
+  ): Promise<StudentProfileData> => {
+    const res = await api.put<ApiResponse<StudentProfileData>>(
+      "/siswa/portfolio/profile",
+      payload,
+    );
+    return unwrap(res);
+  },
 
-  uploadDocument: (categoryId: number, file: File) => {
+  uploadDocument: async (
+    categoryId: number,
+    file: File,
+  ): Promise<PortfolioItem> => {
     const formData = new FormData();
     formData.append("category_id", String(categoryId));
     formData.append("file", file);
 
-    return api.post<{
-      success: boolean;
-      message?: string;
-      data: PortfolioItem;
-    }>("/siswa/portfolio/upload", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
+    const res = await api.post<ApiResponse<PortfolioItem>>(
+      "/siswa/portfolio/upload",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       },
-    });
+    );
+    return unwrap(res);
   },
 
-  deleteDocument: (id: number) =>
-    api.delete<{ success: boolean; message?: string }>(
-      `/siswa/portfolio/${id}`
-    ),
+  deleteDocument: async (id: number): Promise<void> => {
+    await api.delete(`/siswa/portfolio/${id}`);
+  },
 };

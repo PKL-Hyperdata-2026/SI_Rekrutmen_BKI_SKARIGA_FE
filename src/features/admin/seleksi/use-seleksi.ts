@@ -12,20 +12,36 @@ import type {
 type AttendanceFilterValue = "all" | "hadir" | "tidak_hadir" | "belum_absensi";
 
 // Backend actual payload: data: { summary: {total_applicants, total_passed_admin, total_accepted}, applicants: {data:[], meta:{...}} }
-function normalizeSelectionsPayload(
-  envelope: SelectionListEnvelope
-): { rows: RecruitmentSelectionItem[]; meta: SelectionPaginationMeta | null; summary: SelectionSummaryStats | null } {
-  const raw = envelope.data as unknown;
+function normalizeSelectionsPayload(payload: SelectionListEnvelope["data"]): {
+  rows: RecruitmentSelectionItem[];
+  meta: SelectionPaginationMeta | null;
+  summary: SelectionSummaryStats | null;
+} {
+  const raw = payload as unknown;
 
   // Case 1: raw is array (legacy direct array pagination)
   if (Array.isArray(raw)) {
-    const metaEnvelope = (envelope as unknown as Record<string, unknown>).meta as SelectionPaginationMeta | undefined;
-    const total = (envelope as unknown as Record<string, unknown>).total as number | undefined;
-    const currentPage = (envelope as unknown as Record<string, unknown>).current_page as number | undefined;
-    const lastPage = (envelope as unknown as Record<string, unknown>).last_page as number | undefined;
-    const perPage = (envelope as unknown as Record<string, unknown>).per_page as number | undefined;
-    if (metaEnvelope) return { rows: raw as RecruitmentSelectionItem[], meta: metaEnvelope, summary: null };
-    if (currentPage !== undefined || lastPage !== undefined || total !== undefined) {
+    const metaEnvelope = (payload as unknown as Record<string, unknown>)
+      .meta as SelectionPaginationMeta | undefined;
+    const total = (payload as unknown as Record<string, unknown>).total as
+      number | undefined;
+    const currentPage = (payload as unknown as Record<string, unknown>)
+      .current_page as number | undefined;
+    const lastPage = (payload as unknown as Record<string, unknown>)
+      .last_page as number | undefined;
+    const perPage = (payload as unknown as Record<string, unknown>)
+      .per_page as number | undefined;
+    if (metaEnvelope)
+      return {
+        rows: raw as RecruitmentSelectionItem[],
+        meta: metaEnvelope,
+        summary: null,
+      };
+    if (
+      currentPage !== undefined ||
+      lastPage !== undefined ||
+      total !== undefined
+    ) {
       return {
         rows: raw as RecruitmentSelectionItem[],
         meta: {
@@ -37,7 +53,11 @@ function normalizeSelectionsPayload(
         summary: null,
       };
     }
-    return { rows: raw as RecruitmentSelectionItem[], meta: null, summary: null };
+    return {
+      rows: raw as RecruitmentSelectionItem[],
+      meta: null,
+      summary: null,
+    };
   }
 
   if (raw && typeof raw === "object") {
@@ -51,7 +71,9 @@ function normalizeSelectionsPayload(
         const rows = nestedData as RecruitmentSelectionItem[];
         const meta =
           (applicants.meta as SelectionPaginationMeta | undefined) ??
-          ((applicants.current_page !== undefined || applicants.last_page !== undefined || applicants.total !== undefined)
+          (applicants.current_page !== undefined ||
+          applicants.last_page !== undefined ||
+          applicants.total !== undefined
             ? {
                 current_page: (applicants.current_page as number) ?? 1,
                 last_page: (applicants.last_page as number) ?? 1,
@@ -61,15 +83,27 @@ function normalizeSelectionsPayload(
                 to: (applicants.to as number | null) ?? null,
               }
             : null) ??
-          ((envelope as unknown as Record<string, unknown>).meta as SelectionPaginationMeta | undefined) ??
+          ((payload as unknown as Record<string, unknown>).meta as
+            SelectionPaginationMeta | undefined) ??
           null;
 
         const summaryRaw = obj.summary as Record<string, unknown> | undefined;
         const summary: SelectionSummaryStats | null = summaryRaw
           ? {
-              totalPelamar: Number(summaryRaw.total_applicants ?? summaryRaw.totalPelamar ?? summaryRaw.total ?? 0),
-              administrasiLolos: Number(summaryRaw.total_passed_admin ?? summaryRaw.administrasiLolos ?? 0),
-              finalDiterima: Number(summaryRaw.total_accepted ?? summaryRaw.finalDiterima ?? 0),
+              totalPelamar: Number(
+                summaryRaw.total_applicants ??
+                  summaryRaw.totalPelamar ??
+                  summaryRaw.total ??
+                  0,
+              ),
+              administrasiLolos: Number(
+                summaryRaw.total_passed_admin ??
+                  summaryRaw.administrasiLolos ??
+                  0,
+              ),
+              finalDiterima: Number(
+                summaryRaw.total_accepted ?? summaryRaw.finalDiterima ?? 0,
+              ),
             }
           : null;
 
@@ -92,7 +126,9 @@ function normalizeSelectionsPayload(
       };
       const metaFromNested =
         nested.meta ??
-        (nested.current_page !== undefined || nested.last_page !== undefined || nested.total !== undefined
+        (nested.current_page !== undefined ||
+        nested.last_page !== undefined ||
+        nested.total !== undefined
           ? {
               current_page: nested.current_page ?? 1,
               last_page: nested.last_page ?? 1,
@@ -102,8 +138,11 @@ function normalizeSelectionsPayload(
               to: nested.to ?? null,
             }
           : undefined);
-      const rootMeta = (envelope as unknown as { meta?: SelectionPaginationMeta }).meta;
-      const summaryRaw = (nested as unknown as Record<string, unknown>).summary as Record<string, unknown> | undefined;
+      const rootMeta = (
+        payload as unknown as { meta?: SelectionPaginationMeta }
+      ).meta;
+      const summaryRaw = (nested as unknown as Record<string, unknown>)
+        .summary as Record<string, unknown> | undefined;
       const summary: SelectionSummaryStats | null = summaryRaw
         ? {
             totalPelamar: Number(summaryRaw.total_applicants ?? 0),
@@ -135,7 +174,7 @@ function normalizeSelectionsPayload(
 
 function computeStatsFallback(
   rows: RecruitmentSelectionItem[],
-  totalItems: number
+  totalItems: number,
 ): SelectionSummaryStats {
   let administrasiLolos = 0;
   let finalDiterima = 0;
@@ -143,9 +182,11 @@ function computeStatsFallback(
   for (const item of rows) {
     const statusCode = item.status?.code?.toLowerCase().trim() ?? "";
     const statusName = item.status?.name?.toLowerCase().trim() ?? "";
-    const adminStatus = item.selectionResult?.adminSelectionStatus?.toLowerCase().trim() ?? "";
+    const adminStatus =
+      item.selectionResult?.adminSelectionStatus?.toLowerCase().trim() ?? "";
     const decision = item.selectionResult?.decision?.toLowerCase().trim() ?? "";
-    const resultStatus = item.selectionResult?.status?.toLowerCase().trim() ?? "";
+    const resultStatus =
+      item.selectionResult?.status?.toLowerCase().trim() ?? "";
 
     const isAdministrasiLolos =
       statusCode === "lolos_administrasi" ||
@@ -211,9 +252,9 @@ export function useSeleksi(): UseSeleksiReturn {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [vacancyOptions, setVacancyOptions] = useState<SelectionJobVacancyOption[]>([
-    { value: "all", label: "Semua Lowongan" },
-  ]);
+  const [vacancyOptions, setVacancyOptions] = useState<
+    SelectionJobVacancyOption[]
+  >([{ value: "all", label: "Semua Lowongan" }]);
   const [stageOptions, setStageOptions] = useState<SelectionStageOption[]>([
     { value: "all", label: "Semua Tahapan" },
   ]);
@@ -256,7 +297,7 @@ export function useSeleksi(): UseSeleksiReturn {
 
       const [vacancyRes, stageRes] = await Promise.all([vacancyReq, stageReq]);
 
-      const rawVacancyData = vacancyRes.data?.data;
+      const rawVacancyData = vacancyRes;
       const vacancyRows: Array<{
         id: string | number;
         title?: string;
@@ -266,28 +307,33 @@ export function useSeleksi(): UseSeleksiReturn {
       }> = Array.isArray(rawVacancyData)
         ? (rawVacancyData as unknown as typeof vacancyRows)
         : Array.isArray((rawVacancyData as { data?: unknown })?.data)
-          ? ((rawVacancyData as { data: typeof vacancyRows }).data as typeof vacancyRows)
+          ? ((rawVacancyData as { data: typeof vacancyRows })
+              .data as typeof vacancyRows)
           : [];
 
       if (vacancyRows.length > 0) {
-        const mappedVacancies: SelectionJobVacancyOption[] = vacancyRows.map((v) => {
-          const companyLabel =
-            v.company?.name ?? v.companyName ?? null;
-          const base = v.title ?? v.position ?? `Lowongan #${String(v.id)}`;
-          const pos = v.position ? ` - ${v.position}` : "";
-          const suffix = companyLabel ? ` • ${companyLabel}` : "";
-          return {
-            value: String(v.id),
-            label: `${base}${pos}${suffix}`,
-            position: v.position ?? undefined,
-            companyName: companyLabel ?? undefined,
-          };
-        });
-        setVacancyOptions([{ value: "all", label: "Semua Lowongan" }, ...mappedVacancies]);
+        const mappedVacancies: SelectionJobVacancyOption[] = vacancyRows.map(
+          (v) => {
+            const companyLabel = v.company?.name ?? v.companyName ?? null;
+            const base = v.title ?? v.position ?? `Lowongan #${String(v.id)}`;
+            const pos = v.position ? ` - ${v.position}` : "";
+            const suffix = companyLabel ? ` • ${companyLabel}` : "";
+            return {
+              value: String(v.id),
+              label: `${base}${pos}${suffix}`,
+              position: v.position ?? undefined,
+              companyName: companyLabel ?? undefined,
+            };
+          },
+        );
+        setVacancyOptions([
+          { value: "all", label: "Semua Lowongan" },
+          ...mappedVacancies,
+        ]);
       }
 
       if (stageRes) {
-        const rawStageData = stageRes.data?.data;
+        const rawStageData = stageRes;
         const stageRows: Array<{
           id: string | number;
           name?: string;
@@ -298,7 +344,8 @@ export function useSeleksi(): UseSeleksiReturn {
         }> = Array.isArray(rawStageData)
           ? (rawStageData as unknown as typeof stageRows)
           : Array.isArray((rawStageData as { data?: unknown })?.data)
-            ? ((rawStageData as { data: typeof stageRows }).data as typeof stageRows)
+            ? ((rawStageData as { data: typeof stageRows })
+                .data as typeof stageRows)
             : [];
 
         if (stageRows.length > 0) {
@@ -307,7 +354,10 @@ export function useSeleksi(): UseSeleksiReturn {
             label: s.name ?? s.code ?? `Tahapan #${String(s.id)}`,
             sequenceOrder: s.sequence_order ?? s.sequenceOrder ?? undefined,
           }));
-          setStageOptions([{ value: "all", label: "Semua Tahapan" }, ...mappedStages]);
+          setStageOptions([
+            { value: "all", label: "Semua Tahapan" },
+            ...mappedStages,
+          ]);
         }
       }
     } catch {
@@ -329,18 +379,20 @@ export function useSeleksi(): UseSeleksiReturn {
         page: currentPage,
         per_page: perPage,
       };
-      if (selectedVacancyId !== "all") params.job_vacancy_id = selectedVacancyId;
+      if (selectedVacancyId !== "all")
+        params.job_vacancy_id = selectedVacancyId;
       if (selectedStageId !== "all") params.stage_id = selectedStageId;
       if (selectedAttendance !== "all") {
         // UI pakai "belum_absensi" tapi backend expects "belum" (validasi in: hadir,tidak_hadir,belum)
-        const attendanceParam = selectedAttendance === "belum_absensi" ? "belum" : selectedAttendance;
+        const attendanceParam =
+          selectedAttendance === "belum_absensi" ? "belum" : selectedAttendance;
         params.attendance_status = attendanceParam;
       }
       if (debouncedSearch) params.search = debouncedSearch;
 
       const res = await seleksiApi.getRecruitmentSelections(params);
 
-      const envelope = res.data;
+      const envelope = res;
       const { rows, meta, summary } = normalizeSelectionsPayload(envelope);
 
       setSelections(rows);
@@ -366,8 +418,8 @@ export function useSeleksi(): UseSeleksiReturn {
       }
     } catch (err: unknown) {
       const message =
-        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ??
-        "Gagal memuat data seleksi rekrutmen.";
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message ?? "Gagal memuat data seleksi rekrutmen.";
       setError(message);
       setSelections([]);
       setTotalItems(0);
@@ -376,7 +428,14 @@ export function useSeleksi(): UseSeleksiReturn {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, perPage, selectedVacancyId, selectedStageId, selectedAttendance, debouncedSearch]);
+  }, [
+    currentPage,
+    perPage,
+    selectedVacancyId,
+    selectedStageId,
+    selectedAttendance,
+    debouncedSearch,
+  ]);
 
   useEffect(() => {
     fetchSelections();
@@ -394,7 +453,9 @@ export function useSeleksi(): UseSeleksiReturn {
 
   const handleAttendanceChange = useCallback((val: string) => {
     const normalized: AttendanceFilterValue =
-      val === "hadir" || val === "tidak_hadir" || val === "belum_absensi" ? (val as AttendanceFilterValue) : "all";
+      val === "hadir" || val === "tidak_hadir" || val === "belum_absensi"
+        ? (val as AttendanceFilterValue)
+        : "all";
     setSelectedAttendance(normalized);
     setCurrentPage(1);
   }, []);

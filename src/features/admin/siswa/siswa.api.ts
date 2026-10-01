@@ -1,4 +1,6 @@
 import { api } from "@/api/axios";
+import { unwrap } from "@/api/unwrap";
+import type { ApiResponse } from "@/api/unwrap";
 import { selectOptionsApi } from "@/api/select-options";
 import type { AsyncSelectItem } from "@/api/select-options";
 import type {
@@ -20,12 +22,15 @@ function toOptionItems(items: AsyncSelectItem[]): SiswaOptionItem[] {
 const FILTER_PAGE_SIZE = 100;
 
 export const siswaApi = {
-  getStudents: (params?: SiswaFilterParams) =>
-    api.get<{
-      success: boolean;
-      message?: string;
-      data: SiswaPaginatedResponse;
-    }>("/admin/students", { params }),
+  getStudents: async (
+    params?: SiswaFilterParams,
+  ): Promise<SiswaPaginatedResponse> => {
+    const res = await api.get<ApiResponse<SiswaPaginatedResponse>>(
+      "/admin/students",
+      { params },
+    );
+    return unwrap(res);
+  },
 
   getFilterOptions: async (): Promise<SiswaOptionsData> => {
     const baseQuery = { search: "", page: 1, per_page: FILTER_PAGE_SIZE };
@@ -45,48 +50,59 @@ export const siswaApi = {
     };
   },
 
-  getStudent: (id: number | string) =>
-    api.get<{
-      success: boolean;
-      message?: string;
-      data: SiswaItem;
-    }>(`/admin/students/${id}`),
+  getStudent: async (id: number | string): Promise<SiswaItem> => {
+    const res = await api.get<ApiResponse<SiswaItem>>(`/admin/students/${id}`);
+    return unwrap(res);
+  },
 
-  createStudent: (payload: Record<string, unknown>) =>
-    api.post<{
-      success: boolean;
-      message?: string;
-      data: SiswaItem;
-    }>("/admin/students", payload),
+  createStudent: async (
+    payload: Record<string, unknown>,
+  ): Promise<SiswaItem> => {
+    const res = await api.post<ApiResponse<SiswaItem>>(
+      "/admin/students",
+      payload,
+    );
+    return unwrap(res);
+  },
 
-  updateStudent: (id: number | string, payload: Record<string, unknown>) =>
-    api.put<{
-      success: boolean;
-      message?: string;
-      data: SiswaItem;
-    }>(`/admin/students/${id}`, payload),
+  updateStudent: async (
+    id: number | string,
+    payload: Record<string, unknown>,
+  ): Promise<SiswaItem> => {
+    const res = await api.put<ApiResponse<SiswaItem>>(
+      `/admin/students/${id}`,
+      payload,
+    );
+    return unwrap(res);
+  },
 
-  deleteStudent: (id: number | string) =>
-    api.delete<{
-      success: boolean;
-      message?: string;
-    }>(`/admin/students/${id}`),
+  deleteStudent: async (id: number | string): Promise<void> => {
+    await api.delete(`/admin/students/${id}`);
+  },
 
-  uploadPortfolio: (studentId: number | string, formData: FormData) =>
-    api.post<{
-      success: boolean;
-      message?: string;
-      data: SiswaItem;
-    }>(`/admin/students/${studentId}/portfolios`, formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
+  uploadPortfolio: async (
+    studentId: number | string,
+    formData: FormData,
+  ): Promise<SiswaItem> => {
+    const res = await api.post<ApiResponse<SiswaItem>>(
+      `/admin/students/${studentId}/portfolios`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       },
-    }),
+    );
+    return unwrap(res);
+  },
 
-  deletePortfolio: (studentId: number | string, portfolioId: number | string) =>
-    api.delete<{
-      success: boolean;
-      message?: string;
-      data: SiswaItem;
-    }>(`/admin/students/${studentId}/portfolios/${portfolioId}`),
+  deletePortfolio: async (
+    studentId: number | string,
+    portfolioId: number | string,
+  ): Promise<SiswaItem> => {
+    const res = await api.delete<ApiResponse<SiswaItem>>(
+      `/admin/students/${studentId}/portfolios/${portfolioId}`,
+    );
+    return unwrap(res);
+  },
 };

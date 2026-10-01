@@ -69,12 +69,13 @@ export function UsersPage() {
       const params: Record<string, string> = {};
       if (search) params.search = search;
       if (roleFilter !== "all") params.role = roleFilter;
-      if (statusFilter !== "all") params.is_active = statusFilter === "active" ? "1" : "0";
+      if (statusFilter !== "all")
+        params.is_active = statusFilter === "active" ? "1" : "0";
 
       const res = await usersApi.getUsers(params);
-      const rawUsers: UserItem[] = res.data?.data?.data || [];
+      const rawUsers: UserItem[] = res.data || [];
       const filtered = rawUsers.filter(
-        (u) => u.id !== currentUser?.id && u.role !== "superadmin"
+        (u) => u.id !== currentUser?.id && u.role !== "superadmin",
       );
       setUsers(filtered);
     } catch {
@@ -105,18 +106,21 @@ export function UsersPage() {
     setIsFormOpen(true);
   };
 
-  const handleOpenEdit = useCallback((user: UserItem) => {
-    setEditingUser(user);
-    userForm.reset({
-      full_name: user.fullName,
-      email: user.email,
-      phone: user.phone || "",
-      password: "",
-      role: (user.role as "admin" | "hrd" | "siswa" | "alumni") || "admin",
-      company_id: user.company?.id ? String(user.company.id) : "",
-    });
-    setIsFormOpen(true);
-  }, [userForm]);
+  const handleOpenEdit = useCallback(
+    (user: UserItem) => {
+      setEditingUser(user);
+      userForm.reset({
+        full_name: user.fullName,
+        email: user.email,
+        phone: user.phone || "",
+        password: "",
+        role: (user.role as "admin" | "hrd" | "siswa" | "alumni") || "admin",
+        company_id: user.company?.id ? String(user.company.id) : "",
+      });
+      setIsFormOpen(true);
+    },
+    [userForm],
+  );
 
   const handleSubmitForm = userForm.handleSubmit(async (values) => {
     setSubmitting(true);
@@ -148,8 +152,8 @@ export function UsersPage() {
       await usersApi.toggleUserActive(user.id);
       setUsers((prev) =>
         prev.map((item) =>
-          item.id === user.id ? { ...item, isActive: !item.isActive } : item
-        )
+          item.id === user.id ? { ...item, isActive: !item.isActive } : item,
+        ),
       );
       toast.success(`Status akun ${user.fullName} berhasil diubah.`);
     } catch {
@@ -157,17 +161,22 @@ export function UsersPage() {
     }
   }, []);
 
-  const handleOpenReset = useCallback((user: UserItem) => {
-    setResetUser(user);
-    resetForm.reset({ password: "" });
-  }, [resetForm]);
+  const handleOpenReset = useCallback(
+    (user: UserItem) => {
+      setResetUser(user);
+      resetForm.reset({ password: "" });
+    },
+    [resetForm],
+  );
 
   const handleSubmitReset = resetForm.handleSubmit(async (values) => {
     if (!resetUser) return;
     setResetting(true);
     try {
       await usersApi.resetUserPassword(resetUser.id, values);
-      toast.success(`Kata sandi untuk ${resetUser.fullName} berhasil diatur ulang.`);
+      toast.success(
+        `Kata sandi untuk ${resetUser.fullName} berhasil diatur ulang.`,
+      );
       setResetUser(null);
       resetForm.reset();
     } catch (err: unknown) {
@@ -197,15 +206,15 @@ export function UsersPage() {
 
   const adminCount = useMemo(
     () => users.filter((u) => u.role === "admin").length,
-    [users]
+    [users],
   );
   const hrdCount = useMemo(
     () => users.filter((u) => u.role === "hrd").length,
-    [users]
+    [users],
   );
   const siswaCount = useMemo(
     () => users.filter((u) => u.role === "siswa").length,
-    [users]
+    [users],
   );
 
   const columns = useMemo(
@@ -216,9 +225,8 @@ export function UsersPage() {
         onEdit: handleOpenEdit,
         onDelete: (user) => setDeleteUser(user),
       }),
-    [handleToggleActive, handleOpenReset, handleOpenEdit]
+    [handleToggleActive, handleOpenReset, handleOpenEdit],
   );
-
 
   return (
     <div className="space-y-6">
@@ -284,11 +292,21 @@ export function UsersPage() {
               <SelectValue placeholder="Pilih Role" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all" className="text-xs">Semua Role</SelectItem>
-              <SelectItem value="admin" className="text-xs">Admin</SelectItem>
-              <SelectItem value="hrd" className="text-xs">HRD</SelectItem>
-              <SelectItem value="siswa" className="text-xs">Siswa</SelectItem>
-              <SelectItem value="alumni" className="text-xs">Alumni</SelectItem>
+              <SelectItem value="all" className="text-xs">
+                Semua Role
+              </SelectItem>
+              <SelectItem value="admin" className="text-xs">
+                Admin
+              </SelectItem>
+              <SelectItem value="hrd" className="text-xs">
+                HRD
+              </SelectItem>
+              <SelectItem value="siswa" className="text-xs">
+                Siswa
+              </SelectItem>
+              <SelectItem value="alumni" className="text-xs">
+                Alumni
+              </SelectItem>
             </SelectContent>
           </Select>
 
@@ -297,9 +315,15 @@ export function UsersPage() {
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all" className="text-xs">Semua Status</SelectItem>
-              <SelectItem value="active" className="text-xs">Aktif</SelectItem>
-              <SelectItem value="inactive" className="text-xs">Nonaktif</SelectItem>
+              <SelectItem value="all" className="text-xs">
+                Semua Status
+              </SelectItem>
+              <SelectItem value="active" className="text-xs">
+                Aktif
+              </SelectItem>
+              <SelectItem value="inactive" className="text-xs">
+                Nonaktif
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -320,7 +344,13 @@ export function UsersPage() {
         onOpenChange={setIsFormOpen}
         variant="admin"
         size="md"
-        headerIcon={editingUser ? <Pencil className="h-5 w-5" /> : <UserPlus className="h-5 w-5" />}
+        headerIcon={
+          editingUser ? (
+            <Pencil className="h-5 w-5" />
+          ) : (
+            <UserPlus className="h-5 w-5" />
+          )
+        }
         title={editingUser ? "Edit Akun Pengguna" : "Tambah Pengguna Baru"}
         description={
           editingUser
@@ -351,12 +381,14 @@ export function UsersPage() {
         description={
           <div className="flex flex-col gap-1.5 mt-0.5">
             <span className="text-white/90">
-              Ubah kata sandi untuk pengguna <strong className="text-white font-bold">{resetUser?.fullName}</strong> ({resetUser?.email}).
+              Ubah kata sandi untuk pengguna{" "}
+              <strong className="text-white font-bold">
+                {resetUser?.fullName}
+              </strong>{" "}
+              ({resetUser?.email}).
             </span>
             {resetUser && (
-              <div className="pt-0.5">
-                {renderRoleBadge(resetUser.role)}
-              </div>
+              <div className="pt-0.5">{renderRoleBadge(resetUser.role)}</div>
             )}
           </div>
         }
@@ -370,14 +402,22 @@ export function UsersPage() {
         </form>
       </Modal>
 
-      <AlertDialog open={!!deleteUser} onOpenChange={(open) => !open && setDeleteUser(null)}>
+      <AlertDialog
+        open={!!deleteUser}
+        onOpenChange={(open) => !open && setDeleteUser(null)}
+      >
         <AlertDialogContent className="rounded-3xl p-6 sm:p-7 border-none shadow-xl bg-white">
           <AlertDialogHeader>
             <AlertDialogTitle className="font-bold text-lg text-slate-900">
               Hapus Akun Pengguna
             </AlertDialogTitle>
             <AlertDialogDescription className="text-xs sm:text-sm text-slate-500 leading-relaxed mt-1">
-              Apakah Anda yakin ingin menghapus akun <strong className="text-slate-900 font-semibold">{deleteUser?.fullName}</strong> ({deleteUser?.email})? Akses masuk untuk akun ini akan langsung dinonaktifkan.
+              Apakah Anda yakin ingin menghapus akun{" "}
+              <strong className="text-slate-900 font-semibold">
+                {deleteUser?.fullName}
+              </strong>{" "}
+              ({deleteUser?.email})? Akses masuk untuk akun ini akan langsung
+              dinonaktifkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-5 border-none bg-transparent p-0 flex-row justify-end gap-2.5">

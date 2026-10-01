@@ -58,10 +58,11 @@ export function DudiPage() {
       const params: Record<string, string> = {};
       if (search) params.search = search;
       if (industryFilter !== "all") params.industry_id = industryFilter;
-      if (statusFilter !== "all") params.is_active = statusFilter === "active" ? "1" : "0";
+      if (statusFilter !== "all")
+        params.is_active = statusFilter === "active" ? "1" : "0";
 
       const res = await dudiApi.getCompanies(params);
-      setCompanies(res.data?.data?.data || []);
+      setCompanies(res.data || []);
     } catch {
       setCompanies([]);
       toast.error("Gagal memuat data industri mitra.");
@@ -75,8 +76,8 @@ export function DudiPage() {
     dudiApi
       .getCompanyOptions()
       .then((res) => {
-        if (!ignore && res.data?.data?.industries) {
-          setIndustries(res.data.data.industries);
+        if (!ignore && res.industries) {
+          setIndustries(res.industries);
         }
       })
       .catch(() => {});
@@ -108,21 +109,24 @@ export function DudiPage() {
     setIsFormOpen(true);
   };
 
-  const handleOpenEdit = useCallback((item: DudiItem) => {
-    setEditingCompany(item);
-    form.reset({
-      name: item.name,
-      industry_id: item.industryId ? String(item.industryId) : "",
-      address: item.address || "",
-      email: item.email || "",
-      phone: item.phone || "",
-      website: item.website || "",
-      pic_name: item.picName || "",
-      pic_contact: item.picContact || "",
-      is_active: item.isActive,
-    });
-    setIsFormOpen(true);
-  }, [form]);
+  const handleOpenEdit = useCallback(
+    (item: DudiItem) => {
+      setEditingCompany(item);
+      form.reset({
+        name: item.name,
+        industry_id: item.industryId ? String(item.industryId) : "",
+        address: item.address || "",
+        email: item.email || "",
+        phone: item.phone || "",
+        website: item.website || "",
+        pic_name: item.picName || "",
+        pic_contact: item.picContact || "",
+        is_active: item.isActive,
+      });
+      setIsFormOpen(true);
+    },
+    [form],
+  );
 
   const handleSubmitForm = form.handleSubmit(async (values) => {
     setSubmitting(true);
@@ -154,8 +158,8 @@ export function DudiPage() {
       await dudiApi.toggleCompanyActive(company.id);
       setCompanies((prev) =>
         prev.map((item) =>
-          item.id === company.id ? { ...item, isActive: !item.isActive } : item
-        )
+          item.id === company.id ? { ...item, isActive: !item.isActive } : item,
+        ),
       );
       toast.success(`Status mitra ${company.name} berhasil diubah.`);
     } catch {
@@ -180,11 +184,11 @@ export function DudiPage() {
 
   const activeCount = useMemo(
     () => companies.filter((c) => c.isActive).length,
-    [companies]
+    [companies],
   );
   const inactiveCount = useMemo(
     () => companies.filter((c) => !c.isActive).length,
-    [companies]
+    [companies],
   );
 
   const columns = useMemo(
@@ -194,9 +198,8 @@ export function DudiPage() {
         onEdit: handleOpenEdit,
         onDelete: (item) => setDeleteCompany(item),
       }),
-    [handleToggleActive, handleOpenEdit]
+    [handleToggleActive, handleOpenEdit],
   );
-
 
   return (
     <div className="space-y-6">
@@ -255,9 +258,15 @@ export function DudiPage() {
               <SelectValue placeholder="Semua Bidang" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all" className="text-xs">Semua Bidang</SelectItem>
+              <SelectItem value="all" className="text-xs">
+                Semua Bidang
+              </SelectItem>
               {industries.map((ind) => (
-                <SelectItem key={ind.id} value={String(ind.id)} className="text-xs">
+                <SelectItem
+                  key={ind.id}
+                  value={String(ind.id)}
+                  className="text-xs"
+                >
                   {ind.name}
                 </SelectItem>
               ))}
@@ -269,9 +278,15 @@ export function DudiPage() {
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all" className="text-xs">Semua Status</SelectItem>
-              <SelectItem value="active" className="text-xs">Aktif</SelectItem>
-              <SelectItem value="inactive" className="text-xs">Nonaktif</SelectItem>
+              <SelectItem value="all" className="text-xs">
+                Semua Status
+              </SelectItem>
+              <SelectItem value="active" className="text-xs">
+                Aktif
+              </SelectItem>
+              <SelectItem value="inactive" className="text-xs">
+                Nonaktif
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -292,7 +307,13 @@ export function DudiPage() {
         onOpenChange={setIsFormOpen}
         variant="admin"
         size="md"
-        headerIcon={editingCompany ? <Pencil className="h-5 w-5" /> : <Store className="h-5 w-5" />}
+        headerIcon={
+          editingCompany ? (
+            <Pencil className="h-5 w-5" />
+          ) : (
+            <Store className="h-5 w-5" />
+          )
+        }
         title={editingCompany ? "Edit Industri Mitra" : "Tambah Industri Mitra"}
         description={
           editingCompany
@@ -312,14 +333,21 @@ export function DudiPage() {
         </form>
       </Modal>
 
-      <AlertDialog open={!!deleteCompany} onOpenChange={(open) => !open && setDeleteCompany(null)}>
+      <AlertDialog
+        open={!!deleteCompany}
+        onOpenChange={(open) => !open && setDeleteCompany(null)}
+      >
         <AlertDialogContent className="rounded-3xl p-6 sm:p-7 border-none shadow-xl bg-white">
           <AlertDialogHeader>
             <AlertDialogTitle className="font-bold text-lg text-slate-900">
               Hapus Mitra Perusahaan
             </AlertDialogTitle>
             <AlertDialogDescription className="text-xs sm:text-sm text-slate-500 leading-relaxed mt-1">
-              Apakah Anda yakin ingin menghapus data mitra <strong className="text-slate-900 font-semibold">{deleteCompany?.name}</strong>? Data riwayat lowongan terkait tidak akan hilang.
+              Apakah Anda yakin ingin menghapus data mitra{" "}
+              <strong className="text-slate-900 font-semibold">
+                {deleteCompany?.name}
+              </strong>
+              ? Data riwayat lowongan terkait tidak akan hilang.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-5 border-none bg-transparent p-0 flex-row justify-end gap-2.5">

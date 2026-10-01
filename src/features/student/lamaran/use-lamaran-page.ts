@@ -23,8 +23,10 @@ export function useLamaranPage() {
   });
 
   const [instructionModalOpen, setInstructionModalOpen] = useState(false);
-  const [selectedApplicationForInstruction, setSelectedApplicationForInstruction] =
-    useState<StudentJobApplication | null>(null);
+  const [
+    selectedApplicationForInstruction,
+    setSelectedApplicationForInstruction,
+  ] = useState<StudentJobApplication | null>(null);
 
   const fetchApplications = useCallback(async () => {
     setLoading(true);
@@ -51,21 +53,25 @@ export function useLamaranPage() {
       }
 
       const res = await getStudentJobApplications(params);
-      const rawData = res?.data;
+      const rawData = res;
       const apiData = Array.isArray(rawData)
         ? rawData
         : Array.isArray(rawData?.data)
-        ? rawData.data
-        : [];
+          ? rawData.data
+          : [];
 
       setApplications(apiData);
 
       if (rawData && !Array.isArray(rawData) && rawData.meta) {
         setTotalPages(rawData.meta.last_page || 1);
         setTotalItems(rawData.meta.total ?? apiData.length);
-      } else if (rawData && !Array.isArray(rawData) && typeof rawData.total === "number") {
+      } else if (
+        rawData &&
+        !Array.isArray(rawData) &&
+        typeof rawData.total === "number"
+      ) {
         setTotalPages(
-          rawData.last_page || Math.ceil(rawData.total / pageSize) || 1
+          rawData.last_page || Math.ceil(rawData.total / pageSize) || 1,
         );
         setTotalItems(rawData.total);
       } else {
@@ -99,10 +105,13 @@ export function useLamaranPage() {
     setCurrentPage(1);
   }, []);
 
-  const handleDateRangeChange = useCallback((range: DateRangeValue | undefined) => {
-    setDateRange(range);
-    setCurrentPage(1);
-  }, []);
+  const handleDateRangeChange = useCallback(
+    (range: DateRangeValue | undefined) => {
+      setDateRange(range);
+      setCurrentPage(1);
+    },
+    [],
+  );
 
   const handlePageChange = useCallback((page: number) => {
     setCurrentPage(page);
@@ -127,10 +136,10 @@ export function useLamaranPage() {
   const stats = useMemo(() => {
     const total = totalItems || applications.length;
     const diterima = applications.filter(
-      (a) => a.status?.code === "accepted"
+      (a) => a.status?.code === "accepted",
     ).length;
     const gagal = applications.filter(
-      (a) => a.status?.code === "rejected"
+      (a) => a.status?.code === "rejected",
     ).length;
     return { total, diterima, gagal };
   }, [applications, totalItems]);
@@ -142,7 +151,7 @@ export function useLamaranPage() {
         "Pantau perkembangan tahapan seleksi secara otomatis & real-time.",
       badge: "Modul Rekrutmen Terintegrasi",
     }),
-    []
+    [],
   );
 
   return {

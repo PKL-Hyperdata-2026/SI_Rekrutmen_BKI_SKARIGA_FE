@@ -30,10 +30,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/components/custom/sonner";
 import { siswaApi } from "./siswa.api";
-import {
-  useSiswaForm,
-  toSiswaPayload,
-} from "./siswa.form";
+import { useSiswaForm, toSiswaPayload } from "./siswa.form";
 import { SiswaForm } from "./siswa-form";
 import { SiswaDetailModal } from "./siswa-detail-modal";
 import { buildSiswaColumns } from "./siswa-table";
@@ -86,7 +83,8 @@ export function SiswaPage() {
 
   // Modal Detail State
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false);
-  const [activeDetailStudent, setActiveDetailStudent] = useState<SiswaItem | null>(null);
+  const [activeDetailStudent, setActiveDetailStudent] =
+    useState<SiswaItem | null>(null);
 
   // Delete Dialog State
   const [deleteStudent, setDeleteStudent] = useState<SiswaItem | null>(null);
@@ -109,7 +107,7 @@ export function SiswaPage() {
       if (statusFilter !== "all") params.employment_status_id = statusFilter;
 
       const res = await siswaApi.getStudents(params);
-      const resData = res.data?.data;
+      const resData = res;
 
       if (Array.isArray(resData)) {
         setStudents(resData);
@@ -162,7 +160,15 @@ export function SiswaPage() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, perPage, search, deptFilter, majorFilter, classFilter, statusFilter]);
+  }, [
+    currentPage,
+    perPage,
+    search,
+    deptFilter,
+    majorFilter,
+    classFilter,
+    statusFilter,
+  ]);
 
   useEffect(() => {
     let ignore = false;
@@ -236,7 +242,7 @@ export function SiswaPage() {
       });
       setIsFormOpen(true);
     },
-    [form]
+    [form],
   );
 
   const handleOpenDetail = useCallback(async (item: SiswaItem) => {
@@ -244,8 +250,8 @@ export function SiswaPage() {
     setIsDetailOpen(true);
     try {
       const res = await siswaApi.getStudent(item.id);
-      if (res.data?.data) {
-        setActiveDetailStudent(res.data.data);
+      if (res) {
+        setActiveDetailStudent(res);
       }
     } catch {
       // Menggunakan data awal jika endpoint detail lambat merespons
@@ -279,7 +285,8 @@ export function SiswaPage() {
     setDeleting(true);
     try {
       await siswaApi.deleteStudent(deleteStudent.id);
-      const studentName = deleteStudent.fullName || deleteStudent.user?.fullName || "Siswa";
+      const studentName =
+        deleteStudent.fullName || deleteStudent.user?.fullName || "Siswa";
       toast.success(`Data siswa ${studentName} berhasil dihapus.`);
       setDeleteStudent(null);
       fetchStudents();
@@ -290,11 +297,14 @@ export function SiswaPage() {
     }
   };
 
-  const handleUploadPortfolio = async (studentId: number | string, formData: FormData) => {
+  const handleUploadPortfolio = async (
+    studentId: number | string,
+    formData: FormData,
+  ) => {
     try {
       const res = await siswaApi.uploadPortfolio(studentId, formData);
-      if (res.data?.data) {
-        setActiveDetailStudent(res.data.data);
+      if (res) {
+        setActiveDetailStudent(res);
       }
       toast.success("Berkas portofolio berhasil diunggah.");
       fetchStudents();
@@ -309,12 +319,12 @@ export function SiswaPage() {
 
   const handleDeletePortfolio = async (
     studentId: number | string,
-    portfolioId: number | string
+    portfolioId: number | string,
   ) => {
     try {
       const res = await siswaApi.deletePortfolio(studentId, portfolioId);
-      if (res.data?.data) {
-        setActiveDetailStudent(res.data.data);
+      if (res) {
+        setActiveDetailStudent(res);
       }
       toast.success("Berkas portofolio berhasil dihapus.");
       fetchStudents();
@@ -330,7 +340,7 @@ export function SiswaPage() {
         onEdit: handleOpenEdit,
         onDelete: (item) => setDeleteStudent(item),
       }),
-    [handleOpenDetail, handleOpenEdit]
+    [handleOpenDetail, handleOpenEdit],
   );
 
   return (
@@ -385,9 +395,15 @@ export function SiswaPage() {
                 </div>
               </SelectTrigger>
               <SelectContent className="rounded-xl border-slate-200 shadow-md">
-                <SelectItem value="all" className="text-xs font-medium">Semua Departemen</SelectItem>
+                <SelectItem value="all" className="text-xs font-medium">
+                  Semua Departemen
+                </SelectItem>
                 {options.departments.map((d) => (
-                  <SelectItem key={d.id} value={String(d.id)} className="text-xs font-medium">
+                  <SelectItem
+                    key={d.id}
+                    value={String(d.id)}
+                    className="text-xs font-medium"
+                  >
                     {d.name}
                   </SelectItem>
                 ))}
@@ -410,9 +426,15 @@ export function SiswaPage() {
               </div>
             </SelectTrigger>
             <SelectContent className="rounded-xl border-slate-200 shadow-md">
-              <SelectItem value="all" className="text-xs font-medium">Semua Jurusan</SelectItem>
+              <SelectItem value="all" className="text-xs font-medium">
+                Semua Jurusan
+              </SelectItem>
               {filteredMajors.map((m) => (
-                <SelectItem key={m.id} value={String(m.id)} className="text-xs font-medium">
+                <SelectItem
+                  key={m.id}
+                  value={String(m.id)}
+                  className="text-xs font-medium"
+                >
                   {m.name}
                 </SelectItem>
               ))}
@@ -431,9 +453,15 @@ export function SiswaPage() {
               <SelectValue placeholder="Semua Kelas" />
             </SelectTrigger>
             <SelectContent className="rounded-xl border-slate-200 shadow-md">
-              <SelectItem value="all" className="text-xs font-medium">Semua Kelas</SelectItem>
+              <SelectItem value="all" className="text-xs font-medium">
+                Semua Kelas
+              </SelectItem>
               {(options.classes || []).map((c) => (
-                <SelectItem key={c.id} value={String(c.id)} className="text-xs font-medium">
+                <SelectItem
+                  key={c.id}
+                  value={String(c.id)}
+                  className="text-xs font-medium"
+                >
                   {c.name}
                 </SelectItem>
               ))}
@@ -455,9 +483,15 @@ export function SiswaPage() {
               </div>
             </SelectTrigger>
             <SelectContent className="rounded-xl border-slate-200 shadow-md">
-              <SelectItem value="all" className="text-xs font-medium">Semua Status Kerja</SelectItem>
+              <SelectItem value="all" className="text-xs font-medium">
+                Semua Status Kerja
+              </SelectItem>
               {(options.employment_statuses || []).map((st) => (
-                <SelectItem key={st.id} value={String(st.id)} className="text-xs font-medium">
+                <SelectItem
+                  key={st.id}
+                  value={String(st.id)}
+                  className="text-xs font-medium"
+                >
                   {st.name}
                 </SelectItem>
               ))}
@@ -466,7 +500,10 @@ export function SiswaPage() {
 
           {/* Total Count Badge Sesuai Figma */}
           <div className="hidden sm:inline-flex items-center justify-end px-3.5 h-10 rounded-xl border border-slate-200/80 bg-white text-xs font-medium text-slate-600 whitespace-nowrap shadow-2xs">
-            Total : <span className="font-bold text-purple-700 ml-1">{meta.total} Siswa/Siswi</span>
+            Total :{" "}
+            <span className="font-bold text-purple-700 ml-1">
+              {meta.total} Siswa/Siswi
+            </span>
           </div>
         </div>
       </div>
@@ -502,7 +539,11 @@ export function SiswaPage() {
         variant="admin"
         size="md"
         headerIcon={
-          editingStudent ? <Pencil className="h-5 w-5" /> : <UserPlus className="h-5 w-5" />
+          editingStudent ? (
+            <Pencil className="h-5 w-5" />
+          ) : (
+            <UserPlus className="h-5 w-5" />
+          )
         }
         title={editingStudent ? "Edit Data Siswa" : "Tambah Siswa Baru"}
         description={
@@ -555,7 +596,8 @@ export function SiswaPage() {
               <strong className="text-slate-900 font-semibold">
                 {deleteStudent?.fullName || deleteStudent?.user?.fullName}
               </strong>{" "}
-              (NIS: {deleteStudent?.nis})? Akun portal terkait akan dinonaktifkan.
+              (NIS: {deleteStudent?.nis})? Akun portal terkait akan
+              dinonaktifkan.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-5 border-none bg-transparent p-0 flex-row justify-end gap-2.5">
