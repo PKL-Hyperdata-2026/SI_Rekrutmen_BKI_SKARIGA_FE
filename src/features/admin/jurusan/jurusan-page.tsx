@@ -25,7 +25,7 @@ import { Form } from "@/components/ui/form";
 import { Modal } from "@/components/custom/modal";
 import { MajorForm } from "./jurusan-form";
 import { MajorCard, MajorCardSkeleton } from "./jurusan-mobile-card";
-import { useJurusan, getMajorRowId } from "./jurusan.page";
+import { useJurusan, getMajorRowId } from "./use-jurusan";
 
 export function JurusanPage() {
   const {

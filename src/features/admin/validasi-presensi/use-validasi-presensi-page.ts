@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useMemo } from "react";
 import { validasiPresensiApi } from "./validasi-presensi.api";
 import { toast } from "@/components/custom/sonner";
 import {
-  vacancyOptionsResponseSchema,
+  vacancyOptionSchema,
   type VacancyOption,
   cleanVacancyTitle,
 } from "./validasi-presensi.schema";
@@ -36,9 +36,9 @@ export function useValidasiPresensiPage() {
   const fetchVacancies = useCallback(async () => {
     try {
       const res = await validasiPresensiApi.getVacancies();
-      const parsed = vacancyOptionsResponseSchema.safeParse(res.data);
+      const parsed = vacancyOptionSchema.array().safeParse(res);
       if (parsed.success) {
-        setVacancies(parsed.data.data);
+        setVacancies(parsed.data);
       }
     } catch (err: unknown) {
       if (isApiError(err)) {
@@ -55,9 +55,9 @@ export function useValidasiPresensiPage() {
       .getVacancies()
       .then((res) => {
         if (!ignore) {
-          const parsed = vacancyOptionsResponseSchema.safeParse(res.data);
+          const parsed = vacancyOptionSchema.array().safeParse(res);
           if (parsed.success) {
-            setVacancies(parsed.data.data);
+            setVacancies(parsed.data);
           }
         }
       })

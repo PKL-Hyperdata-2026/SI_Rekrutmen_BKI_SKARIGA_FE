@@ -30,10 +30,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/components/custom/sonner";
 import { alumniApi, type AlumniFilterOptions } from "./alumni.api";
-import {
-  useAlumniForm,
-  toCreateAlumniPayload,
-} from "./alumni.form";
+import { useAlumniForm, toCreateAlumniPayload } from "./alumni.form";
 import { AlumniFormModal } from "./alumni-form";
 import { AlumniDetailModal } from "./alumni-detail-modal";
 import { buildAlumniColumns } from "./alumni-table";
@@ -51,14 +48,14 @@ const FALLBACK_EMPLOYMENT_STATUSES = [
 ];
 
 function resolveReferenceName(
-  ref: string | { name?: string } | null | undefined
+  ref: string | { name?: string } | null | undefined,
 ): string | undefined {
   if (!ref || typeof ref === "string") return undefined;
   return ref.name;
 }
 
 function resolveClassMajorFallbackLabel(
-  alumni: AlumniItem | null
+  alumni: AlumniItem | null,
 ): string | undefined {
   if (!alumni) return undefined;
   const className = resolveReferenceName(alumni.class);
@@ -121,7 +118,7 @@ export function AlumniPage() {
       if (statusFilter !== "all") params.employment_status_id = statusFilter;
 
       const res = await alumniApi.getAlumni(params);
-      const resPayload = res.data;
+      const resPayload = res;
       const nested = resPayload?.data as unknown;
 
       if (Array.isArray(nested)) {
@@ -295,9 +292,8 @@ export function AlumniPage() {
     setIsDetailOpen(true);
     try {
       const res = await alumniApi.getAlumniById(item.id);
-      const detail = res.data?.data || res.data;
-      if (detail && typeof detail === "object") {
-        setActiveDetailAlumni(detail as AlumniItem);
+      if (res && typeof res === "object") {
+        setActiveDetailAlumni(res);
       }
     } catch {
       // Retain item if request fails
@@ -325,11 +321,8 @@ export function AlumniPage() {
     payload: Record<string, unknown>,
   ) => {
     const res = await alumniApi.updateAlumni(id, payload);
-    const updated = res.data?.data;
-    if (updated && typeof updated === "object") {
-      setActiveDetailAlumni((prev) =>
-        prev ? { ...prev, ...updated } : (updated as AlumniItem),
-      );
+    if (res && typeof res === "object") {
+      setActiveDetailAlumni((prev) => (prev ? { ...prev, ...res } : res));
     }
     fetchAlumni();
   };
@@ -338,9 +331,8 @@ export function AlumniPage() {
     if (activeDetailAlumni?.id) {
       try {
         const res = await alumniApi.getAlumniById(activeDetailAlumni.id);
-        const detail = res.data?.data || res.data;
-        if (detail && typeof detail === "object") {
-          setActiveDetailAlumni(detail as AlumniItem);
+        if (res && typeof res === "object") {
+          setActiveDetailAlumni(res);
         }
       } catch {
         void 0;
@@ -515,8 +507,12 @@ export function AlumniPage() {
       <FormProvider {...form}>
         <AlumniFormModal
           form={form}
-          classMajorFallbackLabel={resolveClassMajorFallbackLabel(editingAlumni)}
-          statusFallbackLabel={resolveReferenceName(editingAlumni?.employmentStatus)}
+          classMajorFallbackLabel={resolveClassMajorFallbackLabel(
+            editingAlumni,
+          )}
+          statusFallbackLabel={resolveReferenceName(
+            editingAlumni?.employmentStatus,
+          )}
           isEditing={Boolean(editingAlumni)}
           isOpen={isFormOpen}
           onClose={() => setIsFormOpen(false)}

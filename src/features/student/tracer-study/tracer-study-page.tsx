@@ -3,7 +3,10 @@ import { LineChart } from "lucide-react";
 import { PageHeader } from "@/components/custom/page-header";
 import { toast } from "@/components/custom/sonner";
 import { tracerApi } from "./tracer-study.api";
-import { type TracerStudyData, type SubmitTracerPayload } from "./tracer-study.schema";
+import {
+  type TracerStudyData,
+  type SubmitTracerPayload,
+} from "./tracer-study.schema";
 import { TracerStudyForm } from "./tracer-study-form";
 
 export function TracerStudy() {
@@ -15,8 +18,8 @@ export function TracerStudy() {
     try {
       setIsLoading(true);
       const res = await tracerApi.getTracerStudy();
-      if (res.data?.data) {
-        setTracerData(res.data.data);
+      if (res) {
+        setTracerData(res);
       } else {
         setTracerData(null);
       }
@@ -35,19 +38,8 @@ export function TracerStudy() {
     try {
       setIsSaving(true);
       const res = await tracerApi.submitTracerStudy(payload);
-      if (res.data?.success || res.data?.data) {
-        toast.success(
-          res.data?.message || "Data tracer study berhasil disimpan!"
-        );
-        if (res.data?.data) {
-          setTracerData(res.data.data);
-        } else {
-          await fetchTracerStudy();
-        }
-      } else {
-        toast.success("Data tracer study berhasil diperbarui!");
-        await fetchTracerStudy();
-      }
+      toast.success("Data tracer study berhasil disimpan!");
+      setTracerData(res);
     } catch (error: unknown) {
       const err = error as {
         response?: {

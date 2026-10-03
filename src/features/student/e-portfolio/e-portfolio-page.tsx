@@ -80,14 +80,16 @@ function extractSocialMediaList(rawSocialMedia: unknown): SocialMediaItem[] {
     for (const item of rawSocialMedia) {
       if (item && typeof item === "object") {
         const platform = String(
-          (item as { platform?: string }).platform || ""
+          (item as { platform?: string }).platform || "",
         ).toLowerCase();
         const rawUsername = String(
-          (item as { username?: string }).username || ""
+          (item as { username?: string }).username || "",
         );
         const rawUrl = String((item as { url?: string }).url || "");
 
-        let username = rawUsername ? cleanSocialMediaUsername(platform, rawUsername) : "";
+        let username = rawUsername
+          ? cleanSocialMediaUsername(platform, rawUsername)
+          : "";
         if (!username && rawUrl) {
           username = cleanSocialMediaUsername(platform, rawUrl);
         }
@@ -101,9 +103,10 @@ function extractSocialMediaList(rawSocialMedia: unknown): SocialMediaItem[] {
               rawUrl ||
               (config && config.baseUrl
                 ? `${config.baseUrl}${username}`
-                : username.startsWith("http://") || username.startsWith("https://")
-                ? username
-                : `https://${username}`),
+                : username.startsWith("http://") ||
+                    username.startsWith("https://")
+                  ? username
+                  : `https://${username}`),
           });
         }
       }
@@ -121,9 +124,10 @@ function extractSocialMediaList(rawSocialMedia: unknown): SocialMediaItem[] {
           url:
             config && config.baseUrl
               ? `${config.baseUrl}${username}`
-              : username.startsWith("http://") || username.startsWith("https://")
-              ? username
-              : `https://${username}`,
+              : username.startsWith("http://") ||
+                  username.startsWith("https://")
+                ? username
+                : `https://${username}`,
         });
       }
     }
@@ -133,7 +137,9 @@ function extractSocialMediaList(rawSocialMedia: unknown): SocialMediaItem[] {
 }
 
 export function EPortofolio() {
-  const [profileData, setProfileData] = useState<StudentProfileData | null>(null);
+  const [profileData, setProfileData] = useState<StudentProfileData | null>(
+    null,
+  );
   const [options, setOptions] = useState<PortfolioFormOptions | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -141,14 +147,20 @@ export function EPortofolio() {
   const [isDeletingId, setIsDeletingId] = useState<number | null>(null);
 
   const [socialMediaList, setSocialMediaList] = useState<SocialMediaItem[]>([]);
-  const [isAddSocialModalOpen, setIsAddSocialModalOpen] = useState<boolean>(false);
+  const [isAddSocialModalOpen, setIsAddSocialModalOpen] =
+    useState<boolean>(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
-  const [uploadInitialCategoryId, setUploadInitialCategoryId] = useState<number | null>(null);
+  const [uploadInitialCategoryId, setUploadInitialCategoryId] = useState<
+    number | null
+  >(null);
   const [previewItem, setPreviewItem] = useState<PortfolioItem | null>(null);
-  const [portfolioToDelete, setPortfolioToDelete] = useState<PortfolioItem | null>(null);
+  const [portfolioToDelete, setPortfolioToDelete] =
+    useState<PortfolioItem | null>(null);
 
   const directFileInputRef = useRef<HTMLInputElement>(null);
-  const [directUploadCategoryId, setDirectUploadCategoryId] = useState<number | null>(null);
+  const [directUploadCategoryId, setDirectUploadCategoryId] = useState<
+    number | null
+  >(null);
 
   const form = usePortfolioProfileForm(profileData, socialMediaList);
   const { reset, watch } = form;
@@ -160,10 +172,11 @@ export function EPortofolio() {
       profileData
         ? extractSocialMediaList(
             profileData.socialMedia ||
-              (profileData as unknown as { social_media?: unknown }).social_media
+              (profileData as unknown as { social_media?: unknown })
+                .social_media,
           )
         : [],
-    [profileData]
+    [profileData],
   );
 
   const isSocialChanged = useMemo(() => {
@@ -183,7 +196,8 @@ export function EPortofolio() {
     return JSON.stringify(cleanListA) !== JSON.stringify(cleanListB);
   }, [socialMediaList, initialSocial]);
 
-  const isFormChanged = isSocialChanged || currentPhone.trim() !== initialPhone.trim();
+  const isFormChanged =
+    isSocialChanged || currentPhone.trim() !== initialPhone.trim();
 
   const loadData = async () => {
     try {
@@ -192,11 +206,11 @@ export function EPortofolio() {
         portfolioApi.getOptions(),
       ]);
 
-      if (profileRes.data?.data) {
-        setProfileData(profileRes.data.data);
+      if (profileRes) {
+        setProfileData(profileRes);
       }
-      if (optionsRes.data?.data) {
-        setOptions(optionsRes.data.data);
+      if (optionsRes) {
+        setOptions(optionsRes);
       }
     } catch (err: unknown) {
       console.error("Gagal mengambil data portfolio:", err);
@@ -252,7 +266,7 @@ export function EPortofolio() {
 
   const handleRemoveSocialMedia = (platform: string) => {
     setSocialMediaList((prev) =>
-      prev.filter((p) => p.platform.toLowerCase() !== platform.toLowerCase())
+      prev.filter((p) => p.platform.toLowerCase() !== platform.toLowerCase()),
     );
   };
 
@@ -273,12 +287,8 @@ export function EPortofolio() {
 
       const response = await portfolioApi.updateProfile(payload);
 
-      if (response.data?.data) {
-        setProfileData(response.data.data);
-      } else {
-        await loadData();
-      }
-      toast.success(response.data?.message || "Data profil berhasil diperbarui!");
+      setProfileData(response);
+      toast.success("Data profil berhasil diperbarui!");
     } catch (err: unknown) {
       console.error("Gagal menyimpan profil:", err);
       const msg =
@@ -298,8 +308,8 @@ export function EPortofolio() {
   const handleUploadDocument = async (categoryId: number, file: File) => {
     setIsUploading(true);
     try {
-      const response = await portfolioApi.uploadDocument(categoryId, file);
-      toast.success(response.data?.message || "Dokumen berhasil diunggah!");
+      await portfolioApi.uploadDocument(categoryId, file);
+      toast.success("Dokumen berhasil diunggah!");
       await loadData();
     } catch (err: unknown) {
       console.error("Gagal mengunggah dokumen:", err);
@@ -321,7 +331,9 @@ export function EPortofolio() {
     }
   };
 
-  const handleDirectFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDirectFileChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = e.target.files?.[0];
     if (file && directUploadCategoryId) {
       if (file.size > 10 * 1024 * 1024) {
@@ -339,8 +351,8 @@ export function EPortofolio() {
   const handleConfirmDeleteDocument = async (portfolio: PortfolioItem) => {
     setIsDeletingId(portfolio.id);
     try {
-      const response = await portfolioApi.deleteDocument(portfolio.id);
-      toast.success(response.data?.message || "Dokumen berhasil dihapus!");
+      await portfolioApi.deleteDocument(portfolio.id);
+      toast.success("Dokumen berhasil dihapus!");
       setPortfolioToDelete(null);
       await loadData();
     } catch (err: unknown) {
@@ -372,7 +384,7 @@ export function EPortofolio() {
     return (profileData?.portfolios || []).find(
       (p) =>
         p.categoryId === cat.id ||
-        p.category?.code?.toLowerCase() === cat.code?.toLowerCase()
+        p.category?.code?.toLowerCase() === cat.code?.toLowerCase(),
     );
   };
 
@@ -381,29 +393,29 @@ export function EPortofolio() {
     const hasSocial = socialMediaList.length > 0;
     const hasCV = Boolean(
       (profileData?.portfolios || []).some(
-        (p) => p.category?.code?.toLowerCase() === "cv" || p.categoryId === 1
-      )
+        (p) => p.category?.code?.toLowerCase() === "cv" || p.categoryId === 1,
+      ),
     );
     const hasPKL = Boolean(
       (profileData?.portfolios || []).some(
         (p) =>
           p.category?.code?.toLowerCase() === "sertifikat_pkl" ||
-          p.categoryId === 2
-      )
+          p.categoryId === 2,
+      ),
     );
     const hasPrestasi = Boolean(
       (profileData?.portfolios || []).some(
         (p) =>
           p.category?.code?.toLowerCase() === "sertifikat_prestasi" ||
-          p.categoryId === 3
-      )
+          p.categoryId === 3,
+      ),
     );
     const hasBahasa = Boolean(
       (profileData?.portfolios || []).some(
         (p) =>
           p.category?.code?.toLowerCase() === "sertifikat_bahasa" ||
-          p.categoryId === 4
-      )
+          p.categoryId === 4,
+      ),
     );
 
     return [
@@ -418,7 +430,9 @@ export function EPortofolio() {
 
   const completedCount = completenessItems.filter((i) => i.isCompleted).length;
   const totalCount = completenessItems.length;
-  const completenessPercentage = Math.round((completedCount / totalCount) * 100);
+  const completenessPercentage = Math.round(
+    (completedCount / totalCount) * 100,
+  );
 
   return (
     <div className="space-y-3.5 pb-6">
@@ -497,11 +511,10 @@ export function EPortofolio() {
               <div className="space-y-2 flex-1">
                 {displayCategories.map((cat) => {
                   const uploadedItem = getPortfolioForCategory(cat);
-                  const style =
-                    CATEGORY_CONFIG[cat.code.toLowerCase()] || {
-                      icon: <FileText className="h-4 w-4" />,
-                      iconClass: "icon-primary",
-                    };
+                  const style = CATEGORY_CONFIG[cat.code.toLowerCase()] || {
+                    icon: <FileText className="h-4 w-4" />,
+                    iconClass: "icon-primary",
+                  };
 
                   return (
                     <div
@@ -590,11 +603,14 @@ export function EPortofolio() {
                             type="button"
                             variant="outline"
                             size="sm"
-                            disabled={isUploading && directUploadCategoryId === cat.id}
+                            disabled={
+                              isUploading && directUploadCategoryId === cat.id
+                            }
                             onClick={() => handleTriggerDirectUpload(cat.id)}
                             className="h-7 px-2 border-dashed border-slate-300 hover:border-primary hover:bg-primary/5 text-xs font-semibold text-slate-600 hover:text-primary cursor-pointer disabled:opacity-60"
                           >
-                            {isUploading && directUploadCategoryId === cat.id ? (
+                            {isUploading &&
+                            directUploadCategoryId === cat.id ? (
                               <>
                                 <Loader2 className="h-3 w-3 animate-spin" />
                                 <span>Mengunggah...</span>
@@ -642,9 +658,14 @@ export function EPortofolio() {
               <div>
                 <div className="flex items-center justify-between text-xs text-slate-500 font-medium mb-1.5">
                   <span>
-                    <strong className="text-slate-800 font-bold">{completedCount}</strong> dari {totalCount} item terpenuhi
+                    <strong className="text-slate-800 font-bold">
+                      {completedCount}
+                    </strong>{" "}
+                    dari {totalCount} item terpenuhi
                   </span>
-                  <span className="font-bold text-slate-900">{completenessPercentage}%</span>
+                  <span className="font-bold text-slate-900">
+                    {completenessPercentage}%
+                  </span>
                 </div>
                 <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
                   <div
@@ -679,7 +700,9 @@ export function EPortofolio() {
               </div>
 
               <p className="text-xs text-slate-500 pt-0.5 leading-relaxed">
-                <span className="font-bold text-slate-700">Tips:</span> Lengkapi seluruh berkas dan media sosial untuk meningkatkan skor kredibilitas profil di hadapan HRD.
+                <span className="font-bold text-slate-700">Tips:</span> Lengkapi
+                seluruh berkas dan media sosial untuk meningkatkan skor
+                kredibilitas profil di hadapan HRD.
               </p>
             </div>
           </SectionCard>
@@ -708,7 +731,8 @@ export function EPortofolio() {
             <AlertDialogDescription>
               Apakah Anda yakin ingin menghapus berkas{" "}
               <span className="font-semibold text-slate-800">
-                "{portfolioToDelete?.title || portfolioToDelete?.category?.name}"
+                "{portfolioToDelete?.title || portfolioToDelete?.category?.name}
+                "
               </span>
               ? Berkas yang sudah dihapus tidak dapat dipulihkan kembali.
             </AlertDialogDescription>

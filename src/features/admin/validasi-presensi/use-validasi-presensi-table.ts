@@ -5,7 +5,7 @@ import { toast } from "@/components/custom/sonner";
 import {
   type AttendanceItem,
   attendanceItemSchema,
-  attendanceQueueResponseSchema,
+  attendanceQueueDataSchema,
 } from "./validasi-presensi.schema";
 
 interface ApiErrorResponse {
@@ -182,10 +182,10 @@ export function useValidasiPresensiTable({
       }
 
       const response = await validasiPresensiApi.getQueue(params);
-      const parsed = attendanceQueueResponseSchema.safeParse(response.data);
+      const parsed = attendanceQueueDataSchema.safeParse(response);
 
       if (parsed.success) {
-        const queuePayload = parsed.data.data;
+        const queuePayload = parsed.data;
         if (Array.isArray(queuePayload)) {
           setData(queuePayload);
           setTotalPages(1);
@@ -203,7 +203,7 @@ export function useValidasiPresensiTable({
               z.object({ data: z.array(attendanceItemSchema) }),
             ]),
           })
-          .safeParse(response.data);
+          .safeParse(response);
 
         if (fallbackParsed.success) {
           const fallbackPayload = fallbackParsed.data.data;

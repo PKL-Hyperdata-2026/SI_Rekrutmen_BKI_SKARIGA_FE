@@ -34,7 +34,7 @@ bun run preview                            # Preview production build locally
    - Form setup hooks & payload builders: `{feature}.form.ts` exporting `use{Feature}Form()` (wraps `useForm` + `zodResolver` + `defaultValues`) and pure payload builders (`toXxxPayload`).
    - Zod schemas & inferred types: `{feature}.schema.ts`.
    - Axios request modules: `{feature}.api.ts` (always built on the central `api` client).
-   - Local feature hooks: `use{Feature}.ts`; global hooks, utilities, and slices: `camelCase.ts` (e.g. `use-mobile.ts`, `axios.ts`, `authSlice.ts`).
+   - Local feature hooks: `use-{feature}.ts`; global hooks, utilities, and slices: `camelCase.ts` (e.g. `use-mobile.ts`, `axios.ts`, `authSlice.ts`).
    - Pure feature helpers: `{feature}.status.ts` exporting status, date, and ratio functions with no JSX and no hooks (`lowongan-status.ts` -> `isEffectivelyActive`, `formatVacancyDeadline`).
 4. NEVER make raw `fetch()` calls or create new Axios instances. Always use the central configured client at `src/api/axios.ts`.
 5. Global authentication and session state MUST be stored in Redux (`src/store/index.ts` and `src/slices/authSlice.ts`).

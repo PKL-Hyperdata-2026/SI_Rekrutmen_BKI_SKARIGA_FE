@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTablePagination } from "@/components/custom/table/data-table-pagination";
 import { LowonganKerjaFilter } from "./lowongan-kerja-filter";
-import { useLowonganKerjaPage } from "./lowongan-kerja.page";
+import { useLowonganKerjaPage } from "./use-lowongan-kerja";
 import {
   LowonganKerjaCard,
   LowonganKerjaCardSkeleton,

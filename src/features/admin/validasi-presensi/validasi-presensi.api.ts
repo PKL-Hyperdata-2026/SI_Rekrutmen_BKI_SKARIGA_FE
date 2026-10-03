@@ -1,23 +1,58 @@
 import { api } from "@/api/axios";
+import { unwrap } from "@/api/unwrap";
+import type { ApiResponse } from "@/api/unwrap";
+import type {
+  VacancyOption,
+  AttendanceQueueData,
+} from "./validasi-presensi.schema";
 
 export const validasiPresensiApi = {
-  getVacancies: () =>
-    api.get("/admin/attendances/vacancies"),
-  getQueue: (params?: Record<string, string | number>) =>
-    api.get("/admin/attendances/queue", { params }),
-  getHistory: (params?: Record<string, string | number>) =>
-    api.get("/admin/attendances/history", { params }),
-  bulkValidate: (data: {
+  getVacancies: async (): Promise<VacancyOption[]> => {
+    const res = await api.get<ApiResponse<VacancyOption[]>>(
+      "/admin/attendances/vacancies",
+    );
+    return unwrap(res);
+  },
+  getQueue: async (
+    params?: Record<string, string | number>,
+  ): Promise<AttendanceQueueData> => {
+    const res = await api.get<ApiResponse<AttendanceQueueData>>(
+      "/admin/attendances/queue",
+      { params },
+    );
+    return unwrap(res);
+  },
+  getHistory: async (
+    params?: Record<string, string | number>,
+  ): Promise<AttendanceQueueData> => {
+    const res = await api.get<ApiResponse<AttendanceQueueData>>(
+      "/admin/attendances/history",
+      { params },
+    );
+    return unwrap(res);
+  },
+  bulkValidate: async (data: {
     attendance_ids: Array<string | number>;
     validation_status: "verified" | "rejected";
     system_action: string;
-  }) => api.patch("/admin/attendances/bulk-validate", data),
-  validateSingle: (
+  }): Promise<unknown> => {
+    const res = await api.patch<ApiResponse<unknown>>(
+      "/admin/attendances/bulk-validate",
+      data,
+    );
+    return unwrap(res);
+  },
+  validateSingle: async (
     id: string | number,
     data: {
       validation_status: "verified" | "rejected";
       system_action: string;
-    }
-  ) =>
-    api.patch(`/admin/attendances/${encodeURIComponent(String(id))}/validate`, data),
+    },
+  ): Promise<unknown> => {
+    const res = await api.patch<ApiResponse<unknown>>(
+      `/admin/attendances/${encodeURIComponent(String(id))}/validate`,
+      data,
+    );
+    return unwrap(res);
+  },
 };

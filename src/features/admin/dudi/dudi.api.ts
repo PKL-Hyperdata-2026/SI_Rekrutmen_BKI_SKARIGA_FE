@@ -1,11 +1,10 @@
 import { api } from "@/api/axios";
-import type {
-  DudiItem,
-  DudiOptionsData,
-} from "./dudi.schema";
+import { unwrap } from "@/api/unwrap";
+import type { ApiResponse, PaginatedData } from "@/api/unwrap";
+import type { DudiItem, DudiOptionsData } from "./dudi.schema";
 
 export const dudiApi = {
-  getCompanies: (params?: {
+  getCompanies: async (params?: {
     search?: string;
     industry_id?: string;
     is_active?: string;
@@ -13,56 +12,55 @@ export const dudiApi = {
     sort_dir?: string;
     per_page?: number;
     page?: number;
-  }) =>
-    api.get<{
-      success: boolean;
-      message?: string;
-      data: {
-        data: DudiItem[];
-        current_page?: number;
-        last_page?: number;
-        total?: number;
-      };
-    }>("/admin/companies", { params }),
+  }): Promise<PaginatedData<DudiItem>> => {
+    const res = await api.get<ApiResponse<PaginatedData<DudiItem>>>(
+      "/admin/companies",
+      { params },
+    );
+    return unwrap(res);
+  },
 
-  getCompanyOptions: () =>
-    api.get<{
-      success: boolean;
-      message?: string;
-      data: DudiOptionsData;
-    }>("/admin/companies/options"),
+  getCompanyOptions: async (): Promise<DudiOptionsData> => {
+    const res = await api.get<ApiResponse<DudiOptionsData>>(
+      "/admin/companies/options",
+    );
+    return unwrap(res);
+  },
 
-  getCompany: (id: number | string) =>
-    api.get<{
-      success: boolean;
-      message?: string;
-      data: DudiItem;
-    }>(`/admin/companies/${id}`),
+  getCompany: async (id: number | string): Promise<DudiItem> => {
+    const res = await api.get<ApiResponse<DudiItem>>(`/admin/companies/${id}`);
+    return unwrap(res);
+  },
 
-  createCompany: (payload: Record<string, unknown>) =>
-    api.post<{
-      success: boolean;
-      message?: string;
-      data: DudiItem;
-    }>("/admin/companies", payload),
+  createCompany: async (
+    payload: Record<string, unknown>,
+  ): Promise<DudiItem> => {
+    const res = await api.post<ApiResponse<DudiItem>>(
+      "/admin/companies",
+      payload,
+    );
+    return unwrap(res);
+  },
 
-  updateCompany: (id: number | string, payload: Record<string, unknown>) =>
-    api.put<{
-      success: boolean;
-      message?: string;
-      data: DudiItem;
-    }>(`/admin/companies/${id}`, payload),
+  updateCompany: async (
+    id: number | string,
+    payload: Record<string, unknown>,
+  ): Promise<DudiItem> => {
+    const res = await api.put<ApiResponse<DudiItem>>(
+      `/admin/companies/${id}`,
+      payload,
+    );
+    return unwrap(res);
+  },
 
-  toggleCompanyActive: (id: number | string) =>
-    api.patch<{
-      success: boolean;
-      message?: string;
-      data: DudiItem;
-    }>(`/admin/companies/${id}/toggle-active`),
+  toggleCompanyActive: async (id: number | string): Promise<DudiItem> => {
+    const res = await api.patch<ApiResponse<DudiItem>>(
+      `/admin/companies/${id}/toggle-active`,
+    );
+    return unwrap(res);
+  },
 
-  deleteCompany: (id: number | string) =>
-    api.delete<{
-      success: boolean;
-      message?: string;
-    }>(`/admin/companies/${id}`),
+  deleteCompany: async (id: number | string): Promise<void> => {
+    await api.delete(`/admin/companies/${id}`);
+  },
 };

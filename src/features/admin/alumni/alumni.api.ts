@@ -1,4 +1,6 @@
 import { api } from "@/api/axios";
+import { unwrap } from "@/api/unwrap";
+import type { ApiResponse } from "@/api/unwrap";
 import { selectOptionsApi } from "@/api/select-options";
 import type {
   AsyncSelectItem,
@@ -6,7 +8,12 @@ import type {
   SelectPageResult,
   SelectQuery,
 } from "@/api/select-options";
-import type { AlumniFilterParams, AlumniPaginatedResponse, AlumniReferenceItem } from "./alumni.schema";
+import type {
+  AlumniFilterParams,
+  AlumniItem,
+  AlumniPaginatedResponse,
+  AlumniReferenceItem,
+} from "./alumni.schema";
 
 export interface AlumniFilterOptions {
   statuses: AlumniReferenceItem[];
@@ -31,7 +38,7 @@ export function buildGraduationYears(): number[] {
 
 export async function getClassMajorSelectPage(
   query: SelectQuery,
-  opts?: FetchPageOptions
+  opts?: FetchPageOptions,
 ): Promise<SelectPageResult> {
   const [classes, majors] = await Promise.all([
     selectOptionsApi.getStandardTypes("class", query, opts),
@@ -45,7 +52,9 @@ export async function getClassMajorSelectPage(
         : "";
     return {
       value: `class_${item.value}`,
-      label: resolvedMajorName ? `${item.label} - ${resolvedMajorName}` : item.label,
+      label: resolvedMajorName
+        ? `${item.label} - ${resolvedMajorName}`
+        : item.label,
       extra: { ...item.extra, kind: "class" },
     };
   });
@@ -63,7 +72,9 @@ export async function getClassMajorSelectPage(
   };
 }
 
-export async function suggestCompanies(search: string): Promise<AsyncSelectItem[]> {
+export async function suggestCompanies(
+  search: string,
+): Promise<AsyncSelectItem[]> {
   if (search.trim().length < 2) return [];
   const page = await selectOptionsApi.getCompanies({
     search: search.trim(),
@@ -74,12 +85,16 @@ export async function suggestCompanies(search: string): Promise<AsyncSelectItem[
 }
 
 export const alumniApi = {
-  getAlumni: (params?: AlumniFilterParams | Record<string, unknown>) =>
-    api.get<{
-      success?: boolean;
-      message?: string;
-      data: AlumniPaginatedResponse;
-    } & AlumniPaginatedResponse>("/admin/alumni", { params }),
+  getAlumni: async (
+    params?: AlumniFilterParams | Record<string, unknown>,
+  ): Promise<AlumniPaginatedResponse> => {
+    const res = await api.get<ApiResponse<AlumniPaginatedResponse>>(
+      "/admin/alumni",
+      { params },
+    );
+    return unwrap(res);
+  },
+
   getFilterOptions: async (): Promise<AlumniFilterOptions> => {
     const baseQuery = { search: "", page: 1, per_page: FILTER_PAGE_SIZE };
     const [statuses, portfolioTypes] = await Promise.all([
@@ -92,18 +107,53 @@ export const alumniApi = {
       graduationYears: buildGraduationYears(),
     };
   },
-  getAlumniById: (id: string | number) =>
-    api.get(`/admin/alumni/${id}`),
-  createAlumni: (data: Record<string, unknown>) =>
-    api.post("/admin/alumni", data),
-  updateAlumni: (id: string | number, data: Record<string, unknown>) =>
-    api.put(`/admin/alumni/${id}`, data),
-  deleteAlumni: (id: string | number) =>
-    api.delete(`/admin/alumni/${id}`),
-  uploadPortfolio: (studentId: string | number, formData: FormData) =>
-    api.post(`/admin/students/${studentId}/portfolios`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    }),
-  deletePortfolio: (studentId: string | number, portfolioId: string | number) =>
-    api.delete(`/admin/students/${studentId}/portfolios/${portfolioId}`),
+
+  getAlumniById: async (id: string | number): Promise<AlumniItem> => {
+    const res = await api.get<ApiResponse<AlumniItem>>(`/admin/alumni/${id}`);
+    return unwrap(res);
+  },
+
+  createAlumni: async (data: Record<string, unknown>): Promise<AlumniItem> => {
+    const res = await api.post<ApiResponse<AlumniItem>>("/admin/alumni", data);
+    return unwrap(res);
+  },
+
+  updateAlumni: async (
+    id: string | number,
+    data: Record<string, unknown>,
+  ): Promise<AlumniItem> => {
+    const res = await api.put<ApiResponse<AlumniItem>>(
+      `/admin/alumni/${id}`,
+      data,
+    );
+    return unwrap(res);
+  },
+
+  deleteAlumni: async (id: string | number): Promise<void> => {
+    await api.delete(`/admin/alumni/${id}`);
+  },
+
+  uploadPortfolio: async (
+    studentId: string | number,
+    formData: FormData,
+  ): Promise<AlumniItem> => {
+    const res = await api.post<ApiResponse<AlumniItem>>(
+      `/admin/students/${studentId}/portfolios`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      },
+    );
+    return unwrap(res);
+  },
+
+  deletePortfolio: async (
+    studentId: string | number,
+    portfolioId: string | number,
+  ): Promise<AlumniItem> => {
+    const res = await api.delete<ApiResponse<AlumniItem>>(
+      `/admin/students/${studentId}/portfolios/${portfolioId}`,
+    );
+    return unwrap(res);
+  },
 };

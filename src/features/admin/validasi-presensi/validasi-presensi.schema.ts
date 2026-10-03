@@ -86,6 +86,8 @@ export const attendanceQueueResponseSchema = z.object({
   data: attendanceQueueDataSchema,
 });
 
+export type AttendanceQueueData = z.infer<typeof attendanceQueueDataSchema>;
+
 export function cleanVacancyTitle(title: string): string {
   const trimmed = title.trim();
   const lower = trimmed.toLowerCase();
