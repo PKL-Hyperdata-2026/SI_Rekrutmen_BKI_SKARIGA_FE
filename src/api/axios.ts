@@ -23,13 +23,15 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     // Optionally handle global errors like 401 Unauthorized
-    if (error.response?.status === 401) {
+    const isLogoutRequest = error.config?.url?.includes("/logout");
+
+    if (error.response?.status === 401 && !isLogoutRequest) {
       localStorage.removeItem("access_token");
       localStorage.removeItem("auth_user");
       window.location.href = "/login";
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export { api };

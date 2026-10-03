@@ -1,6 +1,9 @@
 import { useMemo } from "react";
 import { Pencil } from "lucide-react";
-import { DataTable, type DataTableColumn } from "@/components/custom/data-table";
+import {
+  DataTable,
+  type DataTableColumn,
+} from "@/components/custom/data-table";
 import { Badge } from "@/components/ui/badge";
 import type { SelectionResultItem } from "./hasil.schema";
 import { cn } from "@/lib/utils";
@@ -33,14 +36,16 @@ export function HasilTable({
       {
         header: "PELAMAR & NISN",
         className: "min-w-[180px] px-3.5 py-3",
-        headerClassName: "px-3.5 select-none font-bold text-xs text-foreground tracking-wider",
+        headerClassName:
+          "px-3.5 select-none font-bold text-xs text-foreground tracking-wider",
         cell: (row) => (
           <div className="flex flex-col min-w-0">
             <span className="font-bold text-slate-900 text-sm leading-tight truncate">
               {row.applicant.name}
             </span>
             <span className="text-[11px] text-slate-500 mt-0.5 truncate">
-              NISN : {row.applicant.nis || "–"} – {row.applicant.school || "SMK PGRI 1 GIRI"}
+              NISN : {row.applicant.nis || "–"} –{" "}
+              {row.applicant.school || "SMK PGRI 1 GIRI"}
             </span>
           </div>
         ),
@@ -49,7 +54,8 @@ export function HasilTable({
         header: "SELEKSI ADMIN",
         align: "center",
         className: "text-center px-3 py-3",
-        headerClassName: "text-center px-3 select-none font-bold text-xs text-foreground tracking-wider",
+        headerClassName:
+          "text-center px-3 select-none font-bold text-xs text-foreground tracking-wider",
         cell: (row) => {
           const isLolos = row.adminSelectionStatus === "lolos";
           return (
@@ -59,7 +65,7 @@ export function HasilTable({
                 "rounded-lg px-2.5 py-0.5 text-xs font-semibold shadow-none",
                 isLolos
                   ? "border-emerald-500 text-emerald-600 bg-white"
-                  : "border-rose-400 text-rose-600 bg-white"
+                  : "border-rose-400 text-rose-600 bg-white",
               )}
             >
               {isLolos ? "Lolos" : "Tidak Lolos"}
@@ -71,7 +77,8 @@ export function HasilTable({
         header: "NILAI PSIKOTES",
         align: "center",
         className: "text-center px-3 py-3",
-        headerClassName: "text-center px-3 select-none font-bold text-xs text-foreground tracking-wider",
+        headerClassName:
+          "text-center px-3 select-none font-bold text-xs text-foreground tracking-wider",
         cell: (row) => (
           <span className="font-bold text-xs text-slate-900">
             {formatDecimalScore(row.psychotestScore)}
@@ -82,7 +89,8 @@ export function HasilTable({
         header: "NILAI INTERVIEW",
         align: "center",
         className: "text-center px-3 py-3",
-        headerClassName: "text-center px-3 select-none font-bold text-xs text-foreground tracking-wider",
+        headerClassName:
+          "text-center px-3 select-none font-bold text-xs text-foreground tracking-wider",
         cell: (row) => (
           <span className="font-bold text-xs text-slate-900">
             {formatDecimalScore(row.interviewScore)}
@@ -93,7 +101,8 @@ export function HasilTable({
         header: "NILAI MCU",
         align: "center",
         className: "text-center px-3 py-3",
-        headerClassName: "text-center px-3 select-none font-bold text-xs text-foreground tracking-wider",
+        headerClassName:
+          "text-center px-3 select-none font-bold text-xs text-foreground tracking-wider",
         cell: (row) => (
           <span className="font-bold text-xs text-slate-900">
             {formatDecimalScore(row.mcuScore)}
@@ -104,7 +113,8 @@ export function HasilTable({
         header: "NILAI AKHIR",
         align: "center",
         className: "text-center px-3 py-3",
-        headerClassName: "text-center px-3 select-none font-bold text-xs text-foreground tracking-wider",
+        headerClassName:
+          "text-center px-3 select-none font-bold text-xs text-foreground tracking-wider",
         cell: (row) => (
           <span className="font-bold text-xs text-emerald-600">
             {formatDecimalScore(row.finalScore)}
@@ -115,7 +125,8 @@ export function HasilTable({
         header: "KEPUTUSAN",
         align: "center",
         className: "text-center px-3 py-3",
-        headerClassName: "text-center px-3 select-none font-bold text-xs text-foreground tracking-wider",
+        headerClassName:
+          "text-center px-3 select-none font-bold text-xs text-foreground tracking-wider",
         cell: (row) => {
           const decision = row.decision || "pending";
           if (decision === "diterima") {
@@ -162,14 +173,20 @@ export function HasilTable({
         header: "AKSI",
         align: "center",
         className: "text-center px-3 py-3 w-20",
-        headerClassName: "text-center px-3 select-none w-20 font-bold text-xs text-foreground tracking-wider",
+        headerClassName:
+          "text-center px-3 select-none w-20 font-bold text-xs text-foreground tracking-wider",
         cell: (row) => (
           <div className="flex items-center justify-center">
             <button
               type="button"
               onClick={() => onEdit(row)}
-              title="Edit Hasil Evaluasi"
-              className="h-8 w-8 rounded-lg border border-purple-200/80 bg-purple-50/70 text-purple-600 hover:bg-purple-100 hover:text-purple-700 flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
+              disabled={row.status === "published"}
+              title={
+                row.status === "published"
+                  ? "Hasil sudah dipublikasikan dan tidak dapat diubah"
+                  : "Edit Hasil Evaluasi"
+              }
+              className="h-8 w-8 rounded-lg border border-purple-200/80 bg-purple-50/70 text-purple-600 hover:bg-purple-100 hover:text-purple-700 flex items-center justify-center transition-colors cursor-pointer shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-purple-50/70"
             >
               <Pencil className="h-3.5 w-3.5" />
             </button>
@@ -177,7 +194,7 @@ export function HasilTable({
         ),
       },
     ],
-    [onEdit]
+    [onEdit],
   );
 
   return (

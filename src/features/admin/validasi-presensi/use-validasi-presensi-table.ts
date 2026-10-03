@@ -254,12 +254,17 @@ export function useValidasiPresensiTable({
       const systemAction =
         status === "verified" ? "Diteruskan ke HRD" : "Gugur / Tidak Hadir";
       try {
+        let affected = selectedIds.length;
         try {
-          await validasiPresensiApi.bulkValidate({
+          const response = await validasiPresensiApi.bulkValidate({
             attendance_ids: selectedIds,
             validation_status: status,
             system_action: systemAction,
           });
+          const reported = response.data?.data?.affected;
+          if (typeof reported === "number") {
+            affected = reported;
+          }
         } catch {
           await Promise.all(
             selectedIds.map((id) =>
@@ -273,9 +278,15 @@ export function useValidasiPresensiTable({
 
         toast.success(
           status === "verified"
-            ? `Berhasil memvalidasi kehadiran ${selectedIds.length} pelamar.`
-            : `Berhasil menolak kehadiran ${selectedIds.length} pelamar.`,
+            ? `Berhasil memvalidasi kehadiran ${affected} pelamar.`
+            : `Berhasil menolak kehadiran ${affected} pelamar.`,
         );
+
+        if (affected < selectedIds.length) {
+          toast.warning(
+            `${selectedIds.length - affected} data dilewati karena sudah divalidasi sebelumnya.`,
+          );
+        }
 
         setSelectedIds([]);
         await fetchQueue();
