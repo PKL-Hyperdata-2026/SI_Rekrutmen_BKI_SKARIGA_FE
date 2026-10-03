@@ -261,7 +261,7 @@ export function useValidasiPresensiTable({
             validation_status: status,
             system_action: systemAction,
           });
-          const reported = response.data?.data?.affected;
+          const reported = response?.affected;
           if (typeof reported === "number") {
             affected = reported;
           }

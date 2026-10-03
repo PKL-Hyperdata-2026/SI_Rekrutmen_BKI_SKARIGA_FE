@@ -35,8 +35,8 @@ export const validasiPresensiApi = {
     attendance_ids: Array<string | number>;
     validation_status: "verified" | "rejected";
     system_action: string;
-  }): Promise<unknown> => {
-    const res = await api.patch<ApiResponse<unknown>>(
+  }): Promise<{ affected: number }> => {
+    const res = await api.patch<ApiResponse<{ affected: number }>>(
       "/admin/attendances/bulk-validate",
       data,
     );
