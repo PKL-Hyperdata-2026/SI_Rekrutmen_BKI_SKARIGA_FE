@@ -19,6 +19,7 @@ import {
   type LucideIcon,
   Shapes,
   ShieldCheck,
+  Mail,
 } from "lucide-react";
 
 export interface MenuItem {
@@ -69,6 +70,11 @@ export const ADMIN_MENUS: MenuItem[] = [
     link: "/admin/access-menus",
     icon: ShieldCheck,
     superadminOnly: true,
+  },
+  {
+    name: "Template Pesan",
+    link: "/admin/message-templates",
+    icon: Mail,
   },
 ];
 

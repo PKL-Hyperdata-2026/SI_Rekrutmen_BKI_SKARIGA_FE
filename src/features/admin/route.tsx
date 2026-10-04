@@ -12,6 +12,7 @@ import { ValidasiPresensiPage } from "./validasi-presensi/validasi-presensi-page
 import { TracerPage } from "./tracer-study/tracer-study-page";
 import { LaporanPage } from "./laporan/laporan-page";
 import { AccessMenusPage } from "./access-menus/access-menus-page";
+import { MessageTemplatesPage } from "./message-templates/message-templates-page";
 
 export const adminRoute = [
   {
@@ -73,5 +74,9 @@ export const adminRoute = [
   {
     path: "access-menus",
     element: <AccessMenusPage />,
+  },
+  {
+    path: "message-templates",
+    element: <MessageTemplatesPage />,
   },
 ];
