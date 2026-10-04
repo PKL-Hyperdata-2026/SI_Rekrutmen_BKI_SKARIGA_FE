@@ -8,22 +8,22 @@ Operational instructions and boundaries: [`AGENTS.md`](./AGENTS.md).
 
 ## 1. Stack
 
-| Layer               | Technology            | Details                                                    |
-| ------------------- | --------------------- | ---------------------------------------------------------- |
-| Runtime & Package   | Bun 1.3+              | Fast JavaScript runtime, package manager (`bun.lock`)      |
-| Framework / Bundler | Vite 8 + React 19     | ESM-based frontend development server and builder          |
-| Language            | TypeScript 6          | Strict type checking (`tsc -b`)                            |
-| CSS & Styling       | Tailwind CSS v4       | Native CSS imports via `@tailwindcss/vite`, Geist font     |
-| UI Primitives       | Shadcn UI / Radix UI  | Accessible UI components (`src/components/ui/`)            |
-| State Management    | Redux Toolkit         | Central store (`src/store/index.ts`) and auth slice        |
-| Routing             | React Router v7       | Declarative routing with layout wrappers (`src/route.tsx`) |
-| HTTP Client         | Axios                 | Configured instance with interceptors (`src/api/axios.ts`) |
-| Real-time & Sockets | Laravel Echo & Pusher | WebSocket event subscription (`laravel-echo`, `pusher-js`) |
-| Forms & Validation  | React Hook Form + Zod | Schema-based form state and validation resolvers           |
-| Tables & Data       | TanStack React Table  | Headless datatables with sorting, pagination, and filtering|
-| Rich Text Editor    | TipTap                | Modular rich text editor suite (`@tiptap/react`)           |
-| Maps & Geo          | Leaflet & React-Leaflet | Coordinate and radius map views                          |
-| Visuals & Charts    | Recharts & Lucide     | Data visualization charts and feather icon suite           |
+| Layer               | Technology              | Details                                                     |
+| ------------------- | ----------------------- | ----------------------------------------------------------- |
+| Runtime & Package   | Bun 1.3+                | Fast JavaScript runtime, package manager (`bun.lock`)       |
+| Framework / Bundler | Vite 8 + React 19       | ESM-based frontend development server and builder           |
+| Language            | TypeScript 6            | Strict type checking (`tsc -b`)                             |
+| CSS & Styling       | Tailwind CSS v4         | Native CSS imports via `@tailwindcss/vite`, Geist font      |
+| UI Primitives       | Shadcn UI / Radix UI    | Accessible UI components (`src/components/ui/`)             |
+| State Management    | Redux Toolkit           | Central store (`src/store/index.ts`) and auth slice         |
+| Routing             | React Router v7         | Declarative routing with layout wrappers (`src/route.tsx`)  |
+| HTTP Client         | Axios                   | Configured instance with interceptors (`src/api/axios.ts`)  |
+| Real-time & Sockets | Laravel Echo & Pusher   | WebSocket event subscription (`laravel-echo`, `pusher-js`)  |
+| Forms & Validation  | React Hook Form + Zod   | Schema-based form state and validation resolvers            |
+| Tables & Data       | TanStack React Table    | Headless datatables with sorting, pagination, and filtering |
+| Rich Text Editor    | TipTap                  | Modular rich text editor suite (`@tiptap/react`)            |
+| Maps & Geo          | Leaflet & React-Leaflet | Coordinate and radius map views                             |
+| Visuals & Charts    | Recharts & Lucide       | Data visualization charts and feather icon suite            |
 
 ## 2. Architecture (how things connect)
 
@@ -95,13 +95,14 @@ frontend/src/
 │   │   ├── protected-route.tsx                  # Role-aware route guard
 │   │   └── route.tsx                            # Auth sub-routes
 │   ├── student/                                 # Student & Alumni portal feature module
-│   │   ├── dashboard/                           # dashboard-page.tsx
+│   │   ├── dashboard/                           # dashboard-page.tsx, dashboard-chart.tsx (dynamic 6-mo trend), kpi, schedules, api
 │   │   ├── e-portfolio/                         # e-portfolio-page.tsx, personal-academic-form.tsx, portfolio.api.ts, portfolio.schema.ts, portfolio.form.ts, modals
 │   │   ├── lamaran/                             # lamaran-page.tsx, lamaran-card.tsx, lamaran-detail-stepper.tsx, lamaran.api.ts, lamaran.schema.ts, placement-letter.ts, hooks
 │   │   ├── lowongan-kerja/                      # lowongan-kerja-page.tsx, card, filter, form, api, hooks
 │   │   ├── tracer-study/                        # tracer-study-page.tsx, tracer-stats-sidebar.tsx, tracer-study.form.ts, tracer-study.api.ts, tracer-study.schema.ts
 │   │   └── route.tsx                            # Student sub-routes
 │   ├── admin/                                   # Administrator portal module (admin, superadmin)
+│   │   ├── access-menus/                        # access-menus-page.tsx, access-menus.api.ts (superadmin role-menu matrix)
 │   │   ├── alumni/                              # alumni-page.tsx, alumni-table.tsx, alumni-form.tsx, alumni-detail-modal.tsx, api, schema, form
 │   │   ├── dashboard/                           # dashboard-page.tsx, dashboard-pie-chart.tsx, dashboard.api.ts, dashboard.types.ts
 │   │   ├── departemen/                          # departemen-page.tsx, departemen-table.tsx, departemen-form.tsx, api, schema, form
@@ -109,6 +110,7 @@ frontend/src/
 │   │   ├── jurusan/                             # jurusan-page.tsx, jurusan-table.tsx, jurusan-form.tsx, api, schema, form
 │   │   ├── laporan/                             # laporan-page.tsx, components/, laporan.api.ts, laporan.types.ts
 │   │   ├── lowongan-kerja/                      # lowongan-kerja-page.tsx, detail, form, table, filter, api, schema, hooks
+│   │   ├── message-templates/                   # message-templates-page.tsx, message-templates.api.ts (notification/email templates)
 │   │   ├── seleksi/                             # seleksi-page.tsx, seleksi.api.ts, types.ts, components/, hooks/
 │   │   ├── siswa/                               # siswa-page.tsx, siswa-table.tsx, siswa-form.tsx, siswa-detail-modal.tsx, siswa-portfolio-modal.tsx, api, schema, form
 │   │   ├── tracer-study/                        # tracer-study-page.tsx, tracer-study-table.tsx, stats-cards, form-modal, detail-modal, api, schema, form
@@ -116,7 +118,7 @@ frontend/src/
 │   │   ├── validasi-presensi/                   # pages/validasi-presensi-page.tsx, components/, hooks/, types/
 │   │   └── route.tsx                            # Admin sub-routes
 │   └── hrd/                                     # Corporate HRD portal module
-│       ├── dashboard/                           # dashboard-page.tsx, metric-cards, status-lowongan, berkas, pelamar
+│       ├── dashboard/                           # dashboard-page.tsx, use-hrd-dashboard.ts, dashboard.api.ts (dynamic API integration)
 │       ├── lowongan/                            # lowongan-page.tsx, form, list, card, status-badge, api, schema, form, hooks (Production)
 │       ├── penempatan/                          # penempatan-page.tsx, form, table, metric-cards, update-form, api, schema, form, hooks (Production)
 │       ├── hasil/                               # hasil-page.tsx, hasil-table.tsx, hasil-metric-cards.tsx, hasil-modal.tsx, api, schema, form (Production)
@@ -211,6 +213,7 @@ AsyncSearchableSelect (props: fetchPage, perPage=20, debounceMs=500, fallbackLab
 ```
 
 Request efficiency rules:
+
 - Search input debounces 500 ms. Opening the popover never searches, closing calls `onClose` to trigger `resetSearch()`.
 - Every new fetch aborts previous requests via `AbortController`.
 - Successful pages are cached in memory per URL and params with 60 s TTL (`selectPageCache`, `clearSelectOptionsCache()`).
