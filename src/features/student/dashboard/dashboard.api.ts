@@ -3,6 +3,7 @@ import type { StudentJobVacancy } from "../lowongan-kerja/lowongan-kerja.card";
 import type { StudentJobApplication } from "../lamaran/lamaran.schema";
 import type { NotificationItem } from "@/api/notification.api";
 import type { StudentProfileData } from "../e-portfolio/e-portfolio.schema";
+import type { MonthlyTrendData } from "./dashboard-chart";
 
 export interface PaginatedResponse<T> {
   data: T[];
@@ -47,5 +48,12 @@ export const studentDashboardApi = {
       data: StudentProfileData;
     }>("/siswa/portfolio/profile");
     return response.data?.data;
+  },
+
+  getTrends: async (): Promise<MonthlyTrendData[]> => {
+    const response = await api.get<{
+      data: MonthlyTrendData[];
+    }>("/siswa/dashboard/trends");
+    return response.data?.data || [];
   },
 };

@@ -10,6 +10,7 @@ import type {
 import type { StudentJobVacancy } from "../lowongan-kerja/lowongan-kerja.card";
 import type { StudentJobApplication } from "../lamaran/lamaran.schema";
 import type { NotificationItem } from "@/api/notification.api";
+import type { MonthlyTrendData } from "./dashboard-chart";
 
 function formatRelativeTime(dateInput: string | Date | undefined): string {
   if (!dateInput) return "Baru saja";
@@ -24,8 +25,10 @@ function formatRelativeTime(dateInput: string | Date | undefined): string {
 
   if (diffMin < 5) return "Baru saja";
   if (diffHours < 1) return `${diffMin} menit lalu`;
-  if (diffHours < 24 && now.getDate() === date.getDate()) return `${diffHours} jam lalu`;
-  if (diffDays === 1 || (diffDays === 0 && now.getDate() !== date.getDate())) return "Kemarin";
+  if (diffHours < 24 && now.getDate() === date.getDate())
+    return `${diffHours} jam lalu`;
+  if (diffDays === 1 || (diffDays === 0 && now.getDate() !== date.getDate()))
+    return "Kemarin";
   if (diffDays < 7) return `${diffDays} hari lalu`;
   const diffWeeks = Math.floor(diffDays / 7);
   if (diffWeeks < 4) return `${diffWeeks} minggu lalu`;
@@ -45,6 +48,7 @@ export function useStudentDashboard() {
 
   const [schedules, setSchedules] = useState<DashboardSchedule[]>([]);
   const [activities, setActivities] = useState<DashboardActivity[]>([]);
+  const [trendData, setTrendData] = useState<MonthlyTrendData[]>([]);
 
   const userRole = (user?.role || "siswa").toLowerCase();
   const isAlumni = userRole === "alumni";
@@ -64,11 +68,13 @@ export function useStudentDashboard() {
 
   const fetchDashboardData = useCallback(async () => {
     try {
-      const [vacanciesRes, applicationsRes, notificationsRes] = await Promise.allSettled([
-        studentDashboardApi.getVacancies(6),
-        studentDashboardApi.getMyApplications(6),
-        studentDashboardApi.getNotifications(10),
-      ]);
+      const [vacanciesRes, applicationsRes, notificationsRes, trendsRes] =
+        await Promise.allSettled([
+          studentDashboardApi.getVacancies(6),
+          studentDashboardApi.getMyApplications(6),
+          studentDashboardApi.getNotifications(10),
+          studentDashboardApi.getTrends(),
+        ]);
 
       // 1. Process Vacancies
       if (vacanciesRes.status === "fulfilled" && vacanciesRes.value) {
@@ -95,7 +101,7 @@ export function useStudentDashboard() {
             companyLogo: v.company?.logoPath,
             workLocation: v.workLocation,
             deadline: v.deadline,
-          }))
+          })),
         );
       }
 
@@ -127,7 +133,7 @@ export function useStudentDashboard() {
             statusName: app.status?.name || "Dalam Proses",
             statusCode: app.status?.code || "in_progress",
             currentStageName: app.currentStage?.name,
-          }))
+          })),
         );
       }
 
@@ -171,15 +177,26 @@ export function useStudentDashboard() {
           for (const history of app.stageHistories) {
             const histDate = history.createdAt;
             if (histDate) {
-              const isAccepted = history.status?.code === "accepted" || history.status?.code === "passed";
-              const isRejected = history.status?.code === "rejected" || history.status?.code === "failed";
+              const isAccepted =
+                history.status?.code === "accepted" ||
+                history.status?.code === "passed";
+              const isRejected =
+                history.status?.code === "rejected" ||
+                history.status?.code === "failed";
               combinedActivities.push({
                 id: `hist-${history.id}`,
                 title: `${history.stage?.name || "Tahap Seleksi"} - ${companyName}`,
-                description: history.notes || history.status?.name || "Hasil seleksi diperbarui",
+                description:
+                  history.notes ||
+                  history.status?.name ||
+                  "Hasil seleksi diperbarui",
                 timestamp: new Date(histDate),
                 timeFormatted: formatRelativeTime(histDate),
-                dotColor: isAccepted ? "emerald" : isRejected ? "amber" : "blue",
+                dotColor: isAccepted
+                  ? "emerald"
+                  : isRejected
+                    ? "amber"
+                    : "blue",
               });
             }
           }
@@ -209,7 +226,9 @@ export function useStudentDashboard() {
       }
 
       // Sort activities descending by timestamp
-      combinedActivities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+      combinedActivities.sort(
+        (a, b) => b.timestamp.getTime() - a.timestamp.getTime(),
+      );
 
       // If no activities yet, provide a welcoming activity
       if (combinedActivities.length === 0) {
@@ -224,8 +243,18 @@ export function useStudentDashboard() {
       }
 
       setActivities(combinedActivities.slice(0, 5));
+
+      if (
+        trendsRes.status === "fulfilled" &&
+        Array.isArray(trendsRes.value) &&
+        trendsRes.value.length > 0
+      ) {
+        setTrendData(trendsRes.value);
+      }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Gagal memuat data dashboard.");
+      setError(
+        err instanceof Error ? err.message : "Gagal memuat data dashboard.",
+      );
     } finally {
       setLoading(false);
     }
@@ -259,5 +288,6 @@ export function useStudentDashboard() {
     totalApplications,
     schedules,
     activities,
+    trendData,
   };
 }

@@ -16,6 +16,7 @@ export function StudentDashboard() {
     totalVacancies,
     schedules,
     isAlumni,
+    trendData,
   } = useStudentDashboard();
 
   return (
@@ -58,7 +59,10 @@ export function StudentDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 xl:gap-4 flex-1 min-h-0">
         {/* Left: 6-Month Vacancy & Application Trend Chart */}
         <div className="lg:col-span-8 flex flex-col h-full min-h-0">
-          <DashboardChart isLoading={loading} />
+          <DashboardChart
+            data={trendData.length > 0 ? trendData : undefined}
+            isLoading={loading}
+          />
         </div>
 
         {/* Right: Upcoming Recruitment Schedule */}
