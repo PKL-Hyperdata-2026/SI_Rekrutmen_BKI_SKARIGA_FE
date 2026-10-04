@@ -11,6 +11,7 @@ import { SeleksiPage } from "./seleksi/seleksi-page";
 import { ValidasiPresensiPage } from "./validasi-presensi/validasi-presensi-page";
 import { TracerPage } from "./tracer-study/tracer-study-page";
 import { LaporanPage } from "./laporan/laporan-page";
+import { AccessMenusPage } from "./access-menus/access-menus-page";
 
 export const adminRoute = [
   {
@@ -68,5 +69,9 @@ export const adminRoute = [
   {
     path: "laporan",
     element: <LaporanPage />,
+  },
+  {
+    path: "access-menus",
+    element: <AccessMenusPage />,
   },
 ];
