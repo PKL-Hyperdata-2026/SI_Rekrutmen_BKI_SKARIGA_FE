@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import type { HrdDashboardSummaryBerkas } from "./dashboard.api";
 
 export interface BerkasFeatureItem {
   id: string;
@@ -6,28 +7,30 @@ export interface BerkasFeatureItem {
   description: string;
 }
 
-export function useDashboardBerkas() {
-  const features: BerkasFeatureItem[] = useMemo(
-    () => [
+export function useDashboardBerkas(summary?: HrdDashboardSummaryBerkas) {
+  const features: BerkasFeatureItem[] = useMemo(() => {
+    const withPortfolio = summary?.with_portfolio ?? 0;
+    const withoutPortfolio = summary?.without_portfolio ?? 0;
+    const total = summary?.total_applicants ?? 0;
+
+    return [
       {
-        id: "email_auto",
-        title: "Email Lowongan Auto",
-        description: "Notifikasi otomatis terkirim ke email pelamar",
+        id: "with_portfolio",
+        title: `${withPortfolio} Pelamar Siap Review`,
+        description: "Pelamar dengan CV & berkas portofolio terunggah",
       },
       {
-        id: "sync_gps",
-        title: "Sync Kehadiran GPS",
-        description: "Hasil absensi peserta terintregasi dari BKK",
+        id: "without_portfolio",
+        title: `${withoutPortfolio} Belum Lengkap Berkas`,
+        description: "Pelamar belum melampirkan portofolio kejuruan",
       },
       {
-        id: "monitoring_penempatan",
-        title: "Monitoring Penempatan",
-        description: "Siswa diterima otomatis dikirimkan ke Tracer Study",
+        id: "total_applicants",
+        title: `${total} Total Berkas Terdaftar`,
+        description: "Seluruh berkas lamaran aktif di perusahaan Anda",
       },
-    ],
-    [],
-  );
+    ];
+  }, [summary]);
 
   return { features };
 }
-

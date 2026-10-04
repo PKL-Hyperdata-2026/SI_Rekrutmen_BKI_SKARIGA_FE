@@ -2,19 +2,32 @@ import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { FileText, ArrowRight } from "lucide-react";
 import { SectionCard, Box, Paragraph, Span } from "@/components/custom";
-import { DataTable, type DataTableColumn } from "@/components/custom/data-table";
+import {
+  DataTable,
+  type DataTableColumn,
+} from "@/components/custom/data-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useDashboardPelamar, type PelamarDashboardItem } from "./dashboard.pelamar";
+import {
+  useDashboardPelamar,
+  type PelamarDashboardItem,
+} from "./dashboard.pelamar";
+import type { HrdDashboardApplicant } from "./dashboard.api";
 
 export interface DashboardPelamarProps {
   className?: string;
+  applicantsList?: HrdDashboardApplicant[];
+  isLoading?: boolean;
 }
 
-export function DashboardPelamar({ className }: DashboardPelamarProps) {
+export function DashboardPelamar({
+  className,
+  applicantsList,
+  isLoading,
+}: DashboardPelamarProps) {
   const navigate = useNavigate();
-  const { applicants } = useDashboardPelamar();
+  const { applicants } = useDashboardPelamar(applicantsList);
 
   const columns: DataTableColumn<PelamarDashboardItem>[] = useMemo(
     () => [
@@ -97,12 +110,13 @@ export function DashboardPelamar({ className }: DashboardPelamarProps) {
       headerClassName="mb-2 sm:mb-2.5"
       title={
         <Span className="text-xs sm:text-sm font-bold text-[#3D0040]">
-          Pelamar terbaru Menunggu Review ( Kandidat Masuk)
+          Pelamar terbaru Menunggu Review (Kandidat Masuk)
         </Span>
       }
       subtitle={
         <Paragraph className="text-[10px] sm:text-[11px] text-muted-foreground mt-0.5">
-          Penyaluran data tersinkronisasi langsung dari akun Siswa/Alumni dan Modul Penempatan
+          Penyaluran data tersinkronisasi langsung dari akun Siswa/Alumni dan
+          Modul Penempatan
         </Paragraph>
       }
       action={
@@ -123,11 +137,9 @@ export function DashboardPelamar({ className }: DashboardPelamarProps) {
       <DataTable
         columns={columns}
         data={applicants}
-        showNumbering={true}
-        role="hrd"
-        className="border border-slate-100 rounded-lg text-xs"
+        loading={isLoading}
+        emptyMessage="Belum ada pelamar yang perlu direview."
       />
     </SectionCard>
   );
 }
-

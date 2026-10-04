@@ -1,5 +1,9 @@
 import { useMemo } from "react";
-import type { MetricCardColor, MetricCardCustomColor } from "@/components/custom";
+import type {
+  MetricCardColor,
+  MetricCardCustomColor,
+} from "@/components/custom";
+import type { HrdDashboardMetrics } from "./dashboard.api";
 
 export interface DashboardMetricItem {
   key: string;
@@ -15,14 +19,21 @@ export interface DashboardMetricItem {
   iconClassName?: string;
 }
 
-export function useDashboardMetricCards() {
-  const cards: DashboardMetricItem[] = useMemo(
-    () => [
+export function useDashboardMetricCards(metrics?: HrdDashboardMetrics) {
+  const cards: DashboardMetricItem[] = useMemo(() => {
+    const activeVacancies = metrics?.active_vacancies ?? 0;
+    const totalQuota = metrics?.total_quota ?? 0;
+    const totalApplicants = metrics?.total_applicants ?? 0;
+    const pendingReviews = metrics?.pending_reviews ?? 0;
+    const upcomingSchedules = metrics?.upcoming_schedules ?? 0;
+    const acceptedCandidates = metrics?.accepted_candidates ?? 0;
+
+    return [
       {
         key: "lowongan_aktif",
         category: "LOWONGAN AKTIF",
-        title: "kuota : 45 Orang",
-        value: "3 Posisi",
+        title: `kuota : ${totalQuota} Orang`,
+        value: `${activeVacancies} Posisi`,
         color: "custom",
         categoryClassName: "text-[#8D1D96] font-bold",
         titleClassName: "text-foreground font-bold",
@@ -39,8 +50,8 @@ export function useDashboardMetricCards() {
       {
         key: "total_pelamar",
         category: "TOTAL PELAMAR",
-        title: "12 Perlu Review",
-        value: "128 Pelamar",
+        title: `${pendingReviews} Perlu Review`,
+        value: `${totalApplicants} Pelamar`,
         color: "custom",
         categoryClassName: "text-[#006A4E] font-bold",
         titleClassName: "text-foreground font-bold",
@@ -57,8 +68,8 @@ export function useDashboardMetricCards() {
       {
         key: "jadwal_seleksi",
         category: "JADWAL SELEKSI",
-        title: "Psikotes & Interview",
-        value: "45 Peserta",
+        title: "Agenda Mendatang",
+        value: `${upcomingSchedules} Sesi`,
         color: "custom",
         categoryClassName: "text-[#0284C7] font-bold",
         titleClassName: "text-foreground font-bold",
@@ -75,8 +86,8 @@ export function useDashboardMetricCards() {
       {
         key: "diterima_kerja",
         category: "DITERIMA KERJA",
-        title: "Sync BKK Valid",
-        value: "28 Peserta",
+        title: "Penempatan Kerja",
+        value: `${acceptedCandidates} Kandidat`,
         color: "custom",
         categoryClassName: "text-[#0369A1] font-bold",
         titleClassName: "text-foreground font-bold",
@@ -90,10 +101,8 @@ export function useDashboardMetricCards() {
             "hover:border-blue-400 hover:bg-blue-50/50 hover:shadow-sm",
         },
       },
-    ],
-    [],
-  );
+    ];
+  }, [metrics]);
 
   return { cards };
 }
-

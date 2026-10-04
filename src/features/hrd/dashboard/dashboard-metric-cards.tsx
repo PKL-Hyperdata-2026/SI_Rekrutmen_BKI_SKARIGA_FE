@@ -1,13 +1,20 @@
 import { MetricCard } from "@/components/custom";
 import { cn } from "@/lib/utils";
 import { useDashboardMetricCards } from "./dashboard.metric-cards";
+import type { HrdDashboardMetrics } from "./dashboard.api";
 
 export interface DashboardMetricCardsProps {
   className?: string;
+  metrics?: HrdDashboardMetrics;
+  isLoading?: boolean;
 }
 
-export function DashboardMetricCards({ className }: DashboardMetricCardsProps) {
-  const { cards } = useDashboardMetricCards();
+export function DashboardMetricCards({
+  className,
+  metrics,
+  isLoading,
+}: DashboardMetricCardsProps) {
+  const { cards } = useDashboardMetricCards(metrics);
 
   return (
     <MetricCard.Grid
@@ -21,7 +28,7 @@ export function DashboardMetricCards({ className }: DashboardMetricCardsProps) {
           key={card.key}
           category={card.category}
           title={card.title}
-          value={card.value}
+          value={isLoading ? "..." : card.value}
           color={card.color}
           customColor={card.customColor}
           isActive={card.isActive}
@@ -35,4 +42,3 @@ export function DashboardMetricCards({ className }: DashboardMetricCardsProps) {
     </MetricCard.Grid>
   );
 }
-

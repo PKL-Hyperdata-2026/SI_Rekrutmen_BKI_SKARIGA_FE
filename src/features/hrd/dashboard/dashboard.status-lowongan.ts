@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import type { HrdDashboardVacancy } from "./dashboard.api";
 
 export interface StatusLowonganItem {
   id: string;
@@ -9,39 +10,25 @@ export interface StatusLowonganItem {
   quota: number;
 }
 
-export function useDashboardStatusLowongan() {
-  const vacancies: StatusLowonganItem[] = useMemo(
-    () => [
-      {
-        id: "1",
-        title: "Junior Mechanic Operator",
-        departmentMajor: "Teknik Mesin/Otomotif",
-        deadline: "28 Feb 2026",
-        applicantCount: 85,
-        quota: 25,
-      },
-      {
-        id: "2",
-        title: "Maintenance Technician Staff",
-        departmentMajor: "Teknik Mesin/Kelistrikan",
-        deadline: "28 Feb 2026",
-        applicantCount: 43,
-        quota: 20,
-      },
-      {
-        id: "3",
-        title: "Quality Control Inspector",
-        departmentMajor: "Teknik Pengelasan",
-        deadline: "05 Mar 2026",
-        applicantCount: 62,
-        quota: 15,
-      },
-    ],
-    [],
-  );
+export function useDashboardStatusLowongan(
+  vacanciesList?: HrdDashboardVacancy[],
+) {
+  const vacancies: StatusLowonganItem[] = useMemo(() => {
+    if (!vacanciesList) {
+      return [];
+    }
+
+    return vacanciesList.map((item) => ({
+      id: item.id,
+      title: item.title,
+      departmentMajor: item.department_major,
+      deadline: item.deadline,
+      applicantCount: item.applicant_count,
+      quota: item.quota,
+    }));
+  }, [vacanciesList]);
 
   return {
     vacancies,
   };
 }
-
